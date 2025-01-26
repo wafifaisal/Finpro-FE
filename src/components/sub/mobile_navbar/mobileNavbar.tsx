@@ -13,7 +13,7 @@ const MobileNavbar = () => {
     <div className="md:hidden">
       <Searchbar />
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto ">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Menu</h2>
@@ -56,7 +56,7 @@ const MobileNavbar = () => {
                   >
                     <Icon size={20} />
                     <span className="text-xs mt-1">{label}</span>
-                  </button>{" "}
+                  </button>
                 </Link>
               ) : (
                 <button
@@ -74,8 +74,8 @@ const MobileNavbar = () => {
             </div>
           ))}
           <Image
-            src="/airbnb-logo.svg"
-            alt="Airbnb Logo"
+            src="/nginepin-logo.png"
+            alt="Nginepin Logo"
             width={80}
             height={24}
             className=" w-auto"

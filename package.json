@@ -9,10 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.12.1",
+    "axios": "^1.7.9",
     "lucide-react": "^0.473.0",
     "next": "14.2.16",
+    "next-auth": "^4.24.11",
+    "oauth-popup": "^0.1.5",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-toastify": "^11.0.3",
+    "swiper": "^11.2.1"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -22,7 +22,7 @@ const MobileSearchBar = () => {
 
   return (
     <div className="md:hidden">
-      <div className="fixed top-0 left-0 right-0 z-40 p-4">
+      <div className="fixed top-0 left-0 right-0 z-50 p-4 ">
         <button
           onClick={() => setIsExpanded(true)}
           className="w-full bg-white shadow-lg border border-gray-200 rounded-full py-3 px-4 flex items-center justify-center"

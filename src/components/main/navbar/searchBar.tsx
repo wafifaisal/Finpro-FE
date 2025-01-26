@@ -10,7 +10,7 @@ export default function Searchbar() {
     where: "",
     checkIn: "",
     checkOut: "",
-    who: "1 guest",
+    who: "",
   });
 
   const isSearchDisabled = Object.values(searchValues).some(
@@ -39,8 +39,8 @@ export default function Searchbar() {
       <div
         className={`hidden md:block border rounded-full max-w-4xl max-[955px]:max-w-[700px] md:mx-auto my-4 ${
           isScrolled
-            ? "fixed top-10 left-1/4 transform right-1/4 -translate-y-1/2 duration-1000 bg-white z-50 md:shadow-md"
-            : "relative transform duration-500 md:shadow-xl top-72"
+            ? "fixed top-10 left-1/4 transform right-1/4 -translate-y-1/2 duration-500 bg-white z-40 md:shadow-md"
+            : "relative transform duration-500 md:shadow-xl top-[370px] bg-white z-40"
         }`}
       >
         <div className="flex items-center justify-between space-x-2 px-4 py-3">
