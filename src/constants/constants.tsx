@@ -15,26 +15,26 @@ export const SearchFields: {
   icon: JSX.Element;
 }[] = [
   {
-    label: "Where",
-    placeholder: "Search destinations",
+    label: "Dimana",
+    placeholder: "Cari Destinasi",
     key: "where",
     icon: <MapPin size={16} className="text-gray-500" />,
   },
   {
     label: "Check-in",
-    placeholder: "Add dates",
+    placeholder: "Atur Tanggal",
     key: "checkIn",
     icon: <Calendar size={16} className="text-gray-500" />,
   },
   {
     label: "Check-out",
-    placeholder: "Add dates",
+    placeholder: "Atur Tanggal",
     key: "checkOut",
     icon: <Calendar size={16} className="text-gray-500" />,
   },
   {
-    label: "Who",
-    placeholder: "1 guest",
+    label: "Atur tamu",
+    placeholder: "1 Tamu",
     key: "who",
     icon: <Users size={16} className="text-gray-500" />,
   },
