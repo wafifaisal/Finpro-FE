@@ -29,7 +29,7 @@ const MobileSearchBar = () => {
         >
           <div className="flex items-center space-x-3">
             <Search size={20} className="text-gray-600" />
-            <span className="text-gray-600">Where to?</span>
+            <span className="text-gray-600">Mau Kemana Hari Ini?</span>
           </div>
         </button>
       </div>
@@ -41,7 +41,7 @@ const MobileSearchBar = () => {
               <button onClick={() => setIsExpanded(false)}>
                 <X size={24} />
               </button>
-              <h2 className="text-xl font-bold">Search</h2>
+              <h2 className="text-xl font-bold">Pencarian</h2>
               <span></span>
             </div>
 
@@ -90,7 +90,7 @@ const MobileSearchBar = () => {
                 }`}
               >
                 <Search size={20} />
-                <span>Search</span>
+                <span>Cari</span>
               </button>
             </div>
           </div>

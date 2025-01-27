@@ -6,13 +6,14 @@ import { useRouter } from "next/navigation"; // Import useRouter
 
 const SocialLogin = () => {
   const router = useRouter(); // Initialize useRouter
+  const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
   const handleGoogleLogin = async (credentialResponse: any) => {
     try {
       const tokenId = credentialResponse.credential; // Extract tokenId from the response
 
       // Send tokenId to the backend using fetch
-      const res = await fetch("http://localhost:8000/api/auth/social-login", {
+      const res = await fetch(`${base_url_be}/auth/social-login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

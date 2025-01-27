@@ -3,9 +3,25 @@
 import React, { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import MobileSearchBar from "@/components/sub/mobile_navbar/mobileSearchBar";
-import { SearchFields, SearchValues } from "@/constants/constants";
+import { SearchFields } from "@/constants/constants";
+import { usePathname, useRouter } from "next/navigation";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+// Define interfaces for search values and API responses
+interface SearchValues {
+  where: string;
+  checkIn: string;
+  checkOut: string;
+  who: string;
+}
+
+interface RoomPriceResponse {
+  price: number;
+}
 
 export default function Searchbar() {
+  const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
   const [searchValues, setSearchValues] = useState<SearchValues>({
     where: "",
     checkIn: "",
@@ -13,26 +29,102 @@ export default function Searchbar() {
     who: "",
   });
 
+  const [roomPrice, setRoomPrice] = useState<number | null>(null);
   const isSearchDisabled = Object.values(searchValues).some(
     (value) => value.trim() === ""
   );
 
-  const handleSearch = () => {
-    console.log("Search initiated with values:", searchValues);
+  const router = useRouter();
+
+  const handleSearch = async () => {
+    const params = new URLSearchParams();
+
+    if (searchValues.where) {
+      params.append("name", searchValues.where);
+    }
+
+    if (searchValues.checkIn) {
+      params.append("checkIn", searchValues.checkIn);
+    }
+
+    if (searchValues.checkOut) {
+      params.append("checkOut", searchValues.checkOut);
+    }
+
+    if (searchValues.who) {
+      params.append("who", searchValues.who);
+    }
+
+    try {
+      const response = await fetch(
+        `${base_url_be}/property?${params.toString()}`
+      );
+      const data = await response.json();
+      console.log("Search results:", data);
+      router.push(`/property?${params.toString()}`);
+    } catch (error) {
+      console.error("Error during search:", error);
+    }
   };
 
+  const fetchRoomPrice = async () => {
+    if (searchValues.where && searchValues.who) {
+      const params = new URLSearchParams({
+        location: searchValues.where,
+        people: searchValues.who,
+      });
+
+      try {
+        const response = await fetch(
+          `${base_url_be}/property?${params.toString()}`
+        );
+        const data: RoomPriceResponse = await response.json();
+        setRoomPrice(data.price); // Assume the response contains a "price" field
+      } catch (error) {
+        console.error("Error fetching room price:", error);
+        setRoomPrice(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Fetch room price when location or number of people changes
+    fetchRoomPrice();
+  }, [searchValues.where, searchValues.who]);
+
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 0);
     };
+
+    if (window.scrollY > 0) {
+      setIsScrolled(true);
+    }
 
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      setIsScrolled(true);
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <>
@@ -46,26 +138,49 @@ export default function Searchbar() {
         <div className="flex items-center justify-between space-x-2 px-4 py-3">
           {SearchFields.map((field, index) => (
             <div key={index} className="flex-grow flex flex-col relative">
-              <label className="text-xs text-gray-600 ">{field.label}</label>
+              <label className="text-xs text-gray-600">{field.label}</label>
               <div className="flex items-center space-x-2">
                 {field.icon}
-                <input
-                  type="text"
-                  placeholder={field.placeholder}
-                  value={searchValues[field.key]}
-                  onChange={(e) =>
-                    setSearchValues((prev) => ({
-                      ...prev,
-                      [field.key]: e.target.value,
-                    }))
-                  }
-                  className="outline-none text-sm w-full truncate"
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                />
+                {field.key === "checkIn" || field.key === "checkOut" ? (
+                  <DatePicker
+                    selected={
+                      field.key === "checkIn"
+                        ? searchValues.checkIn
+                          ? new Date(searchValues.checkIn)
+                          : null
+                        : searchValues.checkOut
+                        ? new Date(searchValues.checkOut)
+                        : null
+                    }
+                    onChange={(date: Date | null) => {
+                      setSearchValues((prev) => ({
+                        ...prev,
+                        [field.key]: date ? date.toISOString() : "",
+                      }));
+                    }}
+                    dateFormat="yyyy/MM/dd"
+                    placeholderText={field.placeholder}
+                    className="outline-none text-sm w-full truncate"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    placeholder={field.placeholder}
+                    value={searchValues[field.key]}
+                    onChange={(e) =>
+                      setSearchValues((prev) => ({
+                        ...prev,
+                        [field.key]: e.target.value,
+                      }))
+                    }
+                    className="outline-none text-sm w-full truncate"
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  />
+                )}
               </div>
             </div>
           ))}
@@ -79,6 +194,11 @@ export default function Searchbar() {
             <Search size={16} />
           </button>
         </div>
+        {roomPrice !== null && (
+          <div className="mt-2 text-sm text-gray-600">
+            <p>Estimated Room Price: ${roomPrice}</p>
+          </div>
+        )}
       </div>
       <MobileSearchBar />
     </>

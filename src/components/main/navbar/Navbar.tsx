@@ -5,21 +5,33 @@ import { Menu, User } from "lucide-react";
 import Image from "next/image";
 import MobileNavbar from "@/components/sub/mobile_navbar/mobileNavbar";
 import Searchbar from "./searchBar";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const pathname = usePathname();
+
   useEffect(() => {
+    if (pathname !== "/") {
+      setIsScrolled(true);
+      return;
+    }
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 0);
     };
+
+    if (window.scrollY > 0) {
+      setIsScrolled(true);
+    }
 
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <div className="fixed w-full z-50">
@@ -50,25 +62,25 @@ const Navbar = () => {
               <User size={16} className="text-gray-500" />
             </button>
             {isMenuOpen && (
-              <div className="absolute right-11 top-16 w-64 bg-white border rounded-xl shadow-lg py-2 text-black z-50">
+              <div className="absolute right-11 top-20 w-64 bg-white border rounded-xl shadow-lg py-2 text-black z-50">
                 <Link
                   href="/auth/user/register"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
-                  Registrasi
+                  Buat Akun
                 </Link>
                 <Link
                   href="/login"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
-                  Log in
+                  Masuk
                 </Link>
                 <div className="border-t my-2"></div>
                 <Link
                   href="/host"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
-                  Sewakan Property Anda
+                  Daftarkan Property Anda
                 </Link>
                 <Link
                   href="/help"
