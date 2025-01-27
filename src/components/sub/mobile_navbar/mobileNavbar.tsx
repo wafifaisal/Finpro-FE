@@ -13,7 +13,7 @@ const MobileNavbar = () => {
     <div className="md:hidden">
       <Searchbar />
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-white z-50 overflow-y-auto ">
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Menu</h2>
@@ -22,17 +22,17 @@ const MobileNavbar = () => {
               </button>
             </div>
             <div className="space-y-4">
-              <Link href="/signup" className="block py-3 border-b text-lg">
-                Sign up
-              </Link>
-              <Link href="/login" className="block py-3 border-b text-lg">
-                Log in
+              <Link
+                href="/auth/user/register"
+                className="block py-3 border-b text-lg"
+              >
+                Buat Akun
               </Link>
               <Link href="/host" className="block py-3 border-b text-lg">
-                Host your home
+                Daftarkan Property Anda
               </Link>
               <Link href="/help" className="block py-3 text-lg">
-                Help
+                Bantuan
               </Link>
             </div>
           </div>
@@ -42,8 +42,8 @@ const MobileNavbar = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
         <div className="flex justify-around py-3">
           {[
-            { icon: Search, label: "Explore", tab: "explore" },
-            { icon: User, label: "Login", tab: "login", slug: "/login" },
+            { icon: Search, label: "Explore", tab: "explore", slug: "/" },
+            { icon: User, label: "Masuk", tab: "login", slug: "/login" },
           ].map(({ icon: Icon, label, tab, slug }) => (
             <div key={tab} className="flex flex-col items-center">
               {slug ? (
@@ -78,11 +78,13 @@ const MobileNavbar = () => {
             alt="Nginepin Logo"
             width={80}
             height={24}
-            className=" w-auto"
+            className="w-auto cursor-pointer"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           />
         </div>
       </div>
     </div>
   );
 };
+
 export default MobileNavbar;

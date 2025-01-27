@@ -16,7 +16,9 @@
     "next-auth": "^4.24.11",
     "oauth-popup": "^0.1.5",
     "react": "^18",
+    "react-datepicker": "^7.6.0",
     "react-dom": "^18",
+    "react-icons": "^5.4.0",
     "react-toastify": "^11.0.3",
     "swiper": "^11.2.1"
   },

@@ -69,6 +69,7 @@ body {
   height: 1rem; 
   border-radius: 50%;
   position: relative;
+  z-index: 50;
   animation: pulse 1s infinite; 
 }
 
@@ -93,10 +94,11 @@ body {
     transform: translateX(100%);
   }
   100% {
-    transform: translateX(-100%);
+    transform: translateX(-105%);
   }
 }
 
 .animate-marquee {
   animation: marquee 20s linear infinite;
 }
+

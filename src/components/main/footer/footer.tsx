@@ -1,0 +1,162 @@
+"use client";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaXTwitter,
+  FaYoutube,
+} from "react-icons/fa6";
+import { GoGlobe } from "react-icons/go";
+import Link from "next/link";
+
+type Property = {
+  id: number;
+  name: string;
+  category: string;
+  PropertyImages?: { image_url: string }[];
+  location: { address: string; city: string; country: string };
+};
+const Footer = () => {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
+
+  useEffect(() => {
+    fetch(`${base_url_be}/property`)
+      .then((response) => response.json())
+      .then((data) => {
+        setProperties(data.result);
+      })
+      .catch((error) => {
+        console.error("Error fetching properties:", error);
+      });
+  }, []);
+
+  const footerLinks = {
+    Dukungan: [
+      "Pusat Bantuan",
+      "Opsi Pembatalan",
+      "Laporkan masalah lingkungan",
+    ],
+    Hosting: ["Nginepin rumah Anda", "Hosting dengan bertanggung jawab"],
+    Nginepin: ["Berita", "Fitur baru", "Karir", "Investor"],
+  };
+
+  const inspirationLinks = {
+    Populer: ["Bandung", "Bali", "Jakarta", "Surabaya", "Yogyakarta"],
+    Kategori: [
+      "Kolam renang menakjubkan",
+      "Arktik",
+      "Camping",
+      "Pantai",
+      "Rumah mungil",
+    ],
+    "Jenis properti": [
+      "Guest house",
+      "Hotel",
+      "Apartemen",
+      "Vila",
+      "Rumah liburan",
+    ],
+  };
+
+  return (
+    <footer className="border-t border-gray-200 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="mb-12 pb-5 border-b border-gray-200">
+          <Image
+            src="/nginepin-logo.png"
+            alt="Logo Nginepin"
+            width={400}
+            height={400}
+            className="h-20 w-auto"
+          />
+        </div>
+
+        <div className="mb-12 pb-12 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">
+            Inspirasi untuk liburan mendatang
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {properties.slice(0, 3).map((property) => (
+              <Link
+                href="/"
+                className="text-gray-600 hover:text-gray-900 text-sm"
+              >
+                <div key={property.id}>
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    {property.name}
+                  </h3>
+                  <ul className="space-y-3">
+                    <li className="">
+                      {property.location.city}, {property.location.country}
+                    </li>
+                  </ul>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Konten utama footer */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {Object.entries(footerLinks).map(([category, links]) => (
+            <div key={category}>
+              <h3 className="font-semibold text-gray-900 mb-4">{category}</h3>
+              <ul className="space-y-3">
+                {links.map((link) => (
+                  <li key={link}>
+                    <Link
+                      href="#"
+                      className="text-gray-600 hover:text-gray-900 text-sm"
+                    >
+                      {link}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer bawah */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            {/* Hak cipta dan link */}
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
+              <span className="text-sm text-gray-600">
+                © 2025 Nginepin, Inc.
+              </span>
+              <div className="flex space-x-6 text-sm text-gray-600">
+                <Link href="#" className="hover:text-gray-900">
+                  Privasi
+                </Link>
+                <Link href="#" className="hover:text-gray-900">
+                  Syarat dan Ketentuan
+                </Link>
+                <Link href="#" className="hover:text-gray-900">
+                  Peta situs
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2 text-gray-700">
+                <GoGlobe className="w-5 h-5" />
+                <span className="text-sm">Indonesia (ID)</span>
+              </div>
+              <div className="flex space-x-4">
+                <FaFacebook className="w-5 h-5 text-gray-700 hover:text-gray-900 cursor-pointer" />
+                <FaXTwitter className="w-5 h-5 text-gray-700 hover:text-gray-900 cursor-pointer" />
+                <FaInstagram className="w-5 h-5 text-gray-700 hover:text-gray-900 cursor-pointer" />
+                <FaYoutube className="w-5 h-5 text-gray-700 hover:text-gray-900 cursor-pointer" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
