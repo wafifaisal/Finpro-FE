@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,6 +8,7 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+
 
 
 body {
@@ -100,5 +103,148 @@ body {
 
 .animate-marquee {
   animation: marquee 20s linear infinite;
+}
+
+@keyframes stroke {
+  0% {
+    fill: rgba(72, 138, 20, 0);
+    stroke: rgb(255, 111, 1);
+    stroke-dashoffset: 25%;
+    stroke-dasharray: 0 50%;
+    stroke-width: 2;
+  }
+  70% {
+    fill: rgba(72, 138, 20, 0);
+    stroke: rgb(255, 111, 1);
+  }
+  80% {
+    fill: rgba(72, 138, 20, 0);
+    stroke: rgb(255, 111, 1);
+    stroke-width: 3;
+  }
+  100% {
+    fill: rgb(255, 52, 2);
+    stroke: rgba(54, 95, 160, 0);
+    stroke-dashoffset: 100%;
+    stroke-dasharray: 100% 0;
+    stroke-width: 0;
+  }
+}
+
+.animate-stroke {
+  animation: stroke 5s infinite alternate;
+}
+
+.font-pacifico {
+  font-family: 'Pacifico', cursive;
+}
+
+/* Gaya umum untuk kalender */
+.custom-calendar {
+  background-color: #fff;
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 100;
+}
+
+/* Tombol navigasi bulan */
+.custom-calendar .react-datepicker__navigation {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 18px;
+  padding: 8px;
+  transition: color 0.3s ease;
+}
+
+
+.custom-calendar .react-datepicker__navigation:hover {
+  color: #f53b3b; /* Warna merah terang untuk interaksi */
+}
+
+/* Menandakan tanggal yang dipilih */
+.custom-calendar .react-datepicker__day--selected {
+  background-color: #f53b3b; /* Warna latar belakang merah terang */
+  color: #fff;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.custom-calendar .react-datepicker__day--today {
+  background-color: #0d9488; 
+  color: white;
+  border-radius: 50%;
+}
+
+/* Hover efek pada tanggal */
+.custom-calendar .react-datepicker__day:hover {
+  color: white;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Membuat header kalender lebih menarik */
+.custom-calendar .react-datepicker__header {
+  background-color: #E82561; /* Latar belakang header kalender */
+  border-bottom: 2px solid #e0e7ff;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  position: relative;
+}
+
+/* Gaya untuk bulan dan tahun */
+.custom-calendar .react-datepicker__current-month {
+  font-weight: bold;
+  font-size: 18px;
+  color: #333;
+}
+
+/* Menyembunyikan beberapa elemen yang tidak diinginkan */
+.react-datepicker__year-dropdown, .react-datepicker__month-dropdown {
+  display: none;
+}
+
+/* Menambahkan ruang kosong pada hari libur dan tanggal yang tidak aktif */
+.custom-calendar .react-datepicker__day--disabled {
+  color: #d1d5db; /* Warna abu-abu untuk hari yang tidak aktif */
+  background-color: transparent;
+  cursor: not-allowed;
+}
+
+.custom-calendar .react-datepicker__day--in-range {
+  background-color: #E82561; /* Biru muda untuk rentang tanggal */
+  color: white;
+  border-radius: 50%;
+}
+
+.custom-calendar .react-datepicker__day--in-range:hover {
+  background-color: #b7e0e0; /* Efek hover lebih gelap untuk rentang tanggal */
+}
+
+/* Gaya untuk nama hari dan bulan */
+.custom-calendar .react-datepicker__day-name,
+.custom-calendar .react-datepicker__current-month {
+  color: white; /* Warna putih untuk nama hari dan bulan */
+}
+
+/* Hover efek pada tanggal */
+.custom-calendar .react-datepicker__day:hover {
+  color: #f53b3b; /* Warna merah terang saat hover */
+  background-color: #f0f0f0; /* Latar belakang terang saat hover */
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+/* Hover efek pada rentang tanggal */
+.custom-calendar .react-datepicker__day--in-range:hover {
+  background-color: #f53b3b; /* Warna latar belakang merah terang saat hover */
+  color: white; /* Warna teks putih saat hover */
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 

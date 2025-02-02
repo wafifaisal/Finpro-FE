@@ -74,6 +74,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ slides }) => {
               alt={`Slide ${index + 1}`}
               width={800}
               height={600}
+              priority
               className={`w-full max-w-[600px] sm:max-w-[400px] md:max-w-[500px] h-auto object-contain rounded-3xl transition-opacity duration-700 ${
                 activeIndex === index ? "opacity-100" : "opacity-0"
               }`}
@@ -103,7 +104,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ slides }) => {
         </div>
       )}
       {hoveredCard && (
-        <div className="absolute top-1/2 -translate-y-1/2 flex w-full justify-between px-4 z-20">
+        <div className="absolute top-1/2 -translate-y-1/2 flex w-full justify-between px-4 z-50">
           <button
             onClick={() => swiperInstance?.slidePrev()}
             className="bg-white/30 hover:bg-white/50 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm transition-all duration-300 group"

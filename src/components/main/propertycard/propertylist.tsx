@@ -6,7 +6,7 @@ import { Pagination, Navigation, Keyboard } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import { ChevronLeft, ChevronRight, LocateIcon, PinIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { FaLocationDot, FaStar } from "react-icons/fa6";
 import { formatCurrency } from "@/helpers/formatCurrency";
@@ -38,12 +38,12 @@ export default function PropertyList() {
         console.error("Error fetching properties:", error);
         setLoading(false);
       });
-  }, []);
+  }, [base_url_be]);
 
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8">
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-gray-800 text-center ">
-        Explore Properties
+        Coba suasana yang beda, cek rumah liburan di Nginepin!
       </h1>
       <div className="grid grid-cols-1 max-[400px]:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-[955px]:grid-cols-2">
         {loading
@@ -125,7 +125,7 @@ export default function PropertyList() {
                     </Swiper>
                   ) : (
                     <Image
-                      src="/placeholder.jpg"
+                      src="/nginepin-logo.png"
                       alt={property.name}
                       layout="fill"
                       objectFit="contain"
@@ -166,7 +166,7 @@ export default function PropertyList() {
                   </div>
                   <Link href={"/"}>
                     <div className="mt-2 flex flex-wrap items-center justify-center">
-                      <button className=" border text-white duration-300 relative group cursor-pointer overflow-hidden h-10 w-36 rounded-md bg-red-500 p-2 font-extrabold hover:bg-sky-700">
+                      <button className=" border text-white hover:text-black duration-300 relative group cursor-pointer overflow-hidden h-10 w-44 rounded-md bg-red-500 p-2 font-extrabold hover:bg-sky-700">
                         <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-16 h-16 rounded-full group-hover:scale-150  duration-700 right-12 top-12  bg-[#EB5A3C]"></div>
                         <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-12 h-12 rounded-full group-hover:scale-150  duration-700 right-20 -top-6 bg-[#DF9755]"></div>
                         <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-8 h-8   rounded-full group-hover:scale-150  duration-700 right-32 top-6  bg-[#E7D283]"></div>

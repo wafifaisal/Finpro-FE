@@ -1,4 +1,3 @@
-// pages/index.tsx
 import HeroSection from "@/components/main/hero/heroSection";
 import PropertyList from "@/components/main/propertycard/propertylist";
 import Image from "next/image";
@@ -33,9 +32,9 @@ const HomePage = () => {
   ];
 
   return (
-    <div className=" pt-8 md:pt-0">
+    <div className="">
       <HeroSection slides={slides} />
-      <div className="pt-36">
+      <div className="pt-48">
         <PropertyList />
       </div>
     </div>

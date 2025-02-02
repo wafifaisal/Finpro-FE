@@ -6,14 +6,24 @@ import Image from "next/image";
 import MobileNavbar from "@/components/sub/mobile_navbar/mobileNavbar";
 import Searchbar from "./searchBar";
 import { usePathname } from "next/navigation";
+import { useSession } from "@/context/useSessionHook";
+import Avatar from "./avatar";
 
 const Navbar = () => {
+  const { isAuth } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const pathname = usePathname();
 
   useEffect(() => {
+    // Mengembalikan posisi scroll yang tersimpan setelah refresh
+    const savedScrollY = sessionStorage.getItem("scrollY");
+    if (savedScrollY) {
+      window.scrollTo(0, parseInt(savedScrollY, 10));
+      setIsScrolled(parseInt(savedScrollY, 10) > 0);
+    }
+
     if (pathname !== "/") {
       setIsScrolled(true);
       return;
@@ -21,6 +31,7 @@ const Navbar = () => {
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
+      sessionStorage.setItem("scrollY", window.scrollY.toString());
     };
 
     if (window.scrollY > 0) {
@@ -34,7 +45,7 @@ const Navbar = () => {
   }, [pathname]);
 
   return (
-    <div className="fixed w-full z-50">
+    <div className="fixed w-full z-40">
       <div
         className={`hidden md:block py-4 ${
           isScrolled
@@ -43,24 +54,30 @@ const Navbar = () => {
         }`}
       >
         <div className="container mx-auto px-4 py-1 flex justify-between items-center">
-          <div className="flex items-center mx-8">
-            <Image
-              src="/nginepin-logo.png"
-              alt="Nginepin Logo"
-              width={400}
-              height={400}
-              className="h-14 w-auto"
-            />
-          </div>
+          <Link href={"/"}>
+            <div className="flex items-center mx-4">
+              <Image
+                src="/nginepin-logo.png"
+                alt="Nginepin Logo"
+                width={400}
+                height={400}
+                className="h-14 w-auto"
+              />
+            </div>
+          </Link>
 
           <div className="flex items-center ">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center border border-gray-200 px-3 mx-8 py-3 rounded-full hover:shadow-md transition-all bg-white"
-            >
-              <Menu size={16} className="mr-2 text-gray-500" />
-              <User size={16} className="text-gray-500" />
-            </button>
+            {isAuth ? (
+              <Avatar />
+            ) : (
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="flex items-center border border-gray-200 px-3 mx-8 py-3 rounded-full hover:shadow-md transition-all bg-white"
+              >
+                <Menu size={16} className="mr-2 text-gray-500" />
+                <User size={16} className="text-gray-500" />
+              </button>
+            )}
             {isMenuOpen && (
               <div className="absolute right-11 top-20 w-64 bg-white border rounded-xl shadow-lg py-2 text-black z-50">
                 <Link
@@ -70,7 +87,7 @@ const Navbar = () => {
                   Buat Akun
                 </Link>
                 <Link
-                  href="/login"
+                  href="/auth/user/login"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
                   Masuk
@@ -92,7 +109,9 @@ const Navbar = () => {
             )}
           </div>
         </div>
-        <Searchbar />
+        {!(
+          pathname === "/auth/user/login" || pathname === "/auth/user/register"
+        ) && <Searchbar />}
       </div>
       <MobileNavbar />
     </div>
