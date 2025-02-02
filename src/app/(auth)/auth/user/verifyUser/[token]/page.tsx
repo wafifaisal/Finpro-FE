@@ -15,7 +15,7 @@ export default function VerifyPage({
     username: "",
     password: "",
     confirmPassword: "",
-    no_telp: "",
+    no_handphone: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
@@ -28,7 +28,7 @@ export default function VerifyPage({
   };
 
   const onVerify = async () => {
-    if (isSubmitting) return; // Prevent duplicate calls
+    if (isSubmitting) return;
     setIsSubmitting(true);
 
     if (!params?.token) {
@@ -37,9 +37,9 @@ export default function VerifyPage({
       return;
     }
 
-    const { username, password, confirmPassword, no_telp } = formData;
+    const { username, password, confirmPassword, no_handphone } = formData;
 
-    if (!username || !password || !confirmPassword || !no_telp) {
+    if (!username || !password || !confirmPassword || !no_handphone) {
       toast.error("All fields are required.");
       setIsSubmitting(false);
       return;
@@ -61,7 +61,7 @@ export default function VerifyPage({
           username,
           password,
           confirmPassword,
-          no_handphone: no_telp,
+          no_handphone: no_handphone,
         }),
       });
 
@@ -73,95 +73,102 @@ export default function VerifyPage({
       const result = await res.json();
       toast.success(result.message || "Account successfully verified!");
       setTimeout(() => {
-        router.push("/login/loginuser");
+        router.push("/auth/user/login");
       }, 3000);
-    } catch (err: any) {
-      console.error("Verification Error:", err);
-      toast.error(err.message || "Verification failed! Please try again.");
-      setTimeout(() => {
-        router.push("/");
-      }, 3000);
+    } catch (error: unknown) {
+      console.error("Error fetching properties:", error);
+
+      let errorMessage = "Terjadi kesalahan";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage, {
+        position: "bottom-right",
+        autoClose: 5000,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <ToastContainer />
-      <div className="w-full max-w-md p-6 bg-white rounded shadow-md">
-        <h1 className="text-2xl font-semibold text-center text-gray-700">
-          Verify Your Account
-        </h1>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onVerify();
-          }}
-          className="mt-4"
-        >
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-indigo-200"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-indigo-200"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-indigo-200"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-600">
-              Phone Number
-            </label>
-            <input
-              type="text"
-              name="no_telp"
-              value={formData.no_telp}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-indigo-200"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-full px-3 py-2 text-white bg-indigo-500 rounded ${
-              isSubmitting ? "opacity-50" : "hover:bg-indigo-600"
-            }`}
+    <div>
+      <div className="flex items-center justify-center min-h-screen bg-white pt-20">
+        <ToastContainer />
+        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg border-2 border-red-500">
+          <h1 className="text-3xl font-semibold text-center text-red-600">
+            Verify Your Account
+          </h1>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onVerify();
+            }}
+            className="mt-4"
           >
-            {isSubmitting ? "Verifying..." : "Verify Account"}
-          </button>
-        </form>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-red-500">
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-red-500">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-red-500">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-red-500">
+                Phone Number
+              </label>
+              <input
+                type="text"
+                name="no_handphone"
+                value={formData.no_handphone}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full px-3 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-200 ${
+                isSubmitting ? "opacity-50" : ""
+              }`}
+            >
+              {isSubmitting ? "Verifying..." : "Verify Account"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

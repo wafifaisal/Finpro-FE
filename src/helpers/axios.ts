@@ -1,11 +1,6 @@
 import axios from "axios";
 
-const BASEURL = process.env.NEXT_PUBLIC_BASE_URL_BE;
-
-const axiosInstace = axios.create({
-  baseURL: BASEURL,
+export const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL_BE,
+  withCredentials: true,
 });
-
-export const isAxiosError = axios.isAxiosError;
-
-export default axiosInstace;

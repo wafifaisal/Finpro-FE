@@ -30,7 +30,7 @@ const Footer = () => {
       .catch((error) => {
         console.error("Error fetching properties:", error);
       });
-  }, []);
+  }, [base_url_be]);
 
   const footerLinks = {
     Dukungan: [
@@ -40,24 +40,6 @@ const Footer = () => {
     ],
     Hosting: ["Nginepin rumah Anda", "Hosting dengan bertanggung jawab"],
     Nginepin: ["Berita", "Fitur baru", "Karir", "Investor"],
-  };
-
-  const inspirationLinks = {
-    Populer: ["Bandung", "Bali", "Jakarta", "Surabaya", "Yogyakarta"],
-    Kategori: [
-      "Kolam renang menakjubkan",
-      "Arktik",
-      "Camping",
-      "Pantai",
-      "Rumah mungil",
-    ],
-    "Jenis properti": [
-      "Guest house",
-      "Hotel",
-      "Apartemen",
-      "Vila",
-      "Rumah liburan",
-    ],
   };
 
   return (
@@ -79,11 +61,11 @@ const Footer = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {properties.slice(0, 3).map((property) => (
-              <Link
-                href="/"
-                className="text-gray-600 hover:text-gray-900 text-sm"
-              >
-                <div key={property.id}>
+              <div key={property.id}>
+                <Link
+                  href="/"
+                  className="text-gray-600 hover:text-gray-900 text-sm"
+                >
                   <h3 className="font-semibold text-gray-900 text-sm">
                     {property.name}
                   </h3>
@@ -92,13 +74,12 @@ const Footer = () => {
                       {property.location.city}, {property.location.country}
                     </li>
                   </ul>
-                </div>
-              </Link>
+                </Link>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Konten utama footer */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
@@ -119,10 +100,8 @@ const Footer = () => {
           ))}
         </div>
 
-        {/* Footer bawah */}
         <div className="mt-12 pt-8 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            {/* Hak cipta dan link */}
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
               <span className="text-sm text-gray-600">
                 © 2025 Nginepin, Inc.

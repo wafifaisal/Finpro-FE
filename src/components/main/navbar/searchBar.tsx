@@ -1,206 +1,209 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import MobileSearchBar from "@/components/sub/mobile_navbar/mobileSearchBar";
-import { SearchFields } from "@/constants/constants";
-import { usePathname, useRouter } from "next/navigation";
+import { getIndonesianCityImage, SearchFields } from "@/constants/constants";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-// Define interfaces for search values and API responses
-interface SearchValues {
-  where: string;
-  checkIn: string;
-  checkOut: string;
-  who: string;
-}
-
-interface RoomPriceResponse {
-  price: number;
-}
+import useSearchbar from "./searchInput";
+import Categories from "./categories";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export default function Searchbar() {
-  const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
-  const [searchValues, setSearchValues] = useState<SearchValues>({
-    where: "",
-    checkIn: "",
-    checkOut: "",
-    who: "",
-  });
+  const suggestionRef = useRef<HTMLDivElement | null>(null); // suggestion list ref
+  const inputRef = useRef<HTMLInputElement | null>(null); // input field ref
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const pathname = usePathname();
+  const {
+    searchValues,
+    setSearchValues,
+    suggestions,
+    isScrolled,
+    isSearchDisabled,
+    loading,
+    handleSuggestionClick,
+    handleSearch,
+    highlightMatch,
+    text,
+    incrementWho,
+    decrementWho,
+  } = useSearchbar();
 
-  const [roomPrice, setRoomPrice] = useState<number | null>(null);
-  const isSearchDisabled = Object.values(searchValues).some(
-    (value) => value.trim() === ""
-  );
-
-  const router = useRouter();
-
-  const handleSearch = async () => {
-    const params = new URLSearchParams();
-
-    if (searchValues.where) {
-      params.append("name", searchValues.where);
-    }
-
-    if (searchValues.checkIn) {
-      params.append("checkIn", searchValues.checkIn);
-    }
-
-    if (searchValues.checkOut) {
-      params.append("checkOut", searchValues.checkOut);
-    }
-
-    if (searchValues.who) {
-      params.append("who", searchValues.who);
-    }
-
-    try {
-      const response = await fetch(
-        `${base_url_be}/property?${params.toString()}`
-      );
-      const data = await response.json();
-      console.log("Search results:", data);
-      router.push(`/property?${params.toString()}`);
-    } catch (error) {
-      console.error("Error during search:", error);
-    }
-  };
-
-  const fetchRoomPrice = async () => {
-    if (searchValues.where && searchValues.who) {
-      const params = new URLSearchParams({
-        location: searchValues.where,
-        people: searchValues.who,
-      });
-
-      try {
-        const response = await fetch(
-          `${base_url_be}/property?${params.toString()}`
-        );
-        const data: RoomPriceResponse = await response.json();
-        setRoomPrice(data.price); // Assume the response contains a "price" field
-      } catch (error) {
-        console.error("Error fetching room price:", error);
-        setRoomPrice(null);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        suggestionRef.current &&
+        !suggestionRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setIsLocationOpen(false);
       }
     }
-  };
-
-  useEffect(() => {
-    // Fetch room price when location or number of people changes
-    fetchRoomPrice();
-  }, [searchValues.where, searchValues.who]);
-
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
-    };
-
-    if (window.scrollY > 0) {
-      setIsScrolled(true);
-    }
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (pathname !== "/") {
-      setIsScrolled(true);
-    }
-  }, [pathname]);
-
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  if (loading) {
-    return null;
-  }
+  if (loading) return null;
 
   return (
     <>
       <div
-        className={`hidden md:block border rounded-full max-w-4xl max-[955px]:max-w-[700px] md:mx-auto my-4 ${
+        className={`hidden md:block border rounded-full max-w-4xl md:mx-auto my-4 ${
+          isScrolled ? "max-w-xl px-3 z-40" : "max-w-4xl py-3 px-4 z-40"
+        } ${
           isScrolled
-            ? "fixed top-10 left-1/4 transform right-1/4 -translate-y-1/2 duration-500 bg-white z-40 md:shadow-md"
-            : "relative transform duration-500 md:shadow-xl top-[370px] bg-white z-40"
+            ? "fixed top-9 left-1/4 right-1/4 -translate-y-1/2 duration-500 bg-white shadow-md"
+            : "relative top-[370px] bg-white shadow-xl duration-500"
         }`}
       >
-        <div className="flex items-center justify-between space-x-2 px-4 py-3">
+        <div className="flex items-center justify-between space-x-2 px-4 py-2">
           {SearchFields.map((field, index) => (
-            <div key={index} className="flex-grow flex flex-col relative">
-              <label className="text-xs text-gray-600">{field.label}</label>
-              <div className="flex items-center space-x-2">
+            <div key={index} className="flex-grow flex flex-col relative group">
+              <label className="text-xs font-medium text-gray-800 flex gap-2">
                 {field.icon}
-                {field.key === "checkIn" || field.key === "checkOut" ? (
+                {field.label}
+              </label>
+              <div className="flex items-center space-x-2">
+                {field.key === "dateRange" ? (
                   <DatePicker
-                    selected={
-                      field.key === "checkIn"
-                        ? searchValues.checkIn
-                          ? new Date(searchValues.checkIn)
-                          : null
-                        : searchValues.checkOut
-                        ? new Date(searchValues.checkOut)
-                        : null
-                    }
-                    onChange={(date: Date | null) => {
+                    selectsRange
+                    startDate={searchValues.checkIn}
+                    endDate={searchValues.checkOut}
+                    onChange={(update) => {
+                      const [start, end] = update;
                       setSearchValues((prev) => ({
                         ...prev,
-                        [field.key]: date ? date.toISOString() : "",
+                        checkIn: start ? new Date(start) : null,
+                        checkOut: end ? new Date(end) : null,
                       }));
                     }}
-                    dateFormat="yyyy/MM/dd"
+                    dateFormat="d MMM"
                     placeholderText={field.placeholder}
-                    className="outline-none text-sm w-full truncate"
+                    calendarClassName="custom-calendar"
+                    className="outline-none text-sm w-full truncate hover:bg-gray-50 focus:bg-gray-50 rounded-lg px-2 py-1 transition-colors"
                   />
+                ) : field.key === "where" ? (
+                  <div className="relative w-full">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center">
+                        <input
+                          ref={inputRef}
+                          type="text"
+                          placeholder={field.placeholder}
+                          value={searchValues.where}
+                          onChange={(e) => {
+                            setSearchValues((prev) => ({
+                              ...prev,
+                              where: e.target.value,
+                            }));
+                            setIsLocationOpen(true);
+                          }}
+                          className="outline-none text-sm w-full bg-transparent hover:bg-gray-50 focus:bg-gray-50"
+                          onFocus={() => setIsLocationOpen(true)}
+                        />
+                      </div>
+                    </div>
+                    {isLocationOpen && (
+                      <div
+                        ref={suggestionRef}
+                        className="absolute z-50 w-72 mt-6 -left-7 bg-white rounded-2xl shadow-lg border  border-gray-200 overflow-hidden"
+                      >
+                        <div className="p-4 border-b">
+                          <h3 className="text-sm font-semibold text-gray-900">
+                            Tujuan yang disarankan
+                          </h3>
+                        </div>
+                        <div className="max-h-60 overflow-y-auto">
+                          <div className="grid grid-cols-1 gap-2 p-4">
+                            {suggestions.map((suggestion, idx) => {
+                              const { image, country } =
+                                getIndonesianCityImage(suggestion);
+
+                              return (
+                                <div
+                                  key={idx}
+                                  className="flex items-center p-2 hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
+                                  onClick={() => {
+                                    handleSuggestionClick(suggestion);
+                                    setIsLocationOpen(false);
+                                  }}
+                                >
+                                  <div className="mr-4">
+                                    <Image
+                                      src={image}
+                                      alt={suggestion}
+                                      width={50}
+                                      height={50}
+                                      className="w-14 h-14 object-contain rounded-lg"
+                                    />
+                                  </div>
+                                  <div className="flex-grow">
+                                    <p className="text-sm font-medium text-gray-900">
+                                      {highlightMatch(suggestion, text)}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      {country}
+                                    </p>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : field.key === "who" ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={decrementWho}
+                      className="text-sm font-bold text-gray-600 hover:text-gray-800"
+                    >
+                      -
+                    </button>
+
+                    <span className="px-6 w-16 text-center font-bold text-sm bg-transparent border rounded-lg">
+                      {searchValues.who}
+                    </span>
+
+                    <button
+                      onClick={incrementWho}
+                      className="text-sm font-bold text-gray-600 hover:text-gray-800"
+                    >
+                      +
+                    </button>
+                  </div>
                 ) : (
                   <input
                     type="text"
-                    placeholder={field.placeholder}
-                    value={searchValues[field.key]}
                     onChange={(e) =>
                       setSearchValues((prev) => ({
                         ...prev,
                         [field.key]: e.target.value,
                       }))
                     }
-                    className="outline-none text-sm w-full truncate"
-                    style={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
+                    placeholder={field.placeholder}
+                    className="outline-none text-sm w-full truncate hover:bg-gray-50 focus:bg-gray-50 rounded-lg px-2 py-1 transition-colors"
                   />
                 )}
               </div>
+              <div className="absolute h-8 w-px bg-gray-200 right-0 top-1/2 -translate-y-1/2" />
             </div>
           ))}
           <button
             onClick={handleSearch}
             disabled={isSearchDisabled}
-            className={`bg-red-500 text-white p-2 rounded-full ${
-              isSearchDisabled && "bg-gray-300 text-gray-500"
-            }`}
+            className="p-3 rounded-full bg-gradient-to-r from-rose-500 to-pink-600 text-white hover:from-rose-600 hover:to-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Search size={16} />
+            <Search className="w-3 h-3" />
           </button>
         </div>
-        {roomPrice !== null && (
-          <div className="mt-2 text-sm text-gray-600">
-            <p>Estimated Room Price: ${roomPrice}</p>
-          </div>
-        )}
       </div>
-      <MobileSearchBar />
+      {!(
+        pathname === "/auth/user/login" || pathname === "/auth/user/register"
+      ) && <MobileSearchBar />}
+      <Categories />
     </>
   );
 }

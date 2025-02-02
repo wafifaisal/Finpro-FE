@@ -1,17 +1,25 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { User, Search, X } from "lucide-react";
+import { Search, X, Menu, Grid } from "lucide-react";
 import Image from "next/image";
 import Searchbar from "@/components/main/navbar/searchBar";
+import Categories from "./mobileCategories";
+import { useSession } from "@/context/useSessionHook";
+import Avatar from "@/components/main/navbar/avatar";
+import { usePathname } from "next/navigation";
 
 const MobileNavbar = () => {
   const [activeTab, setActiveTab] = useState("explore");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const { isAuth } = useSession();
+  const pathname = usePathname();
 
   return (
     <div className="md:hidden">
       <Searchbar />
+
       {isMenuOpen && (
         <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
           <div className="p-6">
@@ -39,48 +47,68 @@ const MobileNavbar = () => {
         </div>
       )}
 
+      {isCategoriesOpen && (
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Kategori</h2>
+              <button onClick={() => setIsCategoriesOpen(false)}>
+                <X size={24} />
+              </button>
+            </div>
+            <Categories />
+          </div>
+        </div>
+      )}
+
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
         <div className="flex justify-around py-3">
-          {[
-            { icon: Search, label: "Explore", tab: "explore", slug: "/" },
-            { icon: User, label: "Masuk", tab: "login", slug: "/login" },
-          ].map(({ icon: Icon, label, tab, slug }) => (
-            <div key={tab} className="flex flex-col items-center">
-              {slug ? (
-                <Link href={slug}>
-                  <button
-                    className={`flex flex-col items-center ${
-                      activeTab === tab ? "text-black" : "text-gray-500"
-                    }`}
-                    onClick={() => setActiveTab(tab)}
-                  >
-                    <Icon size={20} />
-                    <span className="text-xs mt-1">{label}</span>
-                  </button>
-                </Link>
-              ) : (
-                <button
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex flex-col items-center ${
-                    activeTab === tab
-                      ? "text-red-500 font-bold"
-                      : "text-gray-500"
-                  }`}
-                >
-                  <Icon size={20} />
-                  <span className="text-xs mt-1">{label}</span>
-                </button>
-              )}
-            </div>
-          ))}
-          <Image
-            src="/nginepin-logo.png"
-            alt="Nginepin Logo"
-            width={80}
-            height={24}
-            className="w-auto cursor-pointer"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          />
+          <div className="flex flex-col items-center">
+            <Link href="/">
+              <button
+                className={`flex flex-col items-center ${
+                  activeTab === "explore" ? "text-black" : "text-gray-500"
+                }`}
+                onClick={() => setActiveTab("explore")}
+              >
+                <Search size={20} />
+                <span className="text-xs mt-1">Explore</span>
+              </button>
+            </Link>
+          </div>
+
+          <div className="flex flex-col items-center">
+            {!(
+              pathname === "/auth/user/login" ||
+              pathname === "/auth/user/register"
+            ) && (
+              <button
+                className="flex flex-col items-center text-gray-500"
+                onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+              >
+                <Grid size={20} />
+                <span className="text-xs mt-1">Kategori</span>
+              </button>
+            )}
+          </div>
+          {isAuth ? (
+            <Avatar />
+          ) : (
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex items-center border border-gray-200 px-2 py-3 rounded-full hover:shadow-md transition-all bg-white"
+            >
+              <Menu size={16} className="mr-2 text-gray-500" />
+              <Image
+                src="/logo.png"
+                alt="Nginepin Logo"
+                width={16}
+                height={16}
+                className="w-auto cursor-pointer"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              />
+            </button>
+          )}
         </div>
       </div>
     </div>
