@@ -17,7 +17,6 @@ const Navbar = () => {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Mengembalikan posisi scroll yang tersimpan setelah refresh
     const savedScrollY = sessionStorage.getItem("scrollY");
     if (savedScrollY) {
       window.scrollTo(0, parseInt(savedScrollY, 10));
@@ -110,7 +109,9 @@ const Navbar = () => {
           </div>
         </div>
         {!(
-          pathname === "/auth/user/login" || pathname === "/auth/user/register"
+          pathname === "/auth/user/login" ||
+          pathname === "/auth/user/register" ||
+          pathname === "/user/profile"
         ) && <Searchbar />}
       </div>
       <MobileNavbar />

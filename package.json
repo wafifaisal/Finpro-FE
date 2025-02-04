@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.5",
     "@react-oauth/google": "^0.12.1",
     "axios": "^1.7.9",
+    "class-variance-authority": "^0.7.1",
     "date-fns": "^4.1.0",
     "formik": "^2.4.6",
     "framer-motion": "^12.0.6",
@@ -25,7 +27,9 @@
     "react-dom": "^18",
     "react-icons": "^5.4.0",
     "react-toastify": "^11.0.3",
+    "sweetalert2": "^11.15.10",
     "swiper": "^11.2.1",
+    "tailwind-merge": "^3.0.1",
     "use-debounce": "^10.0.4",
     "yup": "^1.6.1"
   },

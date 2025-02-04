@@ -5,6 +5,7 @@ export interface IUser {
   avatar: string | null;
   no_handphone: string;
   googleId?: string;
+  isVerify: boolean;
 }
 
 export interface ITenant {

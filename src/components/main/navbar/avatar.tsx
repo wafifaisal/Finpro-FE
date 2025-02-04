@@ -48,7 +48,7 @@ export default function Avatar() {
     logout();
 
     setTimeout(() => {
-      window.location.assign("/login");
+      window.location.assign("/auth/user/login");
     }, 1000);
   };
 
@@ -103,9 +103,9 @@ export default function Avatar() {
                 "https://res.cloudinary.com/dkyco4yqp/image/upload/v1738487804/user-circle-svgrepo-com_az7hcs.png"
               }
               alt="avatar"
-              width={60}
-              height={60}
-              className="rounded-full"
+              width={800}
+              height={800}
+              className="rounded-full object-cover w-24 h-24"
             />
             <div>
               <h2 className="text-sm md:text-lg font-semibold text-gray-800">
@@ -119,7 +119,7 @@ export default function Avatar() {
             <MenuItem
               icon={<FaUserCircle className="text-gray-600" />}
               label="Profil"
-              onClick={() => navigateTo("/profile")}
+              onClick={() => navigateTo("/user/profile")}
             />
             <MenuItem
               icon={<FaRegCalendarCheck className="text-gray-600" />}

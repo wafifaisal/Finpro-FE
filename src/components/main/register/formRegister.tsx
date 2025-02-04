@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Mail } from "lucide-react";
 import SocialLogin from "./socialLogin";
 import axios from "axios";
@@ -9,7 +8,6 @@ import Image from "next/image";
 const RegisterForm = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [email, setEmail] = useState("");
-  const router = useRouter();
   const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
   const images = [
@@ -41,7 +39,6 @@ const RegisterForm = () => {
         email,
       });
       alert(response.data.message);
-      router.push(`/auth/user/verifyUser/${response.data.token}`);
     } catch (error) {
       console.error(error);
     }
