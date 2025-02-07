@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "@/context/useSessionHook";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import Image from "next/image";
 import Navbar from "@/components/main/navbar/Navbar";
@@ -13,17 +13,8 @@ import ProfileImageModal from "@/components/sub/profile/modalHeader";
 
 export default function ProfilePage() {
   const { isAuth, type, user } = useSession();
-  const [uploading, setUploading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [showSparkle, setShowSparkle] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    setIsLoaded(true);
-    const timer = setTimeout(() => setShowSparkle(true), 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const getRandomEmoji = () => {
     const emojis = ["✈️", "🧳", "🏨", "🛋️", "🎉"];
@@ -53,13 +44,13 @@ export default function ProfilePage() {
     );
   }
 
+  console.log("user", user);
+
   return (
     <>
       <Navbar />
       <div
-        className={`min-h-screen bg-white transition-opacity duration-1000 pt-0 pb-24 md:pb-0 md:pt-24 ${
-          isLoaded ? "opacity-100" : "opacity-0"
-        }`}
+        className={`min-h-screen bg-white transition-opacity duration-1000 pt-0 pb-24 md:pb-0 md:pt-24`}
       >
         {/* Animated Background Header */}
         <div className="bg-gradient-to-r from-rose-400 to-rose-600 h-48 relative overflow-hidden">

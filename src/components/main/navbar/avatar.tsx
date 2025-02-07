@@ -119,7 +119,7 @@ export default function Avatar() {
             <MenuItem
               icon={<FaUserCircle className="text-gray-600" />}
               label="Profil"
-              onClick={() => navigateTo("/user/profile")}
+              onClick={() => navigateTo("/profile")}
             />
             <MenuItem
               icon={<FaRegCalendarCheck className="text-gray-600" />}

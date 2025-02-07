@@ -1,134 +1,173 @@
+import { useSession } from "@/context/useSessionHook";
 import { useState } from "react";
 import { RiLockPasswordLine } from "react-icons/ri";
 import Swal from "sweetalert2";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import * as Yup from "yup";
 
-export default function ProfilePassword() {
+// Definisikan tipe nilai form
+interface FormValues {
+  kataSandiSaatIni: string;
+  kataSandiBaru: string;
+  konfirmasiKataSandi: string;
+}
+
+export default function ProfilKataSandi() {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
-  const [isEditingPassword, setIsEditingPassword] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+  const { user } = useSession();
+  const [sedangMengeditPassword, setSedangMengeditPassword] = useState(false);
+
+  // Skema validasi menggunakan Yup
+  const skemaValidasi = Yup.object().shape({
+    kataSandiSaatIni: Yup.string().required("Kata sandi saat ini wajib diisi"),
+    kataSandiBaru: Yup.string()
+      .min(8, "Kata sandi baru minimal 8 karakter")
+      .required("Kata sandi baru wajib diisi"),
+    konfirmasiKataSandi: Yup.string()
+      .oneOf([Yup.ref("kataSandiBaru")], "Konfirmasi kata sandi tidak cocok")
+      .required("Konfirmasi kata sandi wajib diisi"),
   });
 
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      Swal.fire({
-        title: "Error!",
-        text: "New passwords do not match.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
-
+  // Fungsi untuk menangani pembaruan password dengan tipe parameter yang tepat
+  const tanganiPembaruanPassword = async (
+    values: FormValues,
+    { setSubmitting, resetForm }: FormikHelpers<FormValues>
+  ): Promise<void> => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found");
+      if (!token) throw new Error("Token tidak ditemukan");
 
-      const response = await fetch(`${base_url}/users/update-password`, {
+      const respons = await fetch(`${base_url}/users/update-password`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword,
+          currentPassword: values.kataSandiSaatIni,
+          newPassword: values.kataSandiBaru,
         }),
       });
 
-      if (response.ok) {
+      if (respons.ok) {
         Swal.fire({
-          title: "Success!",
-          text: "Password updated successfully.",
+          title: "Berhasil!",
+          text: "Kata sandi Anda telah diperbarui.",
           icon: "success",
           confirmButtonText: "OK",
         }).then(() => {
-          setIsEditingPassword(false);
-          setPasswordData({
-            currentPassword: "",
-            newPassword: "",
-            confirmPassword: "",
-          });
+          setSedangMengeditPassword(false);
+          resetForm();
         });
       } else {
-        throw new Error("Failed to update password");
+        throw new Error("Gagal memperbarui kata sandi");
       }
     } catch (error) {
+      console.error("Kesalahan saat memperbarui kata sandi:", error);
       Swal.fire({
-        title: "Error!",
-        text: "Failed to update password. Please check your current password and try again.",
+        title: "Kesalahan!",
+        text: "Gagal memperbarui kata sandi. Silakan periksa kata sandi saat ini dan coba lagi.",
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
+
   return (
     <div>
-      <button
-        onClick={() => setIsEditingPassword(!isEditingPassword)}
-        className="flex items-center gap-2 text-rose-500 hover:text-rose-600"
-      >
-        <RiLockPasswordLine />
-        Change Password
-      </button>
+      {!user?.googleId && (
+        <>
+          <button
+            onClick={() => setSedangMengeditPassword(!sedangMengeditPassword)}
+            className="flex items-center gap-2 text-rose-500 hover:text-rose-600"
+          >
+            <RiLockPasswordLine />
+            Ubah Kata Sandi
+          </button>
 
-      {isEditingPassword && (
-        <form onSubmit={handlePasswordUpdate} className="mt-4 space-y-4">
-          <input
-            type="password"
-            value={passwordData.currentPassword}
-            onChange={(e) =>
-              setPasswordData({
-                ...passwordData,
-                currentPassword: e.target.value,
-              })
-            }
-            placeholder="Current Password"
-            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
-            required
-          />
-          <input
-            type="password"
-            value={passwordData.newPassword}
-            onChange={(e) =>
-              setPasswordData({ ...passwordData, newPassword: e.target.value })
-            }
-            placeholder="New Password"
-            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
-            required
-          />
-          <input
-            type="password"
-            value={passwordData.confirmPassword}
-            onChange={(e) =>
-              setPasswordData({
-                ...passwordData,
-                confirmPassword: e.target.value,
-              })
-            }
-            placeholder="Confirm New Password"
-            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
-            required
-          />
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+          {sedangMengeditPassword && (
+            <Formik<FormValues>
+              initialValues={{
+                kataSandiSaatIni: "",
+                kataSandiBaru: "",
+                konfirmasiKataSandi: "",
+              }}
+              validationSchema={skemaValidasi}
+              onSubmit={tanganiPembaruanPassword}
             >
-              Update Password
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditingPassword(false)}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+              {({ isSubmitting }) => (
+                <Form className="mt-4 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Password
+                    </label>
+                    <Field
+                      type="password"
+                      name="kataSandiSaatIni"
+                      placeholder="Kata Sandi Saat Ini"
+                      className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
+                    />
+                    <ErrorMessage
+                      name="kataSandiSaatIni"
+                      component="p"
+                      className="text-red-500 text-sm mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Password Baru
+                    </label>
+                    <Field
+                      type="password"
+                      name="kataSandiBaru"
+                      placeholder="Kata Sandi Baru"
+                      className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
+                    />
+                    <ErrorMessage
+                      name="kataSandiBaru"
+                      component="p"
+                      className="text-red-500 text-sm mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Konfirmasi Password
+                    </label>
+                    <Field
+                      type="password"
+                      name="konfirmasiKataSandi"
+                      placeholder="Konfirmasi Kata Sandi Baru"
+                      className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
+                    />
+                    <ErrorMessage
+                      name="konfirmasiKataSandi"
+                      component="p"
+                      className="text-red-500 text-sm mt-1"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Memproses..." : "Perbarui Kata Sandi"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSedangMengeditPassword(false)}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          )}
+        </>
       )}
     </div>
   );

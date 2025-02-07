@@ -5,16 +5,18 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { FaTimes } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import SocialLogin from "@/components/main/register/socialLogin";
 import Link from "next/link";
 import Navbar from "@/components/main/navbar/Navbar";
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginSchema = Yup.object().shape({
   data: Yup.string().required("Username atau Email harus diisi"),
-  password: Yup.string().required("Password harus diisi"),
+  password: Yup.string()
+    .min(8, "Kata sandi harus minimal 8 karakter ")
+    .required("Password harus diisi"),
 });
 
 interface FormValues {
@@ -26,6 +28,7 @@ export default function LoginUser() {
   const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
@@ -64,10 +67,9 @@ export default function LoginUser() {
 
   return (
     <>
+      <ToastContainer />
       <Navbar />
       <div className="min-h-screen bg-white text-black flex items-center justify-center pb-20 pt-0 md:pt-32 md:pb-7 relative">
-        <ToastContainer />
-
         <div
           className="absolute inset-0 bg-cover bg-center z-0"
           style={{
@@ -145,18 +147,28 @@ export default function LoginUser() {
                     <label className="block text-sm font-medium mb-1">
                       Password
                     </label>
-                    <Field
-                      name="password"
-                      type="password"
-                      placeholder="Masukkan password"
-                      className="w-full p-3 rounded-lg border border-gray-300 outline-none truncate"
-                    />
+                    <div className="relative">
+                      <Field
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Masukkan password"
+                        className="w-full p-3 rounded-lg border border-gray-300 outline-none truncate"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff /> : <Eye />}
+                      </button>
+                    </div>
                     <ErrorMessage
                       name="password"
                       component="div"
                       className="text-red-500 text-sm mt-1"
                     />
                   </div>
+
                   <Link
                     href="/auth/user/login/forgot-password"
                     className="text-sm text-indigo-400 hover:underline"

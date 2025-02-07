@@ -17,15 +17,76 @@ type Property = {
   desc: string;
   category: string;
   PropertyImages?: { image_url: string }[];
-  location: { address: string; city: string; country: string };
+  location: {
+    address: string;
+    city: string;
+    country: string;
+    latitude: string; // Changed to string to match Prisma output
+    longitude: string; // Changed to string to match Prisma output
+  };
   RoomTypes: { id: number; name: string; price: number; avg_rating: number }[];
+};
+
+type UserLocation = {
+  latitude: number;
+  longitude: number;
+} | null;
+
+// Updated utility function to handle string coordinates
+const calculateDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: string,
+  lon2: string
+): number => {
+  // Parse string coordinates to numbers
+  const lat2Num = parseFloat(lat2);
+  const lon2Num = parseFloat(lon2);
+
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = ((lat2Num - lat1) * Math.PI) / 180;
+  const dLon = ((lon2Num - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2Num * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
+// Utility function to format distance
+const formatDistance = (distance: number): string => {
+  if (distance < 1) {
+    return `${Math.round(distance * 1000)} m`;
+  }
+  return `${distance.toFixed(1)} km`;
 };
 
 export default function PropertyList() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [userLocation, setUserLocation] = useState<UserLocation>(null);
   const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
+
+  // Get user's location
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     fetch(`${base_url_be}/property?limit=8&page=1`)
@@ -42,7 +103,7 @@ export default function PropertyList() {
 
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8">
-      <h1 className="text-xl md:text-2xl font-bold mb-6 text-gray-800 text-center ">
+      <h1 className="text-xl md:text-2xl font-bold mb-6 text-gray-800 text-center">
         Coba suasana yang beda, cek rumah liburan di Nginepin!
       </h1>
       <div className="grid grid-cols-1 max-[400px]:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-[955px]:grid-cols-2">
@@ -63,7 +124,7 @@ export default function PropertyList() {
           : properties.map((property) => (
               <div
                 key={property.id}
-                className=" overflow-hidden transition-shadow duration-300"
+                className="overflow-hidden transition-shadow duration-300"
                 onMouseEnter={() => setHoveredCard(property.id)}
                 onMouseLeave={() => setHoveredCard(null)}
               >
@@ -111,7 +172,7 @@ export default function PropertyList() {
                       {hoveredCard === property.id && (
                         <>
                           <button
-                            className={`custom-prev-${property.id} absolute top-1/2 left-2 z-50 bg-white/30 hover:bg-white/50 text-white p-2 rounded-full transform -translate-y-1/2 `}
+                            className={`custom-prev-${property.id} absolute top-1/2 left-2 z-50 bg-white/30 hover:bg-white/50 text-white p-2 rounded-full transform -translate-y-1/2`}
                           >
                             <ChevronLeft className="md:w-4 md:h-4 lg:w-6 lg:h-6 w-3 h-3" />
                           </button>
@@ -140,7 +201,6 @@ export default function PropertyList() {
                     </h2>
                     <h2 className="flex gap-1 text-sm font-bold">
                       <FaStar className="" />
-
                       {(
                         property.RoomTypes.reduce(
                           (sum, room) => sum + room.avg_rating,
@@ -149,12 +209,27 @@ export default function PropertyList() {
                       ).toFixed(1)}
                     </h2>
                   </div>
-                  <div className="flex gap-1 ">
-                    <FaLocationDot className="text-gray-500 text-sm " />
-                    <p className="text-sm text-gray-500 outline-none truncate">
-                      {property.category} di {property.location.address},{" "}
-                      {property.location.city}
-                    </p>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex gap-1">
+                      <FaLocationDot className="text-gray-500 text-sm" />
+                      <p className="text-sm text-gray-500 outline-none truncate">
+                        {property.category} di {property.location.address},{" "}
+                        {property.location.city}
+                      </p>
+                    </div>
+                    {userLocation && (
+                      <p className="text-sm text-gray-500 pl-4">
+                        {formatDistance(
+                          calculateDistance(
+                            userLocation.latitude,
+                            userLocation.longitude,
+                            property.location.latitude,
+                            property.location.longitude
+                          )
+                        )}{" "}
+                        dari lokasi Anda
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center space-x-1 outline-none truncate">
                     <h1 className="text-sm md:text-lg font-bold text-gray-800">
@@ -166,11 +241,11 @@ export default function PropertyList() {
                   </div>
                   <Link href={"/"}>
                     <div className="mt-2 flex flex-wrap items-center justify-center">
-                      <button className=" border text-white hover:text-black duration-300 relative group cursor-pointer overflow-hidden h-10 w-44 rounded-md bg-red-500 p-2 font-extrabold hover:bg-sky-700">
-                        <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-16 h-16 rounded-full group-hover:scale-150  duration-700 right-12 top-12  bg-[#EB5A3C]"></div>
-                        <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-12 h-12 rounded-full group-hover:scale-150  duration-700 right-20 -top-6 bg-[#DF9755]"></div>
-                        <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-8 h-8   rounded-full group-hover:scale-150  duration-700 right-32 top-6  bg-[#E7D283]"></div>
-                        <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-4 h-4   rounded-full group-hover:scale-150  duration-700 right-2 top-12  bg-[#EDF4C2]"></div>
+                      <button className="border text-white hover:text-black duration-300 relative group cursor-pointer overflow-hidden h-10 w-44 rounded-md bg-red-500 p-2 font-extrabold hover:bg-sky-700">
+                        <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-16 h-16 rounded-full group-hover:scale-150 duration-700 right-12 top-12 bg-[#EB5A3C]"></div>
+                        <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-12 h-12 rounded-full group-hover:scale-150 duration-700 right-20 -top-6 bg-[#DF9755]"></div>
+                        <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-8 h-8 rounded-full group-hover:scale-150 duration-700 right-32 top-6 bg-[#E7D283]"></div>
+                        <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-4 h-4 rounded-full group-hover:scale-150 duration-700 right-2 top-12 bg-[#EDF4C2]"></div>
                         <p className="z-10 absolute bottom-2 left-0 text-sm outline-none truncate w-full">
                           Cek Ketersediaan
                         </p>
