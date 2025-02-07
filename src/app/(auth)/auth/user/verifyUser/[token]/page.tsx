@@ -1,9 +1,32 @@
 "use client";
 
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import * as Yup from "yup";
+
+interface VerifyFormValues {
+  username: string;
+  password: string;
+  confirmPassword: string;
+  no_handphone: string;
+}
+
+const validationSchema = Yup.object({
+  username: Yup.string().required("Nama pengguna diperlukan"),
+  password: Yup.string()
+    .min(8, "Kata sandi harus minimal 8 karakter ")
+    .required("Kata sandi diperlukan"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Kata sandi harus cocok")
+    .required("Konfirmasi Kata Sandi diperlukan"),
+  no_handphone: Yup.string()
+    .matches(/^\d+$/, "Nomor telepon harus berupa angka")
+    .required("Nomor telepon diperlukan"),
+});
 
 export default function VerifyPage({
   params,
@@ -11,43 +34,17 @@ export default function VerifyPage({
   params?: { token?: string };
 }) {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    confirmPassword: "",
-    no_handphone: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const onVerify = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-
+  const onVerify = async (
+    values: VerifyFormValues,
+    { setSubmitting }: FormikHelpers<VerifyFormValues>
+  ) => {
     if (!params?.token) {
-      toast.error("Invalid verification token.");
+      toast.error("Token verifikasi tidak valid.");
       router.push("/");
-      return;
-    }
-
-    const { username, password, confirmPassword, no_handphone } = formData;
-
-    if (!username || !password || !confirmPassword || !no_handphone) {
-      toast.error("All fields are required.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      setIsSubmitting(false);
       return;
     }
 
@@ -57,27 +54,20 @@ export default function VerifyPage({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          username,
-          password,
-          confirmPassword,
-          no_handphone: no_handphone,
-        }),
+        body: JSON.stringify(values),
       });
 
       if (!res.ok) {
         const errorResponse = await res.json();
-        throw new Error(errorResponse.message || "Verification failed");
+        throw new Error(errorResponse.message || "Verifikasi gagal");
       }
 
       const result = await res.json();
-      toast.success(result.message || "Account successfully verified!");
+      toast.success(result.message || "Akun berhasil diverifikasi!");
       setTimeout(() => {
         router.push("/auth/user/login");
       }, 3000);
     } catch (error: unknown) {
-      console.error("Error fetching properties:", error);
-
       let errorMessage = "Terjadi kesalahan";
       if (error instanceof Error) {
         errorMessage = error.message;
@@ -87,88 +77,123 @@ export default function VerifyPage({
         autoClose: 5000,
       });
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-center min-h-screen bg-white pt-20">
-        <ToastContainer />
-        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg border-2 border-red-500">
-          <h1 className="text-3xl font-semibold text-center text-red-600">
-            Verify Your Account
-          </h1>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              onVerify();
-            }}
-            className="mt-4"
-          >
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-red-500">
-                Username
-              </label>
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-red-500">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-red-500">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-red-500">
-                Phone Number
-              </label>
-              <input
-                type="text"
-                name="no_handphone"
-                value={formData.no_handphone}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full px-3 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-200 ${
-                isSubmitting ? "opacity-50" : ""
-              }`}
-            >
-              {isSubmitting ? "Verifying..." : "Verify Account"}
-            </button>
-          </form>
-        </div>
+    <div className="flex items-center justify-center min-h-screen bg-white pt-20">
+      <ToastContainer />
+      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg border-2 border-red-500">
+        <h1 className="text-3xl font-semibold text-center text-red-600">
+          Verifikasi Akun Anda
+        </h1>
+        <Formik<VerifyFormValues>
+          initialValues={{
+            username: "",
+            password: "",
+            confirmPassword: "",
+            no_handphone: "",
+          }}
+          validationSchema={validationSchema}
+          onSubmit={onVerify}
+        >
+          {({ isSubmitting }) => (
+            <Form className="mt-4">
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium text-red-500">
+                  Username
+                </label>
+                <Field
+                  type="text"
+                  name="username"
+                  className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
+                />
+                <ErrorMessage
+                  name="username"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium text-red-500">
+                  Password
+                </label>
+                <div className="relative">
+                  <Field
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium text-red-500">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Field
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
+                <ErrorMessage
+                  name="confirmPassword"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium text-red-500">
+                  Nomor telepon
+                </label>
+                <Field
+                  type="text"
+                  name="no_handphone"
+                  className="w-full px-3 py-2 border border-red-500 rounded focus:outline-none focus:ring focus:ring-red-200"
+                />
+                <ErrorMessage
+                  name="no_handphone"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full px-3 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-200 ${
+                  isSubmitting ? "opacity-50" : ""
+                }`}
+              >
+                {isSubmitting ? "Memverifikasi..." : "Verifikasi Akun"}
+              </button>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );

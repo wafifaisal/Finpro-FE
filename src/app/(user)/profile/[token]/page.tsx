@@ -1,7 +1,6 @@
 "use client";
-
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react"; // Tambahkan useCallback
 import Swal from "sweetalert2";
 import { Mail, CheckCircle, AlertCircle } from "lucide-react";
 import { ToastContainer } from "react-toastify";
@@ -18,7 +17,7 @@ export default function VerifyEmail({
   >("pending");
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
-  const requestEmailVerification = async () => {
+  const requestEmailVerification = useCallback(async () => {
     try {
       if (isVerifying) return;
       setIsVerifying(true);
@@ -46,9 +45,8 @@ export default function VerifyEmail({
           icon: "success",
           confirmButtonText: "OK",
         }).then(() => {
-          // Use setTimeout for the redirect
           setTimeout(() => {
-            router.push("/user/profile"); // Redirect after 3 seconds
+            router.push("/profile"); // Redirect setelah 3 detik
           }, 3000);
         });
       } else {
@@ -56,7 +54,7 @@ export default function VerifyEmail({
         throw new Error("Failed to send verification email");
       }
     } catch (error) {
-      console.error(error); // Add error logging
+      console.error(error);
       setVerificationStatus("error");
       Swal.fire({
         title: "Error!",
@@ -67,11 +65,7 @@ export default function VerifyEmail({
     } finally {
       setIsVerifying(false);
     }
-  };
-
-  useEffect(() => {
-    requestEmailVerification();
-  }, []);
+  }, [isVerifying, base_url, params?.token, router]);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">

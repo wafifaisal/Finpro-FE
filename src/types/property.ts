@@ -4,15 +4,15 @@ export interface IUser {
   email: string;
   avatar: string | null;
   no_handphone: string;
-  googleId?: string;
+  googleId?: number;
   isVerify: boolean;
 }
 
 export interface ITenant {
   id: string;
-  username: string;
+  name: string;
   email: string;
-  avatar: string;
+  avatar: string | null;
   no_handphone: string;
   googleId?: string;
 }

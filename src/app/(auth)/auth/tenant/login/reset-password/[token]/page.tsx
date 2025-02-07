@@ -44,7 +44,7 @@ export default function ResetPassword() {
         toast.error("Tidak ditemukan token reset. Mengalihkan ke login...", {
           position: "top-right",
           autoClose: 3000,
-          onClose: () => router.push("/auth/user/login"),
+          onClose: () => router.push("/auth/tenant/login"),
         });
       }
     }
@@ -71,7 +71,7 @@ export default function ResetPassword() {
     try {
       const decodedToken = decodeURIComponent(storedToken);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL_BE}/auth/resetPassword/${params.token}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL_BE}/auth/tenant/reset-password/${params.token}`,
         {
           method: "POST",
           headers: {
@@ -93,7 +93,7 @@ export default function ResetPassword() {
         autoClose: 3000,
         onClose: () => {
           localStorage.removeItem("resetToken");
-          router.push("/auth/user/login");
+          router.push("/auth/tenant/login");
         },
       });
     } catch (err: unknown) {
@@ -237,7 +237,7 @@ export default function ResetPassword() {
           <p className="mt-8 text-center text-sm text-gray-500">
             Ingat password anda?{" "}
             <Link
-              href="/auth/user/login"
+              href="/auth/tenant/login"
               className="text-rose-500 hover:text-rose-600 font-medium"
             >
               Log in

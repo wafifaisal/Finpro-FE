@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect } from "react";
 
 interface ProfileImageModalProps {
@@ -36,9 +37,11 @@ export default function ProfileImageModal({
         className="relative max-w-2xl mx-4 transform transition-all duration-300 animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
-        <img
+        <Image
           src={selectedImage}
           alt="Full View"
+          width={800}
+          height={800}
           className="max-w-full max-h-[80vh] rounded-lg"
         />
         <button

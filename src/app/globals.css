@@ -54,6 +54,12 @@ body {
   transition: all 0.3s ease; 
 }
 
+.hollow-text {
+  font-weight: bold; /* Tebal font */
+  color: transparent; /* Teks transparan */
+  -webkit-text-stroke: 1px white; /* Garis tepi teks untuk layar kecil */
+  text-align: center; /* Teks di tengah */
+}
 
 .swiper-pagination .custom-bullet:hover {
   background-color: rgba(

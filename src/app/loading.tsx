@@ -1,7 +1,6 @@
 export default function Loading() {
   return (
     <div className="relative flex flex-col items-center justify-center h-screen bg-white">
-      {/* Animated Text */}
       <svg viewBox="0 0 1320 300" className="absolute w-full h-full">
         <text
           x="50%"

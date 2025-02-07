@@ -1,13 +1,17 @@
 "use client";
+
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight, Mail } from "lucide-react";
 import SocialLogin from "./socialLogin";
 import axios from "axios";
 import Image from "next/image";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import Swal from "sweetalert2";
 
 const RegisterForm = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [email, setEmail] = useState("");
   const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
   const images = [
@@ -33,19 +37,35 @@ const RegisterForm = () => {
     setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const handleEmailSubmit = async () => {
-    try {
-      const response = await axios.post(`${base_url_be}/auth/register`, {
-        email,
-      });
-      alert(response.data.message);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+    },
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .email("Email tidak valid")
+        .required("Email wajib diisi"),
+    }),
+    onSubmit: async (values) => {
+      setIsLoading(true);
+      try {
+        const response = await axios.post(`${base_url_be}/auth/register`, {
+          email: values.email,
+        });
+        // Tampilkan pesan sukses menggunakan swal
+        Swal.fire("Berhasil", response.data.message, "success");
+      } catch {
+        // Tampilkan pesan error menggunakan swal
+        Swal.fire("Error", "Email sudah terdaftar", "error");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+  });
 
   return (
     <div className="flex h-screen">
+      {/* Hapus ToastContainer dari react-toastify */}
       <div className="relative w-1/2 hidden md:block">
         <div className="relative h-full overflow-hidden">
           {images.map((image, index) => (
@@ -64,7 +84,6 @@ const RegisterForm = () => {
               />
             </div>
           ))}
-
           <button
             onClick={prevSlide}
             className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white"
@@ -77,22 +96,8 @@ const RegisterForm = () => {
           >
             <ChevronRight className="w-6 h-6" />
           </button>
-
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`w-2 h-2 rounded-full ${
-                  index === currentSlide ? "bg-white" : "bg-white/50"
-                }`}
-              />
-            ))}
-          </div>
         </div>
       </div>
-
-      {/* Right side - Register Form */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
@@ -101,23 +106,33 @@ const RegisterForm = () => {
               Buat akun gratis untuk mengakses property dengan harga termurah!
             </p>
           </div>
-
-          <div className="space-y-4">
+          <form onSubmit={formik.handleSubmit} className="space-y-4">
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               placeholder="Masukan Email"
               className="w-full py-4 input"
             />
+            {formik.touched.email && formik.errors.email && (
+              <p className="text-red-500 text-sm">{formik.errors.email}</p>
+            )}
             <button
-              onClick={handleEmailSubmit}
+              type="submit"
               className="relative z-20 flex justify-center w-full py-3 bg-red-500 rounded-2xl text-white"
+              disabled={isLoading}
             >
-              <Mail className="mr-2 h-4 w-4" /> Daftar Menggunakan Email
+              {isLoading ? (
+                "Loading..."
+              ) : (
+                <>
+                  <Mail className="mr-2 h-4 w-4" /> Daftar Menggunakan Email
+                </>
+              )}
             </button>
-          </div>
-
+          </form>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -128,9 +143,7 @@ const RegisterForm = () => {
               </span>
             </div>
           </div>
-
           <SocialLogin />
-
           <p className="text-center text-sm text-gray-600">
             By signing up, you agree to our{" "}
             <a href="#" className="font-medium text-blue-600 hover:underline">

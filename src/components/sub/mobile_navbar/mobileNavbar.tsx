@@ -18,7 +18,14 @@ const MobileNavbar = () => {
 
   return (
     <div className="md:hidden">
-      <Searchbar />
+      {!(
+        pathname === "/auth/user/login" ||
+        pathname === "/auth/user/register" ||
+        pathname === "/profile" ||
+        pathname === "/auth/tenant/homepage" ||
+        pathname === "/auth/tenant/login" ||
+        pathname === "/auth/tenant/register"
+      ) && <Searchbar />}
 
       {isMenuOpen && (
         <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
@@ -36,7 +43,10 @@ const MobileNavbar = () => {
               >
                 Buat Akun
               </Link>
-              <Link href="/host" className="block py-3 border-b text-lg">
+              <Link
+                href="/auth/tenant/homepage"
+                className="block py-3 border-b text-lg"
+              >
                 Daftarkan Property Anda
               </Link>
               <Link href="/help" className="block py-3 text-lg">

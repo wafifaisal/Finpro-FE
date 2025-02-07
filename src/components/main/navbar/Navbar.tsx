@@ -8,6 +8,7 @@ import Searchbar from "./searchBar";
 import { usePathname } from "next/navigation";
 import { useSession } from "@/context/useSessionHook";
 import Avatar from "./avatar";
+import TenantAvatar from "./avatarTenant";
 
 const Navbar = () => {
   const { isAuth } = useSession();
@@ -67,7 +68,10 @@ const Navbar = () => {
 
           <div className="flex items-center ">
             {isAuth ? (
-              <Avatar />
+              <div>
+                <Avatar />
+                <TenantAvatar />
+              </div>
             ) : (
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -93,7 +97,7 @@ const Navbar = () => {
                 </Link>
                 <div className="border-t my-2"></div>
                 <Link
-                  href="/host"
+                  href="/auth/tenant/homepage"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
                   Daftarkan Property Anda
@@ -111,7 +115,10 @@ const Navbar = () => {
         {!(
           pathname === "/auth/user/login" ||
           pathname === "/auth/user/register" ||
-          pathname === "/user/profile"
+          pathname === "/profile" ||
+          pathname === "/auth/tenant/homepage" ||
+          pathname === "/auth/tenant/login" ||
+          pathname === "/auth/tenant/register"
         ) && <Searchbar />}
       </div>
       <MobileNavbar />

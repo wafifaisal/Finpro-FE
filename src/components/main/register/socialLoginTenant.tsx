@@ -4,8 +4,9 @@ import React from "react";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const SocialLogin = () => {
+const SocialLoginTenant = () => {
   const router = useRouter();
   const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
@@ -17,7 +18,7 @@ const SocialLogin = () => {
 
       const tokenId = credentialResponse.credential;
 
-      const res = await fetch(`${base_url_be}/auth/social-login`, {
+      const res = await fetch(`${base_url_be}/auth/social-login-tenant`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,4 +68,4 @@ const SocialLogin = () => {
   );
 };
 
-export default SocialLogin;
+export default SocialLoginTenant;
