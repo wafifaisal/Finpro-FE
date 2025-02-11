@@ -27,11 +27,12 @@ export default function useSearchbar() {
     where: "",
     checkIn: null,
     checkOut: null,
-    who: 0, // Initial number of people set to 0
+    who: 0,
     dateRange: [null, null],
   });
   const [text] = useDebounce(searchValues.where, 1000);
-  const [isScrolled, setIsScrolled] = useState(false);
+  // Inisialisasi isScrolled: jika pathname bukan "/" langsung true
+  const [isScrolled, setIsScrolled] = useState(pathname !== "/" ? true : false);
   const [loading, setLoading] = useState(true);
 
   const isSearchDisabled = Object.values(searchValues).every(
@@ -47,17 +48,27 @@ export default function useSearchbar() {
 
   useEffect(() => {
     const handleScroll = () => {
+      // Simpan posisi scroll di sessionStorage (jika diperlukan)
       sessionStorage.setItem("scrollPos", window.scrollY.toString());
-      setIsScrolled(window.scrollY > 0);
+      // Jika bukan halaman utama, pastikan isScrolled selalu true
+      if (pathname !== "/") {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(window.scrollY > 0);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [pathname]); // Perhatikan dependency pada pathname agar logikanya selalu sesuai
 
+  // Opsional: jika terjadi perubahan pathname (misal melalui navigasi) dan
+  // scroll event belum terjadi, kita bisa langsung set isScrolled.
   useEffect(() => {
     if (pathname !== "/") {
       setIsScrolled(true);
+    } else {
+      setIsScrolled(window.scrollY > 0);
     }
   }, [pathname]);
 
