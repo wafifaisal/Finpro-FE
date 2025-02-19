@@ -10,13 +10,16 @@ import {
 import { GoGlobe } from "react-icons/go";
 import Link from "next/link";
 
-type Property = {
+export type Property = {
   id: number;
   name: string;
+  desc: string;
   category: string;
+  click_rate?: number;
   PropertyImages?: { image_url: string }[];
   location: { address: string; city: string; country: string };
 };
+
 const Footer = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
@@ -25,7 +28,13 @@ const Footer = () => {
     fetch(`${base_url_be}/property`)
       .then((response) => response.json())
       .then((data) => {
-        setProperties(data.result);
+        // Urutkan properti berdasarkan click_rate secara descending
+        const sorted = data.result.sort(
+          (a: Property, b: Property) =>
+            (b.click_rate || 0) - (a.click_rate || 0)
+        );
+        // Simpan hanya 9 properti teratas
+        setProperties(sorted.slice(0, 9));
       })
       .catch((error) => {
         console.error("Error fetching properties:", error);
@@ -60,17 +69,17 @@ const Footer = () => {
             Inspirasi untuk liburan mendatang
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {properties.slice(0, 3).map((property) => (
+            {properties.map((property) => (
               <div key={property.id}>
                 <Link
-                  href="/"
+                  href={`/property/${property.id}`}
                   className="text-gray-600 hover:text-gray-900 text-sm"
                 >
                   <h3 className="font-semibold text-gray-900 text-sm">
                     {property.name}
                   </h3>
                   <ul className="space-y-3">
-                    <li className="">
+                    <li>
                       {property.location.city}, {property.location.country}
                     </li>
                   </ul>

@@ -74,7 +74,7 @@ export default function TenantAvatar() {
         aria-controls="menu"
       >
         <FiMenu className="w-5 h-5 text-gray-600" />
-        <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+        <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-[#FF9A9E] to-[#FAD0C4] flex items-center justify-center">
           {tenant.avatar ? (
             <Image
               src={tenant.avatar}
@@ -95,7 +95,7 @@ export default function TenantAvatar() {
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-blue-500 to-purple-500">
+        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-[#FF9A9E] to-[#FAD0C4]">
           <span className="text-lg font-semibold text-white">
             Tenant Dashboard
           </span>
@@ -133,28 +133,28 @@ export default function TenantAvatar() {
 
           <div className="space-y-1">
             <MenuItem
-              icon={<FaHome className="text-blue-500" />}
-              label="Properti Saya"
-              onClick={() => navigateTo("/properti")}
+              icon={<FaUserCircle className="text-gray-600" />}
+              label="Profil"
+              onClick={() => navigateTo("/tenant-profile")}
             />
             <MenuItem
-              icon={<FaFileInvoiceDollar className="text-green-500" />}
-              label="Payments & Invoices"
+              icon={<FaHome className="text-gray-600" />}
+              label="Properti Saya"
+              onClick={() => navigateTo("/property-tenant")}
+            />
+            <MenuItem
+              icon={<FaFileInvoiceDollar className="text-gray-600" />}
+              label="Proses Pembayaran"
               onClick={() => navigateTo("/payments")}
             />
             <MenuItem
-              icon={<FaBell className="text-yellow-500" />}
-              label="Notifications"
+              icon={<FaBell className="text-gray-600" />}
+              label="Notifikasi"
               onClick={() => navigateTo("/notifications")}
-            />
-            <MenuItem
-              icon={<FaUserCircle className="text-purple-500" />}
-              label="Account Settings"
-              onClick={() => navigateTo("/settings")}
             />
             <div className="pt-4 mt-4 border-t border-gray-100">
               <MenuItem
-                icon={<FaSignOutAlt className="text-red-500" />}
+                icon={<FaSignOutAlt className="text-rose-500" />}
                 label={isLoggingOut ? "Logging out..." : "Sign Out"}
                 onClick={handleLogout}
                 highlight

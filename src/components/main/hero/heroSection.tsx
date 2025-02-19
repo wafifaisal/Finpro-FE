@@ -13,17 +13,27 @@ import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import SwiperCore from "swiper";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+interface Slide {
+  image: string;
+  title: React.ReactNode;
+  buttonText?: string;
+  buttonLink?: string;
+}
+
 interface HeroSectionProps {
-  slides: { image: string; title: React.ReactNode }[];
+  slides: Slide[];
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ slides }) => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [swiperInstance, setSwiperInstance] = useState<SwiperCore | null>(null);
   const [hoveredCard, setHoveredCard] = useState<boolean>(false);
+
+  const activeSlide = slides[activeIndex];
 
   return (
     <div
@@ -56,11 +66,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ slides }) => {
         {slides.map((slide, index) => (
           <SwiperSlide
             key={index}
-            className="relative flex justify-center items-center text-center"
+            className="relative flex flex-col justify-center items-center text-center"
           >
-            <div className="absolute inset-0 flex items-center justify-center rounded-3xl text-center"></div>
             <h1
-              className={`text-xl sm:text-2xl md:text-3xl font-bold text-white mt-4 transition-all duration-1000 pb-8 md:pb-2 md:whitespace-nowrap
+              className={`text-xl sm:text-2xl md:text-3xl font-bold text-white mt-4 transition-all duration-1000 pb-8 md:pb-2 
               ${
                 activeIndex === index
                   ? "translate-y-0 opacity-100"
@@ -83,6 +92,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ slides }) => {
         ))}
       </Swiper>
 
+      {/* Render CTA hanya untuk slide yang bukan slide terakhir */}
+      {activeIndex !== slides.length - 1 && activeSlide.buttonText && (
+        <div className="absolute bottom-20 left-1/2 transition-all  group duration-500 -translate-x-1/2 z-30">
+          <Link href={activeSlide.buttonLink || "#"}>
+            <button className="px-6 py-3 transition-transform bg-gradient-to-r from-[#FF9A9E] to-[#FAD0C4] text-white hover:bg-white hover:text-rose-600 rounded-full font-semibold shadow-md hover:shadow-lg  duration-300">
+              {activeSlide.buttonText}
+            </button>
+          </Link>
+        </div>
+      )}
+
       {activeIndex === slides.length - 1 && (
         <div className="absolute bottom-4 w-full py-2 overflow-hidden">
           <span className="text-2xl md:text-3xl flex font-bold text-white items-center text-center justify-center pb-5 md:pb-0 pl-0 md:pl-20">
@@ -103,6 +123,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ slides }) => {
           </div>
         </div>
       )}
+
       {hoveredCard && (
         <div className="absolute top-1/2 -translate-y-1/2 flex w-full justify-between px-4 z-50">
           <button

@@ -36,7 +36,7 @@ interface Props {
 
 const Map: React.FC<Props> = ({ position, onPositionChange }) => {
   return (
-    <MapContainer center={position} zoom={13} className="h-full w-full">
+    <MapContainer center={position} zoom={13} className="h-full w-full z-10">
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

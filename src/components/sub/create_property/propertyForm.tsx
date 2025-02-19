@@ -52,7 +52,6 @@ const PropertyForm: React.FC = () => {
   const router = useRouter();
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
-  // Gunakan tipe PropertyFormValues sebagai tipe FormikProps
   const formik: FormikProps<PropertyFormValues> = useFormik<PropertyFormValues>(
     {
       initialValues: {
@@ -121,7 +120,7 @@ const PropertyForm: React.FC = () => {
           const data = await response.json();
 
           // Redirect ke halaman detail properti setelah sukses
-          router.push(`/properti/${data.property_id}`);
+          router.push(`/property-tenant/create/${data.property_id}`);
         } catch (error) {
           Swal.fire({
             title: "Error",
