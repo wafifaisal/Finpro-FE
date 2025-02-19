@@ -133,7 +133,7 @@ export default function Avatar() {
             />
             <div className="pt-4 mt-4 border-t border-gray-100">
               <MenuItem
-                icon={<FaSignOutAlt className="text-gray-600" />}
+                icon={<FaSignOutAlt className="text-rose-500" />}
                 label={isLoggingOut ? "Logging out..." : "Log out"}
                 onClick={handleLogout}
                 highlight

@@ -83,6 +83,7 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
                   onToggleBreakfast={handleToggleBreakfast}
                   onRoomQuantityChange={handleRoomQuantityChange}
                   guests={guests}
+                  selectedDate={checkIn || today}
                 />
               );
             })}
@@ -103,19 +104,16 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
           />
         </div>
 
-        {/* Peta */}
         <div className="relative z-10 mt-12">
           <h2 className="text-2xl font-semibold mb-4">Lokasi</h2>
           <PropertyMap property={property} />
         </div>
 
-        {/* Informasi Pemilik */}
         <OwnerInfo
           tenant={property.tenant}
           tenantPropertyCount={tenantPropertyCount}
         />
 
-        {/* Ulasan */}
         <Reviews reviews={aggregatedReviews} />
       </main>
     </div>

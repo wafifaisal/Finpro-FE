@@ -3,6 +3,7 @@ import { Home, DollarSign, Shield } from "lucide-react";
 import CountUp from "@/components/sub/tenant_login/countUp";
 import Image from "next/image";
 import Link from "next/link";
+import PropertyCount from "@/components/sub/tenant_login/PropertyCount";
 
 const TenantHomesPage = () => {
   return (
@@ -63,7 +64,7 @@ const TenantHomesPage = () => {
             </p>
           </div>
           <div>
-            <CountUp />
+            <PropertyCount />
             <p className="text-lg md:text-xl text-gray-700 mt-2">
               Properti Sudah Disewakan
             </p>

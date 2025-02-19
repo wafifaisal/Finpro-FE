@@ -8,8 +8,8 @@ const CountUp = ({ end }: { end: number }) => {
 
   useEffect(() => {
     let start = 0;
-    const duration = 2000; // 2 seconds
-    const interval = 30; // update interval
+    const duration = 2000; // 2 detik
+    const interval = 30; // interval update
     const step = end / (duration / interval);
 
     const counter = setInterval(() => {
@@ -34,11 +34,12 @@ const CountUp = ({ end }: { end: number }) => {
 
 const TenantCount = () => {
   const [tenantCount, setTenantCount] = useState<number | null>(null);
+  const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
   useEffect(() => {
     const fetchTenantCount = async () => {
       try {
-        const response = await fetch("/api/tenant-count");
+        const response = await fetch(`${base_url}/tenant/tenant-count`);
         const data = await response.json();
         setTenantCount(data.count);
       } catch (error) {
@@ -47,7 +48,7 @@ const TenantCount = () => {
     };
 
     fetchTenantCount();
-  }, []);
+  }, [base_url]);
 
   return (
     <div className="flex flex-col items-center">

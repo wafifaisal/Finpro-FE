@@ -89,3 +89,40 @@ export interface Totals {
   breakfastCost: number;
   total: number;
 }
+
+export type UserLocation = {
+  latitude: number;
+  longitude: number;
+} | null;
+
+export type PropertyList = {
+  id: number;
+  name: string;
+  desc: string;
+  category: string;
+  PropertyImages?: { image_url: string }[];
+  location: {
+    address: string;
+    city: string;
+    country: string;
+    latitude: string;
+    longitude: string;
+  };
+  RoomTypes: {
+    id: number;
+    name: string;
+    price: number;
+    seasonal_prices?: { price: number; start_date: string; end_date: string }[];
+    avg_rating?: number;
+    Unavailable?: { id: number; start_date: string; end_date: string }[];
+  }[];
+  isAvailable?: boolean;
+};
+
+export interface PropertyCardProps {
+  property: PropertyList;
+  userLocation?: UserLocation;
+  loading?: boolean;
+  searchStart?: Date;
+  searchEnd?: Date;
+}

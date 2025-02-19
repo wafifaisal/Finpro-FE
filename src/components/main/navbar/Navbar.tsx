@@ -112,14 +112,9 @@ const Navbar = () => {
             )}
           </div>
         </div>
-        {!(
-          pathname === "/auth/user/login" ||
-          pathname === "/auth/user/register" ||
-          pathname === "/profile" ||
-          pathname === "/auth/tenant/homepage" ||
-          pathname === "/auth/tenant/login" ||
-          pathname === "/auth/tenant/register"
-        ) && <Searchbar />}
+        {(pathname === "/" || pathname === "/property/search-result") && (
+          <Searchbar />
+        )}
       </div>
       <MobileNavbar />
     </div>

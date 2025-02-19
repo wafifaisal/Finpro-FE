@@ -1,10 +1,10 @@
-import { FaHome, FaHotel, FaBuilding } from "react-icons/fa";
+import { FaHome, FaHotel, FaBuilding, FaHouseUser } from "react-icons/fa";
 import { PiIslandFill } from "react-icons/pi";
 import { MdOutlineVilla } from "react-icons/md";
 import CategoryBox from "./categoryBox";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaHouseUser } from "react-icons/fa";
+import FilterButton from "./FilterButton";
 
 export const categories = [
   {
@@ -49,13 +49,18 @@ const Categories = () => {
   const params = useSearchParams();
   const category = params?.get("category");
   const pathname = usePathname();
-  const isMainPage = pathname === "/";
+
+  const isMainPage = pathname === "/" || pathname === "/property/search-result";
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mengembalikan posisi scroll yang tersimpan setelah refresh
+    if (pathname === "/property/search-result") {
+      setIsScrolled(true);
+      return;
+    }
+
     const savedScrollY = sessionStorage.getItem("scrollY");
     if (savedScrollY) {
       window.scrollTo(0, parseInt(savedScrollY, 10));
@@ -71,7 +76,7 @@ const Categories = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     setLoading(false);
@@ -81,28 +86,31 @@ const Categories = () => {
   if (loading) return null;
 
   return (
-    <div
-      className={`hidden md:block border-t-[1px] py-1 rounded-b-3xl max-w-2xl md:mx-auto my-4 ${
-        isScrolled
-          ? "max-w-full rounded-b-none px-3"
-          : "max-w-2xl max-[955px]:max-w-[500px] py-3 px-4"
-      } ${
-        isScrolled
-          ? "fixed top-[100px] right-0 left-0 w-full -translate-y-1/2 duration-500 bg-white md:shadow-md"
-          : "relative top-[354px] bg-white md:shadow-xl duration-500"
-      }`}
-    >
-      <div className="flex items-center justify-between overflow-x-auto">
-        {categories.map((item) => (
-          <CategoryBox
-            key={item.label}
-            label={item.label}
-            selected={category === item.label}
-            icon={item.icon}
-          />
-        ))}
+    <>
+      <div
+        className={`hidden md:block border-t-[1px] py-1 rounded-b-3xl max-w-2xl md:mx-auto my-4 ${
+          isScrolled
+            ? "max-w-full rounded-b-none px-3"
+            : "max-w-2xl max-[955px]:max-w-[500px] py-3 px-4"
+        } ${
+          isScrolled
+            ? "fixed top-[100px] right-0 left-0 w-full -translate-y-1/2 duration-500 bg-white md:shadow-md"
+            : "relative top-[354px] bg-white md:shadow-xl duration-500"
+        }`}
+      >
+        <div className="flex items-center justify-between overflow-x-auto">
+          {categories.map((item) => (
+            <CategoryBox
+              key={item.label}
+              label={item.label}
+              selected={category === item.label}
+              icon={item.icon}
+            />
+          ))}
+          {pathname === "/property/search-result" && <FilterButton />}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

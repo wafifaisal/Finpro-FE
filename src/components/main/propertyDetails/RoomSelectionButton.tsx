@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Minus, Plus, Check, Users, AlertCircle } from "lucide-react";
 import { RoomType, RoomSelection } from "@/types/types";
 import { formatCurrency } from "@/helpers/formatCurrency";
@@ -9,6 +9,8 @@ interface RoomSelectionButtonProps {
   onToggleBreakfast: (roomTypeId: number) => void;
   onRoomQuantityChange: (roomTypeId: number, change: number) => void;
   guests: number;
+  /** Tanggal booking (biasanya check‑in) dengan format "YYYY-MM-DD" */
+  selectedDate: string;
 }
 
 const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
@@ -17,9 +19,47 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
   onToggleBreakfast,
   onRoomQuantityChange,
   guests,
+  selectedDate,
 }) => {
   const quantity = selection?.quantity || 0;
   const isSelected = quantity > 0;
+
+  // Konversi selectedDate ke objek Date menggunakan useMemo
+  const selectedDateObj = useMemo(() => new Date(selectedDate), [selectedDate]);
+
+  /**
+   * Fungsi untuk mendapatkan harga kamar sesuai dengan tanggal booking.
+   * Jika ada harga seasonal pada tanggal tersebut, gunakan harga seasonal;
+   * jika tidak, gunakan harga reguler (room.price).
+   */
+  const getRoomPriceForDate = (room: RoomType, date: Date): number => {
+    if (room.seasonal_prices && room.seasonal_prices.length > 0) {
+      const seasonalPrice = room.seasonal_prices.find((sp) => {
+        const start = new Date(sp.start_date);
+        const end = new Date(sp.end_date);
+        return date >= start && date <= end;
+      });
+      if (seasonalPrice) return seasonalPrice.price;
+    }
+    return room.price;
+  };
+
+  const displayedPrice = useMemo(
+    () => getRoomPriceForDate(room, selectedDateObj),
+    [room, selectedDateObj]
+  );
+
+  // Periksa ketersediaan kamar berdasarkan tanggal booking
+  const isUnavailable =
+    room.Unavailable &&
+    room.Unavailable.some((range) => {
+      const start = new Date(range.start_date);
+      const end = new Date(range.end_date);
+      return selectedDateObj >= start && selectedDateObj <= end;
+    });
+
+  const isStockHabis = room.stock !== undefined && room.stock <= 0;
+  const isDisabled = isUnavailable || isStockHabis;
 
   return (
     <div className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-200">
@@ -28,7 +68,7 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <span className="text-xl font-semibold">
-              {formatCurrency(room.price)}
+              {formatCurrency(displayedPrice)}
             </span>
             <span className="text-gray-500 text-sm">per malam</span>
           </div>
@@ -39,7 +79,8 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
               <div className="flex items-center gap-3 border border-gray-300 px-4 py-2 rounded-full">
                 <button
                   onClick={() => onRoomQuantityChange(room.id, -1)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                  disabled={isDisabled}
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Minus className="w-4 h-4 text-gray-600" />
                 </button>
@@ -48,7 +89,8 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
                 </span>
                 <button
                   onClick={() => onRoomQuantityChange(room.id, 1)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                  disabled={isDisabled}
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Plus className="w-4 h-4 text-gray-600" />
                 </button>
@@ -56,9 +98,14 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
             ) : (
               <button
                 onClick={() => onRoomQuantityChange(room.id, 1)}
-                className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-3 rounded-lg transition-colors duration-200 font-medium"
+                disabled={isDisabled}
+                className={`px-6 py-3 rounded-lg transition-colors duration-200 font-medium ${
+                  isDisabled
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-rose-600 hover:bg-rose-700 text-white"
+                }`}
               >
-                Tambah kamar
+                {isDisabled ? "Kamar tidak tersedia" : "Tambah kamar"}
               </button>
             )}
           </div>

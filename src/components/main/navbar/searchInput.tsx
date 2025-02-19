@@ -23,15 +23,21 @@ export default function useSearchbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  // Inisialisasi nilai default: checkIn = hari ini, checkOut = besok, who = 1
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
   const [searchValues, setSearchValues] = useState<SearchValues>({
     where: "",
-    checkIn: null,
-    checkOut: null,
-    who: 0,
-    dateRange: [null, null],
+    checkIn: today,
+    checkOut: tomorrow,
+    who: 1,
+    dateRange: [today, tomorrow],
   });
+
   const [text] = useDebounce(searchValues.where, 1000);
-  // Inisialisasi isScrolled: jika pathname bukan "/" langsung true
   const [isScrolled, setIsScrolled] = useState(pathname !== "/" ? true : false);
   const [loading, setLoading] = useState(true);
 
@@ -48,9 +54,7 @@ export default function useSearchbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Simpan posisi scroll di sessionStorage (jika diperlukan)
       sessionStorage.setItem("scrollPos", window.scrollY.toString());
-      // Jika bukan halaman utama, pastikan isScrolled selalu true
       if (pathname !== "/") {
         setIsScrolled(true);
       } else {
@@ -60,10 +64,8 @@ export default function useSearchbar() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [pathname]); // Perhatikan dependency pada pathname agar logikanya selalu sesuai
+  }, [pathname]);
 
-  // Opsional: jika terjadi perubahan pathname (misal melalui navigasi) dan
-  // scroll event belum terjadi, kita bisa langsung set isScrolled.
   useEffect(() => {
     if (pathname !== "/") {
       setIsScrolled(true);
@@ -71,6 +73,28 @@ export default function useSearchbar() {
       setIsScrolled(window.scrollY > 0);
     }
   }, [pathname]);
+
+  // Perbarui query parameter setiap kali checkIn atau checkOut berubah
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchValues.checkIn) {
+      params.set("checkIn", searchValues.checkIn.toISOString().split("T")[0]);
+    } else {
+      params.delete("checkIn");
+    }
+    if (searchValues.checkOut) {
+      params.set("checkOut", searchValues.checkOut.toISOString().split("T")[0]);
+    } else {
+      params.delete("checkOut");
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [
+    searchValues.checkIn,
+    searchValues.checkOut,
+    pathname,
+    router,
+    searchParams,
+  ]);
 
   const fetchProperties = useCallback(async () => {
     try {
@@ -98,6 +122,7 @@ export default function useSearchbar() {
     }
   }, [base_url_be, text]);
 
+  // Perbarui query parameter untuk keyword dan fetch properties saat keyword berubah
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (text) {
@@ -126,7 +151,7 @@ export default function useSearchbar() {
 
     try {
       await fetch(`${base_url_be}/property?${params.toString()}`);
-      router.push(`/property?${params.toString()}`);
+      router.push(`/property/search-result?${params.toString()}`);
     } catch (error) {
       console.error("Error during search:", error);
     }
