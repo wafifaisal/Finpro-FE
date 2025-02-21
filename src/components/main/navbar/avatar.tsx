@@ -124,7 +124,7 @@ export default function Avatar() {
             <MenuItem
               icon={<FaRegCalendarCheck className="text-gray-600" />}
               label="Pesanan Saya"
-              onClick={() => navigateTo("/")}
+              onClick={() => navigateTo("/trips")}
             />
             <MenuItem
               icon={<FaStar className="text-gray-600" />}

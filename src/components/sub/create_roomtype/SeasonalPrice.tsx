@@ -3,7 +3,7 @@
 
 import React from "react";
 import { FieldArray } from "formik";
-import { PlusCircle, Calendar, X } from "lucide-react";
+import { Calendar, X } from "lucide-react";
 import { formatCurrency } from "@/helpers/formatCurrency";
 import { getHolidayName, computeRecurringDates } from "@/helpers/HolidaysUtils";
 import { CreateRoomTypeFormValues } from "@/types/createRoomTypes";
