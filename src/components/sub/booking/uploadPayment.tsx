@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { uploadPaymentProof } from "@/libs/booking";
+import { useRouter } from "next/navigation";
 
 interface FormValues {
   paymentProof: File | null;
@@ -40,6 +42,7 @@ export default function PaymentProofUpload({
   bookingId: string;
 }) {
   const [uploadStatus, setUploadStatus] = useState<string>("");
+  const router = useRouter();
 
   const handleSubmit = async (
     values: FormValues,
@@ -52,17 +55,11 @@ export default function PaymentProofUpload({
     formData.append("bookingId", bookingId);
 
     try {
-      const response = await axios.patch(
-        "http://localhost:8000/api/user-bookings/payment-proof",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      setUploadStatus(response.data.message);
+      const message = await uploadPaymentProof(bookingId, formData);
+      setUploadStatus(message);
       resetForm();
+
+      router.push("/trips");
     } catch (error) {
       console.error("Upload error:", error);
       setUploadStatus("Gagal mengunggah bukti pembayaran.");
@@ -99,7 +96,7 @@ export default function PaymentProofUpload({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50"
+              className="bg-red-700 px-6 py-2 rounded-lg text-white font-semibold hover:bg-red-800 disabled:opacity-50"
             >
               {isSubmitting ? "Uploading..." : "Upload"}
             </button>

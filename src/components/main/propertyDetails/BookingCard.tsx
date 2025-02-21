@@ -5,6 +5,8 @@ import React from "react";
 import { Star } from "lucide-react";
 import { Property, RoomSelection, Totals } from "@/types/types";
 import { formatCurrency } from "@/helpers/formatCurrency";
+import { createBooking } from "@/libs/booking";
+import { ICreateBooking } from "@/types/booking";
 
 interface BookingCardProps {
   property: Property;
@@ -44,6 +46,26 @@ const BookingCard: React.FC<BookingCardProps> = ({
       ? validRatings.reduce((sum, rt) => sum + (rt.avg_rating || 0), 0) /
         validRatings.length
       : 0;
+
+  const handleBooking = async () => {
+    try {
+      const bookingData: ICreateBooking = {
+        userId: "608cde42-46ab-4436-973d-616efdb0339c",
+        roomTypeId: selectedRooms[0]?.roomTypeId,
+        numOfGuests: guests,
+        startDate: checkIn,
+        endDate: checkOut,
+        payment_method: "Manual",
+      };
+
+      const newBooking = await createBooking(bookingData);
+      console.log("Booking successful:", newBooking);
+      alert("Booking successful!");
+    } catch (error) {
+      console.error("Booking failed:", error);
+      alert("Booking failed. Please try again.");
+    }
+  };
 
   return (
     <div className="relative md:col-span-1">
@@ -97,6 +119,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           </div>
         </div>
         <button
+          onClick={handleBooking}
           className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white py-3 rounded-lg font-medium mt-4 transition"
           disabled={getTotalCapacity() < guests}
         >
