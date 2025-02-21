@@ -1,13 +1,15 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { Search, X, Menu, Grid } from "lucide-react";
+import { X, Menu, Grid } from "lucide-react";
 import Image from "next/image";
 import Searchbar from "@/components/main/navbar/searchBar";
 import Categories from "./mobileCategories";
 import { useSession } from "@/context/useSessionHook";
 import Avatar from "@/components/main/navbar/avatar";
 import { usePathname } from "next/navigation";
+import TenantAvatar from "@/components/main/navbar/avatarTenant";
+import { FaHome } from "react-icons/fa";
 
 const MobileNavbar = () => {
   const [activeTab, setActiveTab] = useState("explore");
@@ -18,14 +20,9 @@ const MobileNavbar = () => {
 
   return (
     <div className="md:hidden">
-      {!(
-        pathname === "/auth/user/login" ||
-        pathname === "/auth/user/register" ||
-        pathname === "/profile" ||
-        pathname === "/auth/tenant/homepage" ||
-        pathname === "/auth/tenant/login" ||
-        pathname === "/auth/tenant/register"
-      ) && <Searchbar />}
+      {(pathname === "/" || pathname === "/property/search-result") && (
+        <Searchbar />
+      )}
 
       {isMenuOpen && (
         <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
@@ -81,17 +78,14 @@ const MobileNavbar = () => {
                 }`}
                 onClick={() => setActiveTab("explore")}
               >
-                <Search size={20} />
-                <span className="text-xs mt-1">Explore</span>
+                <FaHome size={20} />
+                <span className="text-xs mt-1">Halaman Utama</span>
               </button>
             </Link>
           </div>
 
           <div className="flex flex-col items-center">
-            {!(
-              pathname === "/auth/user/login" ||
-              pathname === "/auth/user/register"
-            ) && (
+            {(pathname === "/" || pathname === "/property/search-result") && (
               <button
                 className="flex flex-col items-center text-gray-500"
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
@@ -102,7 +96,10 @@ const MobileNavbar = () => {
             )}
           </div>
           {isAuth ? (
-            <Avatar />
+            <>
+              <Avatar />
+              <TenantAvatar />
+            </>
           ) : (
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}

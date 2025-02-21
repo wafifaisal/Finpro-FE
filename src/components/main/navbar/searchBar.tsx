@@ -10,8 +10,8 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 export default function Searchbar() {
-  const suggestionRef = useRef<HTMLDivElement | null>(null); // suggestion list ref
-  const inputRef = useRef<HTMLInputElement | null>(null); // input field ref
+  const suggestionRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const pathname = usePathname();
   const {
@@ -50,7 +50,7 @@ export default function Searchbar() {
     <>
       <div
         className={`hidden md:block border rounded-full max-w-4xl md:mx-auto my-4 ${
-          isScrolled ? "max-w-xl px-3 z-40" : "max-w-4xl py-3 px-4 z-40"
+          isScrolled ? "max-w-xl px-3 z-40" : "max-w-4xl py-3 px-4 "
         } ${
           isScrolled
             ? "fixed top-9 left-1/4 right-1/4 -translate-y-1/2 duration-500 bg-white shadow-md"
@@ -70,12 +70,16 @@ export default function Searchbar() {
                     selectsRange
                     startDate={searchValues.checkIn}
                     endDate={searchValues.checkOut}
-                    onChange={(update) => {
+                    onChange={(update: [Date | null, Date | null]) => {
                       const [start, end] = update;
                       setSearchValues((prev) => ({
                         ...prev,
                         checkIn: start ? new Date(start) : null,
-                        checkOut: end ? new Date(end) : null,
+                        // Pastikan checkOut hanya diset jika end > start
+                        checkOut:
+                          start && end && end.getTime() > start.getTime()
+                            ? new Date(end)
+                            : null,
                       }));
                     }}
                     dateFormat="d MMM"
@@ -107,7 +111,7 @@ export default function Searchbar() {
                     {isLocationOpen && (
                       <div
                         ref={suggestionRef}
-                        className="absolute z-50 w-72 mt-6 -left-7 bg-white rounded-2xl shadow-lg border  border-gray-200 overflow-hidden"
+                        className="absolute z-40 w-72 mt-6 -left-7 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
                       >
                         <div className="p-4 border-b">
                           <h3 className="text-sm font-semibold text-gray-900">
@@ -200,9 +204,9 @@ export default function Searchbar() {
           </button>
         </div>
       </div>
-      {!(
-        pathname === "/auth/user/login" || pathname === "/auth/user/register"
-      ) && <MobileSearchBar />}
+      {(pathname === "/" || pathname === "/property/search-result") && (
+        <MobileSearchBar />
+      )}
       <Categories />
     </>
   );

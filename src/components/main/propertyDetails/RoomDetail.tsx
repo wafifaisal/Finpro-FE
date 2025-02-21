@@ -1,4 +1,3 @@
-// components/main/propertyDetails/RoomDetail.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -18,6 +17,7 @@ interface RoomDetailProps {
   onToggleBreakfast: (roomTypeId: number) => void;
   onRoomQuantityChange: (roomTypeId: number, change: number) => void;
   guests: number;
+  selectedDate: string;
 }
 
 const RoomDetail: React.FC<RoomDetailProps> = ({
@@ -26,18 +26,22 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
   onToggleBreakfast,
   onRoomQuantityChange,
   guests,
+  selectedDate,
 }) => {
-  // State untuk mengatur apakah fasilitas sudah diexpand atau belum
   const [facilitiesExpanded, setFacilitiesExpanded] = useState(false);
-
-  // Fungsi untuk toggle expand/collapse
   const toggleFacilities = () => setFacilitiesExpanded((prev) => !prev);
-
-  // Tampilkan semua fasilitas jika sudah diexpand, jika tidak tampilkan maksimal 3 fasilitas
   const displayedFacilities = facilitiesExpanded
     ? room.facilities
     : room.facilities.slice(0, 5);
-
+  const bookingDate = new Date(selectedDate);
+  const roomUnavailable =
+    room.Unavailable &&
+    room.Unavailable.length > 0 &&
+    room.Unavailable.some((range) => {
+      const start = new Date(range.start_date);
+      const end = new Date(range.end_date);
+      return bookingDate >= start && bookingDate <= end;
+    });
   return (
     <div className="mb-12 pb-12 border-b last:border-b-0">
       <Swiper
@@ -72,6 +76,11 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
                 </span>
               )}
             </div>
+            {(room.stock <= 0 || roomUnavailable) && (
+              <p className="mt-2 text-red-500 font-semibold">
+                Property Tidak Tersedia
+              </p>
+            )}
           </div>
           <RoomSelectionButton
             room={room}
@@ -79,6 +88,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
             onToggleBreakfast={onToggleBreakfast}
             onRoomQuantityChange={onRoomQuantityChange}
             guests={guests}
+            selectedDate={selectedDate}
           />
         </div>
         <div>

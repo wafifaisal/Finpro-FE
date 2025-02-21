@@ -1,11 +1,15 @@
-import { useState } from "react";
-import { Search, X, Plus, Minus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, X, Plus, Minus, Loader } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useSearchbar from "@/components/main/navbar/searchInput";
+import { usePathname } from "next/navigation";
 
 const MobileSearchBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const pathname = usePathname();
+
   const {
     searchValues,
     setSearchValues,
@@ -16,6 +20,19 @@ const MobileSearchBar = () => {
     incrementWho,
     decrementWho,
   } = useSearchbar();
+
+  useEffect(() => {
+    if (pathname === "/property/search-result") {
+      setIsExpanded(false);
+    }
+  }, [pathname]);
+
+  const handleSearchClick = async () => {
+    setLoading(true);
+    await handleSearch();
+    setIsExpanded(false);
+    setLoading(false);
+  };
 
   const isSearchDisabled = Object.values(searchValues).some(
     (value) => value === "" || value === null
@@ -130,16 +147,25 @@ const MobileSearchBar = () => {
               </div>
 
               <button
-                onClick={handleSearch}
-                disabled={isSearchDisabled}
+                onClick={handleSearchClick}
+                disabled={isSearchDisabled || loading}
                 className={`w-full py-3 rounded-lg flex items-center justify-center space-x-2 ${
-                  isSearchDisabled
+                  isSearchDisabled || loading
                     ? "bg-gray-300 text-gray-500"
                     : "bg-red-500 text-white"
                 }`}
               >
-                <Search size={20} />
-                <span>Cari</span>
+                {loading ? (
+                  <>
+                    <Loader size={20} className="animate-spin" />
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Search size={20} />
+                    <span>Cari</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

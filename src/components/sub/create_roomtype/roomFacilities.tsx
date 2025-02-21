@@ -16,6 +16,8 @@ const RoomFacilities: React.FC<RoomFacilitiesProps> = ({
   availableFacilities,
   setFieldValue,
 }) => {
+  const current: string[] = room.facilities ?? [];
+
   return (
     <div>
       <label className="block text-sm font-medium mb-4">Fasilitas Kamar</label>
@@ -25,10 +27,9 @@ const RoomFacilities: React.FC<RoomFacilitiesProps> = ({
             key={facility.id}
             type="button"
             onClick={() => {
-              const current: string[] = room.facilities;
               if (current.includes(facility.id)) {
                 const newFacilities = current.filter(
-                  (fac: string) => fac !== facility.id
+                  (fac) => fac !== facility.id
                 );
                 setFieldValue(`rooms.${roomIndex}.facilities`, newFacilities);
               } else {
@@ -39,7 +40,7 @@ const RoomFacilities: React.FC<RoomFacilitiesProps> = ({
               }
             }}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              room.facilities.includes(facility.id)
+              current.includes(facility.id)
                 ? "bg-black text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
