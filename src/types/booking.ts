@@ -9,7 +9,7 @@ export interface IBooking {
   id: string;
   num_of_guests: number;
   total_price: number;
-  details?: Record<string, any>;
+  details?: string;
   start_date: Date;
   end_date: Date;
   created_at: Date;

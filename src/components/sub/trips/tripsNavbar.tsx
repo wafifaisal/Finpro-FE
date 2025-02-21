@@ -9,7 +9,6 @@ import { usePathname } from "next/navigation";
 import { useSession } from "@/context/useSessionHook";
 import Avatar from "@/components/main/navbar/avatar";
 import TenantAvatar from "@/components/main/navbar/avatarTenant";
-import Searchbar from "@/components/main/navbar/searchBar";
 
 const TripsNavbar = () => {
   const { isAuth } = useSession();

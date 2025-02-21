@@ -106,7 +106,6 @@ const BookingCard: React.FC<BookingCardProps> = ({
         validRatings.length
       : 0;
 
-<<<<<<< HEAD
   const handleBooking = async () => {
     try {
       const bookingData: ICreateBooking = {
@@ -126,12 +125,10 @@ const BookingCard: React.FC<BookingCardProps> = ({
       alert("Booking failed. Please try again.");
     }
   };
-=======
   // Konversi string tanggal ke objek Date (format "YYYY-MM-DD")
   const checkInDate = checkIn ? new Date(checkIn) : null;
   const checkOutDate = checkOut ? new Date(checkOut) : null;
   const todayDate = new Date(today);
->>>>>>> f3f088ec15fbb28538123e5cfb8964b5a6bf1f63
 
   return (
     <div className="relative z-30 md:col-span-1">

@@ -44,6 +44,7 @@ export default function TripsPage() {
         prevBookings.filter((booking) => booking.id !== bookingId)
       );
     } catch (error) {
+      console.log(error);
       alert("Gagal membatalkan booking. Silakan coba lagi.");
     }
   };
