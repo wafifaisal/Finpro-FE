@@ -38,20 +38,7 @@ const PropertyMap = ({
   userLocation: UserLocation;
   router: ReturnType<typeof useRouter>;
 }) => {
-  if (properties.length === 0) return null;
-
-  // Ambil parameter dari URL (misalnya untuk checkIn/checkOut)
-  const searchParams = new URLSearchParams(window.location.search);
-  const checkInParam = searchParams.get("checkIn") || "";
-  const checkOutParam = searchParams.get("checkOut") || "";
-
-  const searchStart = checkInParam ? new Date(checkInParam) : new Date();
-  const searchEnd = checkOutParam
-    ? new Date(checkOutParam)
-    : new Date(searchStart.getTime() + 24 * 60 * 60 * 1000);
-
-  // Tentukan pusat peta (defaultCenter)
-  // Misalnya, jika ada properti hasil pencarian, gunakan koordinat properti pertama yang valid.
+  // Panggil hook secara unconditional terlebih dahulu.
   const defaultCenter: [number, number] = useMemo(() => {
     for (const property of properties) {
       const lat = getValidCoordinate(property.location.latitude);
@@ -69,6 +56,19 @@ const PropertyMap = ({
     }
     return [0, 0];
   }, [userLocation, properties]);
+
+  // Lakukan early return setelah semua hook terpanggil.
+  if (properties.length === 0) return null;
+
+  // Ambil parameter dari URL (misalnya untuk checkIn/checkOut)
+  const searchParams = new URLSearchParams(window.location.search);
+  const checkInParam = searchParams.get("checkIn") || "";
+  const checkOutParam = searchParams.get("checkOut") || "";
+
+  const searchStart = checkInParam ? new Date(checkInParam) : new Date();
+  const searchEnd = checkOutParam
+    ? new Date(checkOutParam)
+    : new Date(searchStart.getTime() + 24 * 60 * 60 * 1000);
 
   return (
     <div className="mb-8">

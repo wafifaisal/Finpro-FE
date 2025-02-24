@@ -16,21 +16,19 @@ const ForgotPasswordSchema = Yup.object().shape({
 
 export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
+  const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
   const handleForgotPassword = async (values: { email: string }) => {
     setIsLoading(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL_BE}/auth/forgotPassword`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        }
-      );
+      const res = await fetch(`${base_url}/auth/forgotPassword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
       const result = await res.json();
       if (!res.ok)
@@ -60,7 +58,6 @@ export default function ForgotPassword() {
 
       <div className="bg-white rounded-2xl p-8 lg:p-12 shadow-lg w-full max-w-[400px]">
         <div className="flex justify-center mb-6">
-          {/* Ganti dengan logo yang sesuai */}
           <Image
             src="/logo.png"
             alt="Logo Nginepin"
@@ -84,7 +81,6 @@ export default function ForgotPassword() {
         >
           {({ isSubmitting }) => (
             <Form className="space-y-6">
-              {/* Input Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
@@ -102,7 +98,6 @@ export default function ForgotPassword() {
                 />
               </div>
 
-              {/* Tombol Kirim */}
               <button
                 type="submit"
                 disabled={isSubmitting || isLoading}

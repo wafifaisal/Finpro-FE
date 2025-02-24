@@ -130,7 +130,7 @@ body {
 }
 
 
-@keyframes marquee {
+@keyframes marquee-home {
   0% {
     transform: translateX(100%);
   }
@@ -139,8 +139,8 @@ body {
   }
 }
 
-.animate-marquee {
-  animation: marquee 20s linear infinite;
+.animate-marquee-home {
+  animation: marquee-home 20s linear infinite;
 }
 
 @keyframes stroke {
@@ -323,6 +323,19 @@ body {
   animation: scaleIn 0.3s ease-out;
 }
 
-.main-content {
-  padding-top: 120px;
+@keyframes marquee {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-33.33%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+.animate-marquee-reverse {
+  animation: marquee 20s linear infinite reverse;
 }

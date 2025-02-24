@@ -33,7 +33,6 @@ const CountUp = ({ end }: { end: number }) => {
   );
 };
 
-// Komponen utama untuk menampilkan jumlah properti
 const PropertyCount = () => {
   const [propertyCount, setPropertyCount] = useState<number | null>(null);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;

@@ -37,6 +37,7 @@ export interface SeasonalPrice {
   price: number;
   start_date: string;
   end_date: string;
+  dates: string[];
 }
 
 export interface RoomType {
@@ -62,6 +63,7 @@ export interface Tenant {
   email: string;
   avatar: string;
   createdAt: string;
+  properties?: Property[]; // properti baru
 }
 
 export interface Property {
@@ -112,7 +114,12 @@ export type PropertyList = {
     id: number;
     name: string;
     price: number;
-    seasonal_prices?: { price: number; start_date: string; end_date: string }[];
+    seasonal_prices?: {
+      price: number;
+      start_date: string;
+      end_date: string;
+      dates: string[];
+    }[];
     avg_rating?: number;
     Unavailable?: { id: number; start_date: string; end_date: string }[];
   }[];
@@ -125,4 +132,32 @@ export interface PropertyCardProps {
   loading?: boolean;
   searchStart?: Date;
   searchEnd?: Date;
+}
+
+export interface SearchField {
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+  placeholder: string;
+}
+
+export interface SearchValues {
+  where: string;
+  checkIn: Date | null;
+  checkOut: Date | null;
+  who: number;
+  dateRange: Date[];
+  [key: string]: string | number | Date | Date[] | null;
+}
+
+export interface SearchField {
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+  placeholder: string;
+}
+
+export interface FormValues {
+  data: string;
+  password: string;
 }

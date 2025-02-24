@@ -1,4 +1,3 @@
-// src/types/roomTypes.ts
 export interface RoomType {
   name: string;
   stock: string;
@@ -9,5 +8,22 @@ export interface RoomType {
   breakfast_price: number;
   images: File[];
   facilities: string[];
-  imagePreviews: string[]; // Pastikan properti ini ada
+  imagePreviews: string[];
+}
+
+export interface RoomTypeDetail {
+  id: number;
+  price: number;
+  seasonal_prices?: {
+    start_date: string;
+    end_date: string;
+    price: number | string;
+  }[];
+  has_breakfast: boolean;
+  breakfast_price: number;
+  capacity: number;
+  Unavailable?: {
+    start_date: string;
+    end_date: string;
+  }[];
 }

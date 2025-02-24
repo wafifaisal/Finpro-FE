@@ -28,12 +28,10 @@ const Footer = () => {
     fetch(`${base_url_be}/property`)
       .then((response) => response.json())
       .then((data) => {
-        // Urutkan properti berdasarkan click_rate secara descending
         const sorted = data.result.sort(
           (a: Property, b: Property) =>
             (b.click_rate || 0) - (a.click_rate || 0)
         );
-        // Simpan hanya 9 properti teratas
         setProperties(sorted.slice(0, 9));
       })
       .catch((error) => {

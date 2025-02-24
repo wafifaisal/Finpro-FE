@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useFormik, FormikProps } from "formik";
-import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import ImageUploadSection from "./imageUpload";
@@ -11,39 +10,7 @@ import BasicInfoSection from "./basicInfo";
 import LocationSection from "./locationSection";
 import TermsConditionsSection from "./termCondition";
 import { SAMPLE_FACILITIES, Position } from "@/types/index";
-
-// -----------------------------------------------------------------
-// Definisikan tipe nilai formulir secara lengkap (gunakan satu tipe)
-// -----------------------------------------------------------------
-export interface PropertyFormValues {
-  name: string;
-  desc: string;
-  category: string;
-  terms_condition: string;
-  address: string;
-  country: string;
-  city: string;
-  facilities: string[];
-  images: File[];
-}
-
-const validationSchema = Yup.object({
-  name: Yup.string().required("Nama properti wajib diisi"),
-  desc: Yup.string()
-    .required("Deskripsi wajib diisi")
-    .min(20, "Deskripsi harus terdiri dari minimal 20 karakter"),
-  category: Yup.string().required("Kategori wajib diisi"),
-  terms_condition: Yup.string().required("Syarat & ketentuan wajib diisi"),
-  address: Yup.string().required("Alamat wajib diisi"),
-  country: Yup.string().required("Negara wajib diisi"),
-  city: Yup.string().required("Kota wajib diisi"),
-  facilities: Yup.array()
-    .of(Yup.string())
-    .min(1, "Pilih setidaknya satu fasilitas"),
-  images: Yup.array()
-    .of(Yup.mixed().required("File wajib diunggah"))
-    .max(10, "Maksimal 10 foto diizinkan"),
-});
+import { PropertyFormValues, validationSchema } from "./validationSchema";
 
 const PropertyForm: React.FC = () => {
   const [position, setPosition] = useState<Position>([-6.9175, 107.6191]);
@@ -87,9 +54,7 @@ const PropertyForm: React.FC = () => {
           Object.entries(values).forEach(([key, value]) => {
             if (key === "facilities") {
               formDataToSend.append("facilities", JSON.stringify(value));
-            } else if (key === "images") {
-              // File gambar akan di-append nanti
-            } else {
+            } else if (key !== "images") {
               formDataToSend.append(key, value.toString());
             }
           });
@@ -104,7 +69,6 @@ const PropertyForm: React.FC = () => {
 
           formDataToSend.append("location", JSON.stringify(locationObj));
 
-          // Append tiap file gambar
           values.images.forEach((image: File) =>
             formDataToSend.append("files", image)
           );
@@ -119,7 +83,6 @@ const PropertyForm: React.FC = () => {
 
           const data = await response.json();
 
-          // Redirect ke halaman detail properti setelah sukses
           router.push(`/property-tenant/create/${data.property_id}`);
         } catch (error) {
           Swal.fire({
@@ -145,11 +108,9 @@ const PropertyForm: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      // Gabungkan file baru dengan yang sudah ada, batasi maksimal 10 file
       const updatedFiles = [...formik.values.images, ...newFiles].slice(0, 10);
       formik.setFieldValue("images", updatedFiles);
 
-      // Buat preview URL dan batasi hingga 10 URL
       const newPreviewUrls = newFiles.map((file) => URL.createObjectURL(file));
       const updatedPreviews = [...imagePreviewUrls, ...newPreviewUrls].slice(
         0,
@@ -160,12 +121,10 @@ const PropertyForm: React.FC = () => {
   };
 
   const removeImage = (index: number) => {
-    // Hapus file dari nilai Formik
     const updatedFiles = [...formik.values.images];
     updatedFiles.splice(index, 1);
     formik.setFieldValue("images", updatedFiles);
 
-    // Batalkan URL dan perbarui preview
     setImagePreviewUrls((prev) => {
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);

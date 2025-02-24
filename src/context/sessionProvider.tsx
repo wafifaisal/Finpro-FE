@@ -81,7 +81,7 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  }, [base_url, resetSession]); // ✅ Menambahkan resetSession ke dependensi
+  }, [base_url, resetSession]);
 
   const logout = useCallback(() => {
     localStorage.removeItem("token");
