@@ -103,10 +103,10 @@ const Navbar = () => {
                   Daftarkan Property Anda
                 </Link>
                 <Link
-                  href="/help"
+                  href="/about"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
-                  Help
+                  Tentang Nginepin
                 </Link>
               </div>
             )}

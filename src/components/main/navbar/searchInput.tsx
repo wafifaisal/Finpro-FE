@@ -2,20 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "use-debounce";
 import "react-datepicker/dist/react-datepicker.css";
-
-interface SearchValues {
-  where: string;
-  checkIn: Date | null;
-  checkOut: Date | null;
-  dateRange: [Date | null, Date | null];
-  who: number;
-}
-
-interface Property {
-  id: number;
-  name: string;
-  location: { address: string; city: string; country: string };
-}
+import { SearchValues, Property } from "../../../types/types";
 
 export default function useSearchbar() {
   const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
@@ -23,8 +10,6 @@ export default function useSearchbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [suggestions, setSuggestions] = useState<string[]>([]);
-
-  // Inisialisasi nilai default: checkIn = hari ini, checkOut = besok, who = 1
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);

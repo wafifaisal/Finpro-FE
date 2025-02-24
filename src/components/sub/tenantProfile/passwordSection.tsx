@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
-// Definisikan tipe nilai form
 interface FormValues {
   kataSandiSaatIni: string;
   kataSandiBaru: string;
@@ -17,7 +16,6 @@ export default function ProfilKataSandi() {
   const { tenant } = useSession();
   const [sedangMengeditPassword, setSedangMengeditPassword] = useState(false);
 
-  // Skema validasi menggunakan Yup
   const skemaValidasi = Yup.object().shape({
     kataSandiSaatIni: Yup.string().required("Kata sandi saat ini wajib diisi"),
     kataSandiBaru: Yup.string()
@@ -28,7 +26,6 @@ export default function ProfilKataSandi() {
       .required("Konfirmasi kata sandi wajib diisi"),
   });
 
-  // Fungsi untuk menangani pembaruan password dengan tipe parameter yang tepat
   const tanganiPembaruanPassword = async (
     values: FormValues,
     { setSubmitting, resetForm }: FormikHelpers<FormValues>

@@ -38,34 +38,49 @@ export default function PropertyCard({
         validRatings.length
       : 0;
 
-  // Ambil tipe kamar pertama untuk tampilan harga
-  const roomType = property.RoomTypes[0];
-  const regularPrice = roomType?.price;
-
   const effectiveStart = searchStart ? searchStart : new Date();
   const effectiveEnd = searchEnd
     ? searchEnd
     : new Date(effectiveStart.getTime() + 24 * 60 * 60 * 1000);
 
-  // Cek harga seasonal
-  let activeSeasonalPrice = undefined;
-  if (roomType?.seasonal_prices && roomType.seasonal_prices.length > 0) {
-    activeSeasonalPrice = roomType.seasonal_prices.find((sp) => {
-      const spStart = new Date(sp.start_date);
-      const spEnd = new Date(sp.end_date);
-      return effectiveStart >= spStart && effectiveEnd <= spEnd;
-    });
-  }
-  const finalPrice = activeSeasonalPrice
-    ? activeSeasonalPrice.price
-    : regularPrice;
-  const showDiscount = !!(
-    activeSeasonalPrice &&
-    regularPrice &&
-    regularPrice > activeSeasonalPrice.price
+  const lowestRegularPrice = Math.min(
+    ...property.RoomTypes.map((room) => room.price)
   );
 
-  // Cek ketersediaan kamar
+  // Hitung harga efektif terendah dengan mempertimbangkan seasonal price
+  const lowestEffectivePrice = property.RoomTypes.reduce((min, room) => {
+    let effectiveRoomPrice = room.price;
+    if (room.seasonal_prices && room.seasonal_prices.length > 0) {
+      const applicableSeasonal = room.seasonal_prices.find((sp) => {
+        // Jika ada properti `dates` dan tidak kosong, gunakan tanggal‑tanggal tersebut
+        if (sp.dates && sp.dates.length > 0) {
+          const targetStr = effectiveStart.toISOString().split("T")[0];
+          return sp.dates.some((d: string) => {
+            const dStr = new Date(d).toISOString().split("T")[0];
+            return dStr === targetStr;
+          });
+        }
+        // Jika tidak, gunakan range start_date dan end_date
+        else if (sp.start_date && sp.end_date) {
+          const spStart = new Date(sp.start_date);
+          const spEnd = new Date(sp.end_date);
+          return effectiveStart >= spStart && effectiveStart <= spEnd;
+        }
+        return false;
+      });
+      if (applicableSeasonal) {
+        effectiveRoomPrice = applicableSeasonal.price;
+      }
+    }
+    return Math.min(min, effectiveRoomPrice);
+  }, Infinity);
+
+  // Harga yang akan ditampilkan adalah harga efektif terendah
+  const finalPrice = lowestEffectivePrice;
+  // Tampilkan discount jika harga reguler lebih tinggi dari harga efektif
+  const showDiscount = lowestRegularPrice > lowestEffectivePrice;
+
+  // Cek ketersediaan kamar di semua room types
   const isAnyRoomAvailable = property.RoomTypes.some((room) => {
     if (!room.Unavailable || room.Unavailable.length === 0) return true;
     const isRoomUnavailable = room.Unavailable.some((range) => {
@@ -105,7 +120,7 @@ export default function PropertyCard({
         overallRating={overallRating}
         finalPrice={finalPrice}
         showDiscount={showDiscount}
-        regularPrice={regularPrice}
+        regularPrice={lowestRegularPrice}
         handlePropertyClick={handlePropertyClick}
       />
     </div>

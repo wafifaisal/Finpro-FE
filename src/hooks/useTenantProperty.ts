@@ -97,6 +97,26 @@ export const useTenantProperties = (page: number) => {
   };
 
   const handleDeleteRoomType = async (roomTypeId: number) => {
+    const propertyWithRoomType = properties.find(
+      (property) =>
+        property.RoomTypes &&
+        property.RoomTypes.some((room) => room.id === roomTypeId)
+    );
+
+    if (
+      propertyWithRoomType &&
+      propertyWithRoomType.RoomTypes &&
+      propertyWithRoomType.RoomTypes.length <= 1
+    ) {
+      Swal.fire({
+        title: "Peringatan",
+        text: "Tidak dapat menghapus tipe kamar jika hanya tersisa satu, silahkan edit tipe kamar ",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     const confirmResult = await Swal.fire({
       title: "Apakah Anda yakin?",
       text: "Tipe kamar ini akan dihapus secara permanen!",
@@ -112,10 +132,13 @@ export const useTenantProperties = (page: number) => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${base_url}/roomtype/${roomTypeId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token || ""}` },
-      });
+      const response = await fetch(
+        `${base_url}/create/roomtype/${roomTypeId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token || ""}` },
+        }
+      );
       if (!response.ok) {
         throw new Error(await response.text());
       }

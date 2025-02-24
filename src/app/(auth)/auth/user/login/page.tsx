@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { FaTimes } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import Image from "next/image";
@@ -11,18 +10,8 @@ import SocialLogin from "@/components/main/register/socialLogin";
 import Link from "next/link";
 import Navbar from "@/components/main/navbar/Navbar";
 import { Eye, EyeOff } from "lucide-react";
-
-const LoginSchema = Yup.object().shape({
-  data: Yup.string().required("Username atau Email harus diisi"),
-  password: Yup.string()
-    .min(8, "Kata sandi harus minimal 8 karakter ")
-    .required("Password harus diisi"),
-});
-
-interface FormValues {
-  data: string;
-  password: string;
-}
+import { LoginSchema } from "@/types/LoginSchema";
+import { FormValues } from "@/types/types";
 
 export default function LoginUser() {
   const [isLoading, setIsLoading] = useState(false);

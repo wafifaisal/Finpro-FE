@@ -2,7 +2,7 @@ import React from "react";
 import "react-quill/dist/quill.snow.css";
 import { FormikProps } from "formik";
 import dynamic from "next/dynamic";
-import { PropertyFormValues } from "./propertyForm";
+import { PropertyFormValues } from "@/types/propertyTypes";
 
 interface TermsConditionsSectionProps {
   formik: FormikProps<PropertyFormValues>;

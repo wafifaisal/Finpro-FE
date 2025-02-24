@@ -1,15 +1,10 @@
-// pages/EditRoomType.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Formik, Form, FieldArray, FormikHelpers } from "formik";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
-import RoomCard from "../create_roomtype/roomCard";
-import validationSchema from "@/types/ValidationSchema";
-import SeasonalPriceSection from "./SeasonalPriceSection";
-import UnavailableSection from "./UnavailableSection";
+import EditRoomTypeForm from "./EditRoomtypeForm";
 import {
   EditRoomTypeFormValues,
   EditRoom,
@@ -19,6 +14,20 @@ import {
 
 interface EditRoomTypeProps {
   params: { property_id: number; roomtype_id: number };
+}
+
+interface RoomImage {
+  image_url: string;
+}
+
+interface FetchRoomTypeResponse {
+  roomType: {
+    RoomImages?: RoomImage[];
+    unavailable?: UnavailablePeriod[];
+    Unavailable?: UnavailablePeriod[];
+    seasonal_prices?: SeasonalPrice[];
+    [key: string]: unknown;
+  };
 }
 
 export default function EditRoomType({ params }: EditRoomTypeProps) {
@@ -52,7 +61,7 @@ export default function EditRoomType({ params }: EditRoomTypeProps) {
     { id: "PRIVATE_POOL", name: "Kolam Privat" },
   ];
 
-  // Fetch room type data from backend
+  // Fetch room type data dari backend
   useEffect(() => {
     const fetchRoomType = async () => {
       try {
@@ -65,29 +74,27 @@ export default function EditRoomType({ params }: EditRoomTypeProps) {
           }
         );
         if (!res.ok) throw new Error("Gagal mengambil data room type");
-        const data = await res.json();
+        const data: FetchRoomTypeResponse = await res.json();
         const roomData = data.roomType;
-        const imagePreviews = roomData.RoomImages
-          ? roomData.RoomImages.map(
-              (img: { image_url: string }) => img.image_url
-            )
+        const imagePreviews: string[] = roomData.RoomImages
+          ? roomData.RoomImages.map((img: RoomImage) => img.image_url)
           : [];
-        const unavailable = (
+        const unavailable: UnavailablePeriod[] = (
           roomData.unavailable ||
           roomData.Unavailable ||
           []
         ).map((u: UnavailablePeriod & { id?: number }) => ({
           id: u.id,
-          start_date: format(new Date(u.start_date), "yyyy-MM-dd"),
-          end_date: format(new Date(u.end_date), "yyyy-MM-dd"),
+          start_date: format(new Date(u.start_date as string), "yyyy-MM-dd"),
+          end_date: format(new Date(u.end_date as string), "yyyy-MM-dd"),
         }));
-        const seasonal_prices = (roomData.seasonal_prices || []).map(
-          (sp: SeasonalPrice) => ({
-            ...sp,
-            start_date: format(new Date(sp.start_date), "yyyy-MM-dd"),
-            end_date: format(new Date(sp.end_date), "yyyy-MM-dd"),
-          })
-        );
+        const seasonal_prices: SeasonalPrice[] = (
+          roomData.seasonal_prices || []
+        ).map((sp: SeasonalPrice) => ({
+          ...sp,
+          start_date: format(new Date(sp.start_date as string), "yyyy-MM-dd"),
+          end_date: format(new Date(sp.end_date as string), "yyyy-MM-dd"),
+        }));
         setInitialValues({
           rooms: [
             {
@@ -96,7 +103,17 @@ export default function EditRoomType({ params }: EditRoomTypeProps) {
               unavailable,
               seasonal_prices,
               images: [],
-            } as EditRoom,
+              name: roomData.name || "",
+              stock: roomData.stock || 0,
+              price: roomData.price || 0,
+              capacity: roomData.capacity || 0,
+              size: roomData.size || 0,
+              description: roomData.description || "",
+              facilities: roomData.facilities || [],
+              bed_details: roomData.bed_details || "",
+              has_breakfast: roomData.has_breakfast || false,
+              breakfast_price: roomData.breakfast_price || 0,
+            } as unknown as EditRoom,
           ],
         });
       } catch (error) {
@@ -112,8 +129,8 @@ export default function EditRoomType({ params }: EditRoomTypeProps) {
       resetForm,
       setSubmitting,
       setStatus,
-    }: FormikHelpers<EditRoomTypeFormValues>
-  ) => {
+    }: import("formik").FormikHelpers<EditRoomTypeFormValues>
+  ): Promise<void> => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -178,67 +195,11 @@ export default function EditRoomType({ params }: EditRoomTypeProps) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-8 bg-white">
-      <h1 className="text-4xl font-bold mb-12">Edit Tipe Kamar</h1>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-        enableReinitialize
-      >
-        {({ values, setFieldValue, isSubmitting, status }) => (
-          <Form className="space-y-12">
-            {status && status.responseMessage && (
-              <div
-                className={`mb-8 p-4 rounded-2xl ${
-                  (status.responseMessage as string).includes("berhasil")
-                    ? "bg-green-50 text-green-700"
-                    : "bg-red-50 text-red-700"
-                }`}
-              >
-                {status.responseMessage}
-              </div>
-            )}
-            <FieldArray name="rooms">
-              {({ remove }) => (
-                <>
-                  {values.rooms.map((room, roomIndex: number) => (
-                    <div
-                      key={roomIndex}
-                      className="border p-4 rounded-2xl mb-8"
-                    >
-                      <RoomCard
-                        room={room}
-                        roomIndex={roomIndex}
-                        availableFacilities={availableFacilities}
-                        setFieldValue={setFieldValue}
-                        remove={remove}
-                      />
-                      <SeasonalPriceSection
-                        roomIndex={roomIndex}
-                        values={values}
-                        setFieldValue={setFieldValue}
-                      />
-                      <UnavailableSection
-                        roomIndex={roomIndex}
-                        values={values}
-                        setFieldValue={setFieldValue}
-                      />
-                    </div>
-                  ))}
-                </>
-              )}
-            </FieldArray>
-            <button
-              type="submit"
-              disabled={isSubmitting || isLoading}
-              className="w-full bg-black text-white py-3 rounded-2xl hover:bg-gray-800 transition-colors"
-            >
-              {isLoading ? "Loading..." : "Perbarui Tipe Kamar"}
-            </button>
-          </Form>
-        )}
-      </Formik>
-    </div>
+    <EditRoomTypeForm
+      initialValues={initialValues}
+      isLoading={isLoading}
+      handleSubmit={handleSubmit}
+      availableFacilities={availableFacilities}
+    />
   );
 }

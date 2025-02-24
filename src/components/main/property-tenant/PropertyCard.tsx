@@ -1,12 +1,14 @@
-// components/PropertyCard.tsx
 "use client";
-
 import React from "react";
 import Image from "next/image";
-import { Plus } from "lucide-react";
-import { FaLocationDot, FaStar } from "react-icons/fa6";
-import { formatCurrency } from "@/helpers/formatCurrency";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import ExpandableText from "./ExpandableText";
+import {
+  formatFacilityName,
+  getPropertyFacilityIcon,
+} from "@/helpers/facilityUtils";
 import { Property } from "@/types/propertyTypes";
+import RoomTypesSection from "./RoomTypesSection";
 
 interface PropertyCardProps {
   property: Property;
@@ -25,196 +27,97 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   handleDeleteRoomType,
   handleCreateRoomType,
 }) => {
-  const roomTypes = property.RoomTypes || [];
-
   return (
-    <div className="container max-w-full flex flex-col md:flex-row bg-white rounded-md shadow-md overflow-hidden transition-all hover:shadow-lg">
-      {/* Gambar Properti */}
-      <div className="w-full md:w-1/3 h-48">
-        <Image
-          src={
-            property.PropertyImages && property.PropertyImages.length > 0
-              ? property.PropertyImages[0].image_url
-              : "/placeholder.jpg"
-          }
-          width={400}
-          height={400}
-          alt={property.name}
-          className="w-full h-full object-cover rounded-lg"
-        />
-      </div>
-      {/* Detail Properti */}
-      <div className="flex-1 p-4 space-y-2">
-        <div>
-          <h2 className="text-lg font-bold text-rose-600">{property.name}</h2>
-          {property.desc && (
-            <>
-              <span className="text-xs font-semibold text-gray-700">
-                Deskripsi :{" "}
-              </span>
-              <p
-                dangerouslySetInnerHTML={{ __html: property.desc }}
-                className="text-xs text-gray-700"
-              />
-            </>
-          )}
-          {property.terms_condition && (
-            <>
-              <span className="text-xs font-semibold text-gray-700">
-                Syarat & Ketentuan :{" "}
-              </span>
-              <p
-                dangerouslySetInnerHTML={{ __html: property.terms_condition }}
-                className="text-xs text-gray-700"
-              />
-            </>
-          )}
+    <div className="w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto p-4">
+      {/* Banner peringatan jika belum ada tipe kamar */}
+      {(!property.RoomTypes || property.RoomTypes.length === 0) && (
+        <div className="flex items-center mb-2">
+          <span className="text-red-600 text-xl font-bold mr-2">!</span>
+          <span className="text-red-600 text-sm">
+            Diperlukan tipe kamar untuk mulai menjual properti !
+          </span>
         </div>
-        <div className="flex items-center text-xs text-gray-600">
-          <FaLocationDot className="mr-1" />
-          <p>
-            {property.location?.address ?? "Alamat tidak tersedia"},{" "}
-            {property.location?.city ?? "Kota tidak tersedia"},{" "}
-            {property.location?.country ?? "Negara tidak tersedia"}
-          </p>
+      )}
+      <div className="flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
+        {/* Gambar Properti */}
+        <div className="w-full md:w-1/3 h-56 relative">
+          <Image
+            src={
+              property.PropertyImages && property.PropertyImages.length > 0
+                ? property.PropertyImages[0].image_url
+                : "/placeholder.jpg"
+            }
+            fill
+            alt={property.name}
+            className="object-cover"
+          />
         </div>
-        {property.facilities && property.facilities.length > 0 && (
-          <p className="text-xs text-gray-700">
-            <span className="font-semibold">Fasilitas:</span>{" "}
-            {property.facilities.join(", ")}
-          </p>
-        )}
-        {/* Tipe Kamar */}
-        <div className="border-t pt-2">
-          <h3 className="text-sm font-semibold text-gray-800">Tipe Kamar</h3>
-          {roomTypes.length > 0 ? (
-            roomTypes.map((room) => (
-              <div key={room.id} className="mt-2 p-2 border rounded">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-sm font-bold">{room.name}</h4>
-                  {room.avg_rating !== undefined &&
-                    room.avg_rating !== null && (
-                      <div className="flex items-center text-xs text-yellow-600">
-                        <FaStar className="mr-1" />
-                        {room.avg_rating.toFixed(1)}
-                      </div>
-                    )}
-                </div>
-                <p className="text-xs text-gray-700">
-                  Harga: {formatCurrency(room.price)} / malam
-                </p>
-                <p className="text-xs text-gray-700">
-                  Kapasitas: {room.capacity} orang, Stok: {room.stock}
-                </p>
-                {room.bed_details && (
-                  <p className="text-xs text-gray-700">
-                    Tempat Tidur: {room.bed_details}
-                  </p>
-                )}
-                <p className="text-xs text-gray-700">
-                  Sarapan:{" "}
-                  {room.has_breakfast
-                    ? `Tersedia (${formatCurrency(room.breakfast_price)})`
-                    : "Tidak tersedia"}
-                </p>
-                {room.facilities && room.facilities.length > 0 && (
-                  <p className="text-xs text-gray-700">
-                    Fasilitas: {room.facilities.join(", ")}
-                  </p>
-                )}
-                {room.seasonal_prices && room.seasonal_prices.length > 0 && (
-                  <div className="mt-1">
-                    <h5 className="text-xs font-semibold text-gray-800">
-                      Harga Musiman:
-                    </h5>
-                    <ul className="list-disc list-inside text-xs text-gray-700">
-                      {room.seasonal_prices.map((sp) => (
-                        <li key={sp.id}>
-                          {formatCurrency(sp.price)} dari{" "}
-                          {new Date(sp.start_date).toLocaleDateString()} sampai{" "}
-                          {new Date(sp.end_date).toLocaleDateString()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {room.Unavailable && room.Unavailable.length > 0 && (
-                  <div className="mt-1">
-                    <h5 className="text-xs font-semibold text-gray-800">
-                      Periode Tidak Tersedia:
-                    </h5>
-                    <ul className="list-disc list-inside text-xs text-gray-700">
-                      {room.Unavailable.map((u) => (
-                        <li key={u.id}>
-                          {new Date(u.start_date).toLocaleDateString()} -{" "}
-                          {new Date(u.end_date).toLocaleDateString()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {room.Review && room.Review.length > 0 && (
-                  <div className="mt-1">
-                    <h5 className="text-xs font-semibold text-gray-800">
-                      Ulasan:
-                    </h5>
-                    <ul className="list-disc list-inside text-xs text-gray-700">
-                      {room.Review.map((rev) => (
-                        <li key={rev.id}>
-                          <strong>{rev.rating} / 5</strong> - {rev.review}{" "}
-                          <span className="text-gray-500">
-                            (
-                            {rev.created_at
-                              ? new Date(rev.created_at).toLocaleDateString()
-                              : ""}
-                            )
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <div className="flex justify-end space-x-2 pt-1">
-                  <button
-                    onClick={() => handleEditRoomType(property.id, room.id)}
-                    className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded transition-colors duration-300"
-                  >
-                    Ubah Tipe
-                  </button>
-                  <button
-                    onClick={() => handleDeleteRoomType(room.id)}
-                    className="px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition-colors duration-300"
-                  >
-                    Hapus Tipe
-                  </button>
-                </div>
+        {/* Detail Properti */}
+        <div className="flex-1 py-2 px-4 sm:px-6 space-y-2">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-rose-600">
+              {property.name}
+            </h2>
+            {property.desc && (
+              <div className="mt-1">
+                <span className="block text-xs sm:text-sm font-semibold text-gray-800">
+                  Deskripsi:
+                </span>
+                <ExpandableText text={property.desc} limit={120} />
               </div>
-            ))
-          ) : (
-            <p className="text-xs text-gray-500 mt-1">Belum ada tipe kamar.</p>
+            )}
+            {property.terms_condition && (
+              <div className="mt-1">
+                <span className="block text-xs sm:text-sm font-semibold text-gray-800">
+                  Syarat & Ketentuan:
+                </span>
+                <ExpandableText text={property.terms_condition} limit={120} />
+              </div>
+            )}
+          </div>
+          <div className="flex items-center text-xs sm:text-sm text-gray-600">
+            <FaMapMarkerAlt className="mr-1 sm:mr-2" />
+            <p>
+              {property.location?.address ?? "Alamat tidak tersedia"},{" "}
+              {property.location?.city ?? "Kota tidak tersedia"},{" "}
+              {property.location?.country ?? "Negara tidak tersedia"}
+            </p>
+          </div>
+          {property.facilities && property.facilities.length > 0 && (
+            <div className="flex flex-wrap gap-1 sm:gap-2">
+              {property.facilities.map((facility, index) => (
+                <span
+                  key={index}
+                  className="flex items-center text-xs sm:text-sm text-gray-700"
+                >
+                  {getPropertyFacilityIcon(facility)}
+                  {formatFacilityName(facility)}
+                </span>
+              ))}
+            </div>
           )}
-          <button
-            onClick={() => handleCreateRoomType(property.id)}
-            className="mt-2 inline-flex items-center px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-md transition-colors duration-300"
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            Tambah Tipe Kamar
-          </button>
-        </div>
-        {/* Tombol aksi untuk properti */}
-        <div className="flex justify-end space-x-2 pt-2">
-          <button
-            onClick={() => handleEdit(property.id)}
-            className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors duration-300"
-          >
-            Ubah
-          </button>
-          <button
-            onClick={() => handleDelete(property.id)}
-            className="px-2 py-1 bg-rose-500 hover:bg-rose-600 text-white text-xs rounded transition-colors duration-300"
-          >
-            Hapus
-          </button>
+          <RoomTypesSection
+            propertyId={property.id}
+            roomTypes={property.RoomTypes || []}
+            handleEditRoomType={handleEditRoomType}
+            handleDeleteRoomType={handleDeleteRoomType}
+            handleCreateRoomType={handleCreateRoomType}
+          />
+          {/* Tombol aksi properti */}
+          <div className="flex justify-end space-x-2 pt-2">
+            <button
+              onClick={() => handleEdit(property.id)}
+              className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors duration-300"
+            >
+              Ubah
+            </button>
+            <button
+              onClick={() => handleDelete(property.id)}
+              className="px-3 py-1 bg-rose-500 hover:bg-rose-600 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors duration-300"
+            >
+              Hapus
+            </button>
+          </div>
         </div>
       </div>
     </div>
