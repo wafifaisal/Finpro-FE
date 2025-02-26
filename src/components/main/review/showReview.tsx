@@ -1,4 +1,3 @@
-// src/components/ReviewModal.tsx
 import React from "react";
 import { Dialog, DialogContent } from "@/components/sub/UI/dialog";
 import ReviewForm from "./makeReview";

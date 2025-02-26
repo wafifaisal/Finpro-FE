@@ -22,7 +22,9 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
 }) => {
   const quantity = selection?.quantity || 0;
   const isSelected = quantity > 0;
+
   const selectedDateObj = useMemo(() => new Date(selectedDate), [selectedDate]);
+
   const getRoomPriceForDate = (room: RoomType, date: Date): number => {
     if (room.seasonal_prices && room.seasonal_prices.length > 0) {
       const seasonalPrice = room.seasonal_prices.find((sp) => {
@@ -48,6 +50,7 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
     () => getRoomPriceForDate(room, selectedDateObj),
     [room, selectedDateObj]
   );
+
   const isUnavailable =
     room.Unavailable &&
     room.Unavailable.some((range) => {
@@ -55,9 +58,22 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
       const end = new Date(range.end_date);
       return selectedDateObj >= start && selectedDateObj <= end;
     });
-
+  const availableCount = useMemo(() => {
+    if (room.RoomAvailability && room.RoomAvailability.length > 0) {
+      const selectedDateStr = selectedDateObj.toISOString().split("T")[0];
+      const record = room.RoomAvailability.find((ra) => {
+        const raDateStr = new Date(ra.date).toISOString().split("T")[0];
+        return raDateStr === selectedDateStr;
+      });
+      if (record) {
+        return record.availableCount;
+      }
+    }
+    return room.stock;
+  }, [room, selectedDateObj]);
   const isStockHabis = room.stock !== undefined && room.stock <= 0;
-  const isDisabled = isUnavailable || isStockHabis;
+  const isAvailableCountZero = availableCount <= 0;
+  const isDisabled = isUnavailable || isStockHabis || isAvailableCountZero;
 
   return (
     <div className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-200">

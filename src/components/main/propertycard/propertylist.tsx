@@ -29,6 +29,7 @@ export default function PropertyCard({
     );
   }
 
+  // Calculate overall rating based on RoomTypes that have ratings.
   const validRatings = property.RoomTypes.filter(
     (room) => room.avg_rating !== undefined && room.avg_rating !== null
   );
@@ -38,30 +39,29 @@ export default function PropertyCard({
         validRatings.length
       : 0;
 
+  // Set effective search dates.
   const effectiveStart = searchStart ? searchStart : new Date();
   const effectiveEnd = searchEnd
     ? searchEnd
     : new Date(effectiveStart.getTime() + 24 * 60 * 60 * 1000);
 
+  // Determine the lowest regular price across room types.
   const lowestRegularPrice = Math.min(
     ...property.RoomTypes.map((room) => room.price)
   );
 
-  // Hitung harga efektif terendah dengan mempertimbangkan seasonal price
+  // Calculate the lowest effective price considering seasonal pricing.
   const lowestEffectivePrice = property.RoomTypes.reduce((min, room) => {
     let effectiveRoomPrice = room.price;
     if (room.seasonal_prices && room.seasonal_prices.length > 0) {
       const applicableSeasonal = room.seasonal_prices.find((sp) => {
-        // Jika ada properti `dates` dan tidak kosong, gunakan tanggal‑tanggal tersebut
         if (sp.dates && sp.dates.length > 0) {
           const targetStr = effectiveStart.toISOString().split("T")[0];
           return sp.dates.some((d: string) => {
             const dStr = new Date(d).toISOString().split("T")[0];
             return dStr === targetStr;
           });
-        }
-        // Jika tidak, gunakan range start_date dan end_date
-        else if (sp.start_date && sp.end_date) {
+        } else if (sp.start_date && sp.end_date) {
           const spStart = new Date(sp.start_date);
           const spEnd = new Date(sp.end_date);
           return effectiveStart >= spStart && effectiveStart <= spEnd;
@@ -75,21 +75,42 @@ export default function PropertyCard({
     return Math.min(min, effectiveRoomPrice);
   }, Infinity);
 
-  // Harga yang akan ditampilkan adalah harga efektif terendah
   const finalPrice = lowestEffectivePrice;
-  // Tampilkan discount jika harga reguler lebih tinggi dari harga efektif
   const showDiscount = lowestRegularPrice > lowestEffectivePrice;
 
-  // Cek ketersediaan kamar di semua room types
+  // Updated availability check: For each room type, determine if it's available
+  // in the effective date range by checking both the Unavailable records and
+  // (if available) the RoomAvailability records that report availableCount === 0.
   const isAnyRoomAvailable = property.RoomTypes.some((room) => {
-    if (!room.Unavailable || room.Unavailable.length === 0) return true;
-    const isRoomUnavailable = room.Unavailable.some((range) => {
-      const rangeStart = new Date(range.start_date);
-      const rangeEnd = new Date(range.end_date);
-      return effectiveStart <= rangeEnd && effectiveEnd >= rangeStart;
-    });
-    return !isRoomUnavailable;
+    let roomUnavailable = false;
+    // Check if this room type is marked unavailable in any Unavailable record.
+    if (room.Unavailable && room.Unavailable.length > 0) {
+      roomUnavailable = room.Unavailable.some((range) => {
+        const rangeStart = new Date(range.start_date);
+        const rangeEnd = new Date(range.end_date);
+        return effectiveStart <= rangeEnd && effectiveEnd >= rangeStart;
+      });
+    }
+    // If RoomAvailability exists and is an array, check if any date in the range has availableCount === 0.
+    if (
+      Array.isArray(room.RoomAvailability) &&
+      room.RoomAvailability.length > 0
+    ) {
+      const roomHasZeroAvailability = room.RoomAvailability.some((ra) => {
+        const raDate = new Date(ra.date);
+        return (
+          effectiveStart <= raDate &&
+          raDate < effectiveEnd &&
+          ra.availableCount === 0
+        );
+      });
+      if (roomHasZeroAvailability) {
+        roomUnavailable = true;
+      }
+    }
+    return !roomUnavailable;
   });
+
   const disableButton = property.isAvailable === false || !isAnyRoomAvailable;
 
   const handlePropertyClick = async () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -28,20 +28,65 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
   guests,
   selectedDate,
 }) => {
+  const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
+
+  const [effectiveRoom, setEffectiveRoom] = useState<RoomType>(room);
+
+  useEffect(() => {
+    const fetchRoomDetail = async () => {
+      try {
+        const res = await fetch(`${base_url}/property/rooms/${room.id}`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch room detail");
+        }
+        const data: RoomType = await res.json();
+        setEffectiveRoom(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchRoomDetail();
+    const interval = setInterval(fetchRoomDetail, 3000);
+    return () => clearInterval(interval);
+  }, [room.id, base_url]);
+
   const [facilitiesExpanded, setFacilitiesExpanded] = useState(false);
   const toggleFacilities = () => setFacilitiesExpanded((prev) => !prev);
+  const facilities = effectiveRoom.facilities || [];
   const displayedFacilities = facilitiesExpanded
-    ? room.facilities
-    : room.facilities.slice(0, 5);
-  const bookingDate = new Date(selectedDate);
-  const roomUnavailable =
-    room.Unavailable &&
-    room.Unavailable.length > 0 &&
-    room.Unavailable.some((range) => {
-      const start = new Date(range.start_date);
-      const end = new Date(range.end_date);
-      return bookingDate >= start && bookingDate <= end;
-    });
+    ? facilities
+    : facilities.slice(0, 5);
+  const bookingDate = useMemo(() => new Date(selectedDate), [selectedDate]);
+  const availableCountFromAvailability = useMemo(() => {
+    if (
+      effectiveRoom.RoomAvailability &&
+      effectiveRoom.RoomAvailability.length > 0
+    ) {
+      const selectedDateStr = bookingDate.toISOString().split("T")[0];
+      const record = effectiveRoom.RoomAvailability.find((ra) => {
+        const raDateStr = new Date(ra.date).toISOString().split("T")[0];
+        return raDateStr === selectedDateStr;
+      });
+      if (record) {
+        return record.availableCount;
+      }
+    }
+    return effectiveRoom.stock;
+  }, [effectiveRoom, bookingDate]);
+  const isDateUnavailable = useMemo(() => {
+    if (effectiveRoom.Unavailable && effectiveRoom.Unavailable.length > 0) {
+      const selectedDateStr = bookingDate.toISOString().split("T")[0];
+      return effectiveRoom.Unavailable.some((u) => {
+        const startStr = new Date(u.start_date).toISOString().split("T")[0];
+        const endStr = new Date(u.end_date).toISOString().split("T")[0];
+        return selectedDateStr >= startStr && selectedDateStr <= endStr;
+      });
+    }
+    return false;
+  }, [effectiveRoom, bookingDate]);
+  const availableCount = isDateUnavailable ? 0 : availableCountFromAvailability;
+  const roomUnavailable = availableCount <= 0;
+
   return (
     <div className="mb-12 pb-12 border-b last:border-b-0">
       <Swiper
@@ -50,12 +95,12 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
         pagination={{ clickable: true }}
         className="h-80 rounded-xl overflow-hidden mb-6"
       >
-        {room.RoomImages.map((image) => (
+        {(effectiveRoom.RoomImages || []).map((image) => (
           <SwiperSlide key={image.id}>
             <div className="relative w-full h-full">
               <Image
                 src={image.image_url}
-                alt={room.name}
+                alt={effectiveRoom.name}
                 fill
                 className="object-cover"
               />
@@ -66,24 +111,26 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-start">
           <div>
-            <h3 className="text-xl font-medium">{room.name}</h3>
+            <h3 className="text-xl font-medium">{effectiveRoom.name}</h3>
             <div className="flex flex-wrap gap-4 text-gray-600 text-sm mt-2">
-              {room.bed_details && <span>{room.bed_details}</span>}
-              <span>Stok: {room.stock}</span>
-              {room.has_breakfast && (
+              {effectiveRoom.bed_details && (
+                <span>{effectiveRoom.bed_details}</span>
+              )}
+              <span>Jumlah Kamar Tersedia: {availableCount}</span>
+              {effectiveRoom.has_breakfast && (
                 <span>
-                  Harga Sarapan: {formatCurrency(room.breakfast_price)}
+                  Harga Sarapan: {formatCurrency(effectiveRoom.breakfast_price)}
                 </span>
               )}
             </div>
-            {(room.stock <= 0 || roomUnavailable) && (
+            {(availableCount <= 0 || roomUnavailable) && (
               <p className="mt-2 text-red-500 font-semibold">
                 Property Tidak Tersedia
               </p>
             )}
           </div>
           <RoomSelectionButton
-            room={room}
+            room={effectiveRoom}
             selection={selection}
             onToggleBreakfast={onToggleBreakfast}
             onRoomQuantityChange={onRoomQuantityChange}
@@ -102,8 +149,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
               </span>
             ))}
           </div>
-          {/* Tampilkan tombol expand jika jumlah fasilitas lebih dari 3 */}
-          {room.facilities.length > 3 && (
+          {facilities.length > 3 && (
             <button
               onClick={toggleFacilities}
               className="text-blue-500 text-sm mt-2 flex items-center"

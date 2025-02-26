@@ -40,14 +40,17 @@ const MobileNavbar = () => {
               >
                 Buat Akun
               </Link>
+              <Link href="/auth/user/login" className="block py-3 text-lg">
+                Masuk
+              </Link>
               <Link
                 href="/auth/tenant/homepage"
                 className="block py-3 border-b text-lg"
               >
                 Daftarkan Property Anda
               </Link>
-              <Link href="/help" className="block py-3 text-lg">
-                Bantuan
+              <Link href="/about" className="block py-3 text-lg">
+                Tentang Nginepin
               </Link>
             </div>
           </div>

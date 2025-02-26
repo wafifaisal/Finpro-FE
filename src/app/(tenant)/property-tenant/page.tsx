@@ -1,8 +1,9 @@
 "use client";
 import TenantProfile from "@/components/main/property-tenant/TenantProfile";
+import withGuard from "@/hoc/pageGuard";
 import { useEffect } from "react";
 
-export default function TenantProperty() {
+function TenantProperty() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -12,3 +13,8 @@ export default function TenantProperty() {
     </div>
   );
 }
+
+export default withGuard(TenantProperty, {
+  requiredRole: "tenant",
+  redirectTo: "/not-authorized",
+});

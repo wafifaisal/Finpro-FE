@@ -10,8 +10,9 @@ import ProfilePassword from "@/components/sub/tenantProfile/passwordSection";
 import StatGrid from "@/components/sub/tenantProfile/statGrid";
 import ProfileHeader from "@/components/sub/tenantProfile/profileHeader";
 import ProfileImageModal from "@/components/sub/tenantProfile/modalHeader";
+import withGuard from "@/hoc/pageGuard";
 
-export default function ProfilePage() {
+function ProfilePage() {
   const { isAuth, type, tenant } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -119,7 +120,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Profile Image Modal with Animation */}
       <ProfileImageModal
         selectedImage={selectedImage}
         isOpen={isModalOpen}
@@ -128,3 +128,8 @@ export default function ProfilePage() {
     </>
   );
 }
+
+export default withGuard(ProfilePage, {
+  requiredRole: "tenant",
+  redirectTo: "/not-authorized",
+});

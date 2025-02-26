@@ -12,12 +12,15 @@ import Navbar from "@/components/main/navbar/Navbar";
 import { Eye, EyeOff } from "lucide-react";
 import { LoginSchema } from "@/types/LoginSchema";
 import { FormValues } from "@/types/types";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginUser() {
   const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
   const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
 
   const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
@@ -37,7 +40,7 @@ export default function LoginUser() {
         position: "bottom-right",
         autoClose: 3000,
       });
-      setTimeout(() => window.location.assign("/"), 1000);
+      setTimeout(() => window.location.assign(redirectTo), 1000);
     } catch (error: unknown) {
       console.error("Error fetching properties:", error);
 
