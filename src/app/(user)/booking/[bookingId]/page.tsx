@@ -35,8 +35,40 @@ export default function BookingPage({
   }, [params.bookingId]);
 
   if (isLoading) return <Loading />;
-
   if (!booking) return <p>Booking not found.</p>;
+  const startDate = new Date(booking.start_date);
+  const endDate = new Date(booking.end_date);
+  const nights = Math.ceil(
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  const bookingDate = new Date(booking.start_date);
+  const activeSeasonalPrice =
+    booking.room_types.seasonal_prices &&
+    booking.room_types.seasonal_prices.find((sp) => {
+      if (sp.dates && sp.dates.length > 0) {
+        const target = bookingDate.toISOString().split("T")[0];
+        return sp.dates.some((d: string) => {
+          const dStr = new Date(d).toISOString().split("T")[0];
+          return dStr === target;
+        });
+      } else if (sp.start_date && sp.end_date) {
+        const spStart = new Date(sp.start_date);
+        const spEnd = new Date(sp.end_date);
+        return bookingDate >= spStart && bookingDate <= spEnd;
+      }
+      return false;
+    });
+
+  const effectivePrice = activeSeasonalPrice
+    ? Number(activeSeasonalPrice.price)
+    : booking.room_types.price;
+  const quantity = booking.quantity || 1;
+  const roomCost = effectivePrice * quantity * nights;
+  const breakfastCost = booking.room_types.has_breakfast
+    ? booking.room_types.breakfast_price * quantity * nights
+    : 0;
+  const computedTotal = roomCost + breakfastCost;
 
   return (
     <div>
@@ -101,7 +133,8 @@ export default function BookingPage({
               </p>
             </div>
           </div>
-          <div className="flex-1 border border-gray-400 rounded-xl h-64 p-4 sticky z-10 top-28">
+
+          <div className="flex-1 border border-gray-400 rounded-xl h-fit p-4 sticky z-10 top-28">
             <div className="flex gap-6 items-center">
               <div className="relative w-28 h-28 mb-4">
                 <Image
@@ -115,13 +148,25 @@ export default function BookingPage({
                 <h2 className="text-lg font-bold">{booking.room_types.name}</h2>
                 <div className="border-b-[1px] border-gray-400 mb-4"></div>
                 <h3 className="font-semibold">Detail Harga</h3>
-                <p className="mb-4 ">
-                  {formatCurrency(booking.total_price)} x 1 malam
+                <p className="mb-4">
+                  {formatCurrency(effectivePrice)} x {quantity} kamar x {nights}{" "}
+                  malam
                 </p>
                 <div className="border-b-[1px] border-gray-400 mb-4"></div>
-                <p>
-                  <span>Total:</span> {formatCurrency(booking.total_price)}
-                </p>
+                <div className="space-y-2">
+                  <p>
+                    <span>Biaya Kamar: </span> {formatCurrency(roomCost)}
+                  </p>
+                  {breakfastCost > 0 && (
+                    <p>
+                      <span>Biaya Sarapan: </span>{" "}
+                      {formatCurrency(breakfastCost)}
+                    </p>
+                  )}
+                  <p className="font-bold">
+                    Total: {formatCurrency(computedTotal)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

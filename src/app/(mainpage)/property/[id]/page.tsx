@@ -15,7 +15,6 @@ import usePropertyDetail from "@/hooks/usePropertyDetail";
 import { Review as ReviewType } from "@/types/types";
 
 const PropertyDetail = ({ params }: { params: { id: string } }) => {
-  // Scroll ke atas saat komponen pertama kali dimount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -104,6 +103,7 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
             setGuests={setGuests}
             getTotalCapacity={getTotalCapacity}
             selectedRooms={selectedRooms}
+            onRoomSelectionChange={handleRoomQuantityChange}
           />
         </div>
 

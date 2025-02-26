@@ -17,7 +17,6 @@ import {
 const Portfolio: React.FC = () => {
   return (
     <div className="pt-16 min-h-[60vh] bg-white">
-      {/* Hero Section */}
       <div className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <FloatingShape delay={0} initialX={-100}>
           <div className="w-16 h-16 bg-red-500 rounded-tr-full" />

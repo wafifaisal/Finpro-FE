@@ -10,8 +10,9 @@ import ProfilePassword from "@/components/sub/profile/passwordSection";
 import StatGrid from "@/components/sub/profile/statGrid";
 import ProfileHeader from "@/components/sub/profile/profileHeader";
 import ProfileImageModal from "@/components/sub/profile/modalHeader";
+import withGuard from "@/hoc/pageGuard";
 
-export default function ProfilePage() {
+function ProfilePage() {
   const { isAuth, type, user } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -45,8 +46,6 @@ export default function ProfilePage() {
       </div>
     );
   }
-
-  console.log("user", user);
 
   return (
     <>
@@ -126,3 +125,8 @@ export default function ProfilePage() {
     </>
   );
 }
+
+export default withGuard(ProfilePage, {
+  requiredRole: "user",
+  redirectTo: "/not-authorized",
+});
