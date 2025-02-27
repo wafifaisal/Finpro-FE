@@ -36,38 +36,67 @@ export default function BookingPage({
 
   if (isLoading) return <Loading />;
   if (!booking) return <p>Booking not found.</p>;
+
   const startDate = new Date(booking.start_date);
   const endDate = new Date(booking.end_date);
   const nights = Math.ceil(
     (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
   );
-
-  const bookingDate = new Date(booking.start_date);
-  const activeSeasonalPrice =
-    booking.room_types.seasonal_prices &&
-    booking.room_types.seasonal_prices.find((sp) => {
-      if (sp.dates && sp.dates.length > 0) {
-        const target = bookingDate.toISOString().split("T")[0];
-        return sp.dates.some((d: string) => {
-          const dStr = new Date(d).toISOString().split("T")[0];
-          return dStr === target;
-        });
-      } else if (sp.start_date && sp.end_date) {
-        const spStart = new Date(sp.start_date);
-        const spEnd = new Date(sp.end_date);
-        return bookingDate >= spStart && bookingDate <= spEnd;
-      }
-      return false;
-    });
-
-  const effectivePrice = activeSeasonalPrice
-    ? Number(activeSeasonalPrice.price)
-    : booking.room_types.price;
   const quantity = booking.quantity || 1;
-  const roomCost = effectivePrice * quantity * nights;
-  const breakfastCost = booking.room_types.has_breakfast
-    ? booking.room_types.breakfast_price * quantity * nights
-    : 0;
+  let seasonalNights = 0;
+  let regularNights = 0;
+  let seasonalCost = 0;
+  let regularCost = 0;
+
+  for (let i = 0; i < nights; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(currentDate.getDate() + i);
+    let priceForNight = booking.room_types.price;
+    let isSeasonal = false;
+    if (
+      booking.room_types.seasonal_prices &&
+      booking.room_types.seasonal_prices.length > 0
+    ) {
+      for (const sp of booking.room_types.seasonal_prices) {
+        if (sp.dates && sp.dates.length > 0) {
+          const target = currentDate.toISOString().split("T")[0];
+          if (
+            sp.dates.some((d: string) => {
+              const dStr = new Date(d).toISOString().split("T")[0];
+              return dStr === target;
+            })
+          ) {
+            priceForNight = Number(sp.price);
+            isSeasonal = true;
+            break;
+          }
+        } else if (sp.start_date && sp.end_date) {
+          const spStart = new Date(sp.start_date);
+          const spEnd = new Date(sp.end_date);
+          if (currentDate >= spStart && currentDate <= spEnd) {
+            priceForNight = Number(sp.price);
+            isSeasonal = true;
+            break;
+          }
+        }
+      }
+    }
+    if (isSeasonal) {
+      seasonalNights++;
+      seasonalCost += priceForNight * quantity;
+    } else {
+      regularNights++;
+      regularCost += priceForNight * quantity;
+    }
+  }
+
+  const roomCost = seasonalCost + regularCost;
+
+  const breakfastCost =
+    booking.room_types.has_breakfast && booking.add_breakfast
+      ? booking.room_types.breakfast_price * quantity * nights
+      : 0;
+
   const computedTotal = roomCost + breakfastCost;
 
   return (
@@ -148,21 +177,47 @@ export default function BookingPage({
                 <h2 className="text-lg font-bold">{booking.room_types.name}</h2>
                 <div className="border-b-[1px] border-gray-400 mb-4"></div>
                 <h3 className="font-semibold">Detail Harga</h3>
-                <p className="mb-4">
-                  {formatCurrency(effectivePrice)} x {quantity} kamar x {nights}{" "}
-                  malam
-                </p>
+                {seasonalNights > 0 || regularNights > 0 ? (
+                  <div className="mb-4 space-y-1">
+                    {regularNights > 0 && (
+                      <p className="text-sm">
+                        {formatCurrency(booking.room_types.price)} x {quantity}{" "}
+                        kamar x {regularNights} malam (Harga Reguler)
+                      </p>
+                    )}
+                    {seasonalNights > 0 && (
+                      <p className="text-sm">
+                        {booking.room_types.seasonal_prices &&
+                        booking.room_types.seasonal_prices[0]
+                          ? formatCurrency(
+                              Number(
+                                booking.room_types.seasonal_prices[0].price
+                              )
+                            )
+                          : formatCurrency(booking.room_types.price)}{" "}
+                        x {quantity} kamar x {seasonalNights} malam (Harga
+                        Musiman)
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="mb-4">
+                    {formatCurrency(booking.room_types.price)} x {quantity}{" "}
+                    kamar x {nights} malam
+                  </p>
+                )}
                 <div className="border-b-[1px] border-gray-400 mb-4"></div>
                 <div className="space-y-2">
                   <p>
                     <span>Biaya Kamar: </span> {formatCurrency(roomCost)}
                   </p>
-                  {breakfastCost > 0 && (
-                    <p>
-                      <span>Biaya Sarapan: </span>{" "}
-                      {formatCurrency(breakfastCost)}
-                    </p>
-                  )}
+                  {booking.room_types.has_breakfast &&
+                    booking.add_breakfast && (
+                      <p>
+                        <span>Biaya Sarapan: </span>{" "}
+                        {formatCurrency(breakfastCost)}
+                      </p>
+                    )}
                   <p className="font-bold">
                     Total: {formatCurrency(computedTotal)}
                   </p>

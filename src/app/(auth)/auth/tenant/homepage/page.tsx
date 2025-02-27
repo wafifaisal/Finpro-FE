@@ -7,7 +7,7 @@ import PropertyCount from "@/components/sub/tenant_login/PropertyCount";
 
 const TenantHomesPage = () => {
   return (
-    <div className="min-h-screen bg-white pt-24">
+    <div className="min-h-screen bg-white pt-0 md:pt-24">
       <div className="relative h-screen">
         <video
           autoPlay

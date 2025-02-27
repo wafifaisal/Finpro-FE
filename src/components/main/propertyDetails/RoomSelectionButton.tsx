@@ -6,7 +6,7 @@ import { formatCurrency } from "@/helpers/formatCurrency";
 interface RoomSelectionButtonProps {
   room: RoomType;
   selection?: RoomSelection;
-  onToggleBreakfast: (roomTypeId: number) => void;
+  onToggleBreakfast: (roomTypeId: number, checked: boolean) => void;
   onRoomQuantityChange: (roomTypeId: number, change: number) => void;
   guests: number;
   selectedDate: string;
@@ -58,6 +58,7 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
       const end = new Date(range.end_date);
       return selectedDateObj >= start && selectedDateObj <= end;
     });
+
   const availableCount = useMemo(() => {
     if (room.RoomAvailability && room.RoomAvailability.length > 0) {
       const selectedDateStr = selectedDateObj.toISOString().split("T")[0];
@@ -71,6 +72,7 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
     }
     return room.stock;
   }, [room, selectedDateObj]);
+
   const isStockHabis = room.stock !== undefined && room.stock <= 0;
   const isAvailableCountZero = availableCount <= 0;
   const isDisabled = isUnavailable || isStockHabis || isAvailableCountZero;
@@ -147,10 +149,10 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
                   type="checkbox"
                   id={`breakfast-${room.id}`}
                   checked={selection?.addBreakfast || false}
-                  onChange={() => onToggleBreakfast(room.id)}
+                  onChange={(e) => onToggleBreakfast(room.id, e.target.checked)}
                   className="peer sr-only"
                 />
-                <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:border-rose-500 peer-checked:bg-rose-500 transition-colors">
+                <div className="w-5 h-5 border-2 border-gray-300 rounded transition-colors peer-checked:border-rose-500 peer-checked:bg-rose-500">
                   {selection?.addBreakfast && (
                     <Check className="w-4 h-4 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                   )}

@@ -1,4 +1,3 @@
-// components/CreateRoomType/CreateRoomTypeForm.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -94,7 +93,7 @@ const CreateRoomTypeForm: React.FC<CreateRoomTypeProps> = ({ params }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8 bg-white pt-40">
+    <div className="max-w-max md:max-w-6xl mx-auto p-0 md:p-8 bg-white pt-20 md:pt-40">
       <h1 className="text-4xl font-bold mb-12">Buat Tipe Kamar Baru</h1>
       <Formik
         initialValues={initialValues}
