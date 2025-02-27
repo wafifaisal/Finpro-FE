@@ -23,7 +23,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   property,
   roomtypes,
 }) => {
-  // Hitung rata-rata rating dari semua RoomTypes yang memiliki rating valid
   const validRatings = roomtypes.filter(
     (rt) => rt.avg_rating !== undefined && rt.avg_rating !== null
   );
@@ -33,16 +32,12 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
         validRatings.length
       : 0;
 
-  // Hitung jumlah ulasan teragregasi
   const aggregatedReviewCount = roomtypes.reduce(
     (acc, rt) => acc + (rt.Review ? rt.Review.length : 0),
     0
   );
-
-  // State untuk mengatur tampilan modal share
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  // Dapatkan URL properti saat ini
   const shareUrl =
     typeof window !== "undefined" ? window.location.href : "https://";
 
@@ -50,7 +45,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
     <div className="mb-8">
       <h1 className="text-3xl font-semibold mb-4">{property.name}</h1>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Informasi Rating dan Lokasi */}
         <div className="flex items-center gap-6 text-sm">
           <div className="flex items-center">
             <Star className="w-4 h-4 text-rose-500" />
@@ -75,7 +69,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           </div>
         </div>
 
-        {/* Tombol Bagikan dan Like */}
         <div className="flex gap-4">
           <button
             onClick={() => setIsShareModalOpen(true)}
@@ -87,15 +80,12 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
         </div>
       </div>
 
-      {/* Modal Share */}
       {isShareModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          {/* Latar belakang modal */}
           <div
             className="fixed inset-0 bg-black opacity-50"
             onClick={() => setIsShareModalOpen(false)}
           ></div>
-          {/* Konten Modal */}
           <div className="bg-white p-6 rounded-lg shadow-lg relative z-10 w-11/12 max-w-md">
             <button
               onClick={() => setIsShareModalOpen(false)}

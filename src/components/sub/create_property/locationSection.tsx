@@ -3,7 +3,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { FormikProps } from "formik";
 import { Position } from "@/types/index";
-import { PropertyFormValues } from "./propertyForm"; // Sesuaikan path impor sesuai struktur proyek Anda
+import { PropertyFormValues } from "@/types/propertyTypes";
 
 const DynamicMap = dynamic(
   () => import("@/components/sub/create_property/map"),
@@ -11,7 +11,6 @@ const DynamicMap = dynamic(
 );
 
 interface LocationSectionProps {
-  // Gunakan tipe PropertyFormValues agar mencakup field lokasi (address, country, city)
   formik: FormikProps<PropertyFormValues>;
   position: Position;
   setPosition: React.Dispatch<React.SetStateAction<Position>>;

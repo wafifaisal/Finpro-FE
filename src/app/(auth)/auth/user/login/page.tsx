@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { FaTimes } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import Image from "next/image";
@@ -11,24 +10,17 @@ import SocialLogin from "@/components/main/register/socialLogin";
 import Link from "next/link";
 import Navbar from "@/components/main/navbar/Navbar";
 import { Eye, EyeOff } from "lucide-react";
-
-const LoginSchema = Yup.object().shape({
-  data: Yup.string().required("Username atau Email harus diisi"),
-  password: Yup.string()
-    .min(8, "Kata sandi harus minimal 8 karakter ")
-    .required("Password harus diisi"),
-});
-
-interface FormValues {
-  data: string;
-  password: string;
-}
+import { LoginSchema } from "@/types/LoginSchema";
+import { FormValues } from "@/types/types";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginUser() {
   const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
   const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
 
   const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
@@ -48,7 +40,7 @@ export default function LoginUser() {
         position: "bottom-right",
         autoClose: 3000,
       });
-      setTimeout(() => window.location.assign("/"), 1000);
+      setTimeout(() => window.location.assign(redirectTo), 1000);
     } catch (error: unknown) {
       console.error("Error fetching properties:", error);
 

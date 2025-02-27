@@ -2,7 +2,7 @@ import React from "react";
 import "react-quill/dist/quill.snow.css";
 import { FormikProps } from "formik";
 import dynamic from "next/dynamic";
-import { PropertyFormValues } from "./propertyForm"; // Pastikan path sudah benar
+import { PropertyFormValues } from "@/types/propertyTypes";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 

@@ -1,5 +1,3 @@
-// types/createRoomTypes.ts
-
 import { RoomType } from "./roomTypes"; // Pastikan file roomTypes.ts sudah ada
 
 export interface SeasonalPrice {
@@ -8,6 +6,7 @@ export interface SeasonalPrice {
   end_date: string;
   apply_weekend?: boolean;
   apply_holiday?: boolean;
+  dates: string[];
 }
 
 export interface UnavailablePeriod {

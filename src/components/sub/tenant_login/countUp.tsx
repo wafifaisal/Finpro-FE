@@ -8,8 +8,8 @@ const CountUp = ({ end }: { end: number }) => {
 
   useEffect(() => {
     let start = 0;
-    const duration = 2000; // 2 detik
-    const interval = 30; // interval update
+    const duration = 2000;
+    const interval = 30;
     const step = end / (duration / interval);
 
     const counter = setInterval(() => {

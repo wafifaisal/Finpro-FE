@@ -92,7 +92,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ slides }) => {
         ))}
       </Swiper>
 
-      {/* Render CTA hanya untuk slide yang bukan slide terakhir */}
       {activeIndex !== slides.length - 1 && activeSlide.buttonText && (
         <div className="absolute bottom-20 left-1/2 transition-all  group duration-500 -translate-x-1/2 z-30">
           <Link href={activeSlide.buttonLink || "#"}>
@@ -108,7 +107,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ slides }) => {
           <span className="text-2xl md:text-3xl flex font-bold text-white items-center text-center justify-center pb-5 md:pb-0 pl-0 md:pl-20">
             Dipercayai Oleh :
           </span>
-          <div className="whitespace-nowrap animate-marquee pb-16">
+          <div className="whitespace-nowrap animate-marquee-home pb-16">
             {[1, 2, 3, 4, 5, 6].map((num) => (
               <div key={num} className="inline-block mr-10">
                 <Image

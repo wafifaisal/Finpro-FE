@@ -6,14 +6,14 @@ export type SearchValues = {
   checkIn: string;
   checkOut: string;
   who: string;
-  dateRange: string; // Make sure 'dateRange' is part of the SearchValues type if you're going to use it
+  dateRange: string;
 };
 
 export const SearchFields: {
   label: string;
   placeholder: string;
   key: keyof SearchValues;
-  icon?: JSX.Element; // Making icon optional to allow the dateRange field to not require an icon
+  icon?: JSX.Element;
 }[] = [
   {
     label: "Dimana",

@@ -37,9 +37,18 @@ export interface SeasonalPrice {
   price: number;
   start_date: string;
   end_date: string;
+  dates: string[];
+}
+
+export interface RoomAvailability {
+  id: number;
+  date: string;
+  availableCount: number;
+  room_typesId: number;
 }
 
 export interface RoomType {
+  property_id: number;
   id: number;
   name: string;
   price: number;
@@ -54,6 +63,7 @@ export interface RoomType {
   Review?: Review[];
   Unavailable?: Unavailable[];
   seasonal_prices?: SeasonalPrice[];
+  RoomAvailability?: RoomAvailability[];
 }
 
 export interface Tenant {
@@ -62,6 +72,7 @@ export interface Tenant {
   email: string;
   avatar: string;
   createdAt: string;
+  properties?: Property[];
 }
 
 export interface Property {
@@ -109,10 +120,16 @@ export type PropertyList = {
     longitude: string;
   };
   RoomTypes: {
+    RoomAvailability: boolean;
     id: number;
     name: string;
     price: number;
-    seasonal_prices?: { price: number; start_date: string; end_date: string }[];
+    seasonal_prices?: {
+      price: number;
+      start_date: string;
+      end_date: string;
+      dates: string[];
+    }[];
     avg_rating?: number;
     Unavailable?: { id: number; start_date: string; end_date: string }[];
   }[];
@@ -125,4 +142,25 @@ export interface PropertyCardProps {
   loading?: boolean;
   searchStart?: Date;
   searchEnd?: Date;
+}
+
+export interface SearchField {
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+  placeholder: string;
+}
+
+export interface SearchValues {
+  where: string;
+  checkIn: Date | null;
+  checkOut: Date | null;
+  who: number;
+  dateRange: Date[];
+  [key: string]: string | number | Date | Date[] | null;
+}
+
+export interface FormValues {
+  data: string;
+  password: string;
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useCallback } from "react"; // Tambahkan useCallback
+import { useState, useCallback, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import { Mail, CheckCircle, AlertCircle } from "lucide-react";
 import { ToastContainer } from "react-toastify";
@@ -16,6 +16,7 @@ export default function VerifyEmail({
     "pending" | "success" | "error"
   >("pending");
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
+  const hasCalledRef = useRef(false);
 
   const requestEmailVerification = useCallback(async () => {
     try {
@@ -24,7 +25,7 @@ export default function VerifyEmail({
       const token = localStorage.getItem("token");
       if (!token) {
         setVerificationStatus("error");
-        throw new Error("No token found");
+        throw new Error("Token tidak ditemukan");
       }
 
       const response = await fetch(
@@ -40,25 +41,25 @@ export default function VerifyEmail({
       if (response.ok) {
         setVerificationStatus("success");
         Swal.fire({
-          title: "Success!",
-          text: "Email Verification Successful!",
+          title: "Berhasil!",
+          text: "Verifikasi email berhasil!",
           icon: "success",
           confirmButtonText: "OK",
         }).then(() => {
           setTimeout(() => {
-            router.push("/profile"); // Redirect setelah 3 detik
+            router.push("/profile");
           }, 3000);
         });
       } else {
         setVerificationStatus("error");
-        throw new Error("Failed to send verification email");
+        throw new Error("Gagal mengirim email verifikasi");
       }
     } catch (error) {
       console.error(error);
       setVerificationStatus("error");
       Swal.fire({
-        title: "Error!",
-        text: "Failed to send verification email. Please try again later.",
+        title: "Gagal!",
+        text: "Gagal mengirim email verifikasi. Silakan coba lagi nanti.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -66,6 +67,13 @@ export default function VerifyEmail({
       setIsVerifying(false);
     }
   }, [isVerifying, base_url, params?.token, router]);
+
+  useEffect(() => {
+    if (params?.token && !hasCalledRef.current) {
+      hasCalledRef.current = true;
+      requestEmailVerification();
+    }
+  }, [params?.token, requestEmailVerification]);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -99,10 +107,10 @@ export default function VerifyEmail({
             {verificationStatus === "pending" && (
               <>
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  Verifying Your Email
+                  Memverifikasi Email Anda
                 </h2>
                 <p className="text-gray-600 animate-pulse">
-                  Please wait while we verify your email address...
+                  Harap tunggu, kami sedang memverifikasi alamat email Anda...
                 </p>
               </>
             )}
@@ -110,10 +118,10 @@ export default function VerifyEmail({
             {verificationStatus === "success" && (
               <>
                 <h2 className="text-2xl font-bold text-green-700 mb-4">
-                  Verification Successful
+                  Verifikasi Berhasil
                 </h2>
                 <p className="text-gray-600">
-                  Your email has been verified. Redirecting...
+                  Email Anda telah diverifikasi. Sedang mengalihkan...
                 </p>
               </>
             )}
@@ -121,16 +129,16 @@ export default function VerifyEmail({
             {verificationStatus === "error" && (
               <>
                 <h2 className="text-2xl font-bold text-red-700 mb-4">
-                  Verification Failed
+                  Verifikasi Gagal
                 </h2>
                 <p className="text-gray-600">
-                  Unable to verify your email. Please try again.
+                  Gagal memverifikasi email Anda. Silakan coba lagi.
                 </p>
                 <button
                   onClick={requestEmailVerification}
                   className="mt-4 px-6 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
                 >
-                  Retry Verification
+                  Coba Verifikasi Lagi
                 </button>
               </>
             )}

@@ -29,6 +29,7 @@ export default function PropertyCard({
     );
   }
 
+  // Calculate overall rating based on RoomTypes that have ratings.
   const validRatings = property.RoomTypes.filter(
     (room) => room.avg_rating !== undefined && room.avg_rating !== null
   );
@@ -38,43 +39,78 @@ export default function PropertyCard({
         validRatings.length
       : 0;
 
-  // Ambil tipe kamar pertama untuk tampilan harga
-  const roomType = property.RoomTypes[0];
-  const regularPrice = roomType?.price;
-
+  // Set effective search dates.
   const effectiveStart = searchStart ? searchStart : new Date();
   const effectiveEnd = searchEnd
     ? searchEnd
     : new Date(effectiveStart.getTime() + 24 * 60 * 60 * 1000);
 
-  // Cek harga seasonal
-  let activeSeasonalPrice = undefined;
-  if (roomType?.seasonal_prices && roomType.seasonal_prices.length > 0) {
-    activeSeasonalPrice = roomType.seasonal_prices.find((sp) => {
-      const spStart = new Date(sp.start_date);
-      const spEnd = new Date(sp.end_date);
-      return effectiveStart >= spStart && effectiveEnd <= spEnd;
-    });
-  }
-  const finalPrice = activeSeasonalPrice
-    ? activeSeasonalPrice.price
-    : regularPrice;
-  const showDiscount = !!(
-    activeSeasonalPrice &&
-    regularPrice &&
-    regularPrice > activeSeasonalPrice.price
+  // Determine the lowest regular price across room types.
+  const lowestRegularPrice = Math.min(
+    ...property.RoomTypes.map((room) => room.price)
   );
 
-  // Cek ketersediaan kamar
+  // Calculate the lowest effective price considering seasonal pricing.
+  const lowestEffectivePrice = property.RoomTypes.reduce((min, room) => {
+    let effectiveRoomPrice = room.price;
+    if (room.seasonal_prices && room.seasonal_prices.length > 0) {
+      const applicableSeasonal = room.seasonal_prices.find((sp) => {
+        if (sp.dates && sp.dates.length > 0) {
+          const targetStr = effectiveStart.toISOString().split("T")[0];
+          return sp.dates.some((d: string) => {
+            const dStr = new Date(d).toISOString().split("T")[0];
+            return dStr === targetStr;
+          });
+        } else if (sp.start_date && sp.end_date) {
+          const spStart = new Date(sp.start_date);
+          const spEnd = new Date(sp.end_date);
+          return effectiveStart >= spStart && effectiveStart <= spEnd;
+        }
+        return false;
+      });
+      if (applicableSeasonal) {
+        effectiveRoomPrice = applicableSeasonal.price;
+      }
+    }
+    return Math.min(min, effectiveRoomPrice);
+  }, Infinity);
+
+  const finalPrice = lowestEffectivePrice;
+  const showDiscount = lowestRegularPrice > lowestEffectivePrice;
+
+  // Updated availability check: For each room type, determine if it's available
+  // in the effective date range by checking both the Unavailable records and
+  // (if available) the RoomAvailability records that report availableCount === 0.
   const isAnyRoomAvailable = property.RoomTypes.some((room) => {
-    if (!room.Unavailable || room.Unavailable.length === 0) return true;
-    const isRoomUnavailable = room.Unavailable.some((range) => {
-      const rangeStart = new Date(range.start_date);
-      const rangeEnd = new Date(range.end_date);
-      return effectiveStart <= rangeEnd && effectiveEnd >= rangeStart;
-    });
-    return !isRoomUnavailable;
+    let roomUnavailable = false;
+    // Check if this room type is marked unavailable in any Unavailable record.
+    if (room.Unavailable && room.Unavailable.length > 0) {
+      roomUnavailable = room.Unavailable.some((range) => {
+        const rangeStart = new Date(range.start_date);
+        const rangeEnd = new Date(range.end_date);
+        return effectiveStart <= rangeEnd && effectiveEnd >= rangeStart;
+      });
+    }
+    // If RoomAvailability exists and is an array, check if any date in the range has availableCount === 0.
+    if (
+      Array.isArray(room.RoomAvailability) &&
+      room.RoomAvailability.length > 0
+    ) {
+      const roomHasZeroAvailability = room.RoomAvailability.some((ra) => {
+        const raDate = new Date(ra.date);
+        return (
+          effectiveStart <= raDate &&
+          raDate < effectiveEnd &&
+          ra.availableCount === 0
+        );
+      });
+      if (roomHasZeroAvailability) {
+        roomUnavailable = true;
+      }
+    }
+    return !roomUnavailable;
   });
+
   const disableButton = property.isAvailable === false || !isAnyRoomAvailable;
 
   const handlePropertyClick = async () => {
@@ -105,7 +141,7 @@ export default function PropertyCard({
         overallRating={overallRating}
         finalPrice={finalPrice}
         showDiscount={showDiscount}
-        regularPrice={regularPrice}
+        regularPrice={lowestRegularPrice}
         handlePropertyClick={handlePropertyClick}
       />
     </div>

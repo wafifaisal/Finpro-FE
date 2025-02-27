@@ -1,34 +1,66 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Property } from "@/types/types";
+import { Property, Tenant, RoomType, Review } from "@/types/types";
 import { Star, Shield, Home, MessageCircle, CheckCircle } from "lucide-react";
 
 interface OwnerInfoProps {
-  tenant: Property["tenant"];
-  tenantPropertyCount: number;
+  tenant: Tenant;
 }
 
-const OwnerInfo: React.FC<OwnerInfoProps> = ({
-  tenant,
-  tenantPropertyCount,
-}) => {
-  // Ambil tahun berdasarkan properti createdAt dari tenant
-  const joinYear = new Date(tenant.createdAt).getFullYear();
-
-  // State untuk mengatur apakah email telah disalin
+const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
+  const { id, email, createdAt, properties } = tenant;
+  const joinYear = new Date(createdAt).getFullYear();
   const [copied, setCopied] = useState(false);
+  const [propertyCount, setPropertyCount] = useState<number>(0);
+  const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
-  // Fungsi untuk menyalin email tenant ke clipboard
+  useEffect(() => {
+    async function fetchPropertyCount() {
+      try {
+        const res = await fetch(`${base_url}/tenant/count-properties/${id}`, {
+          method: "GET",
+        });
+        if (!res.ok) {
+          throw new Error("Gagal mengambil properti tenant");
+        }
+        const data = await res.json();
+        setPropertyCount(data.totalProperties);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    if (id) {
+      fetchPropertyCount();
+    }
+  }, [id, base_url]);
+
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText(tenant.email);
+    navigator.clipboard.writeText(email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Aggregate all reviews from each property owned by tenant.
+  const aggregatedReviews =
+    properties?.reduce((acc: Review[], property: Property) => {
+      const roomReviews =
+        property.RoomTypes.flatMap((room: RoomType) => room.Review || []) || [];
+      return [...acc, ...roomReviews];
+    }, []) || [];
+
+  const totalRating = aggregatedReviews.reduce(
+    (sum: number, review: Review) => sum + review.rating,
+    0
+  );
+  const reviewCount = aggregatedReviews.length;
+  const avgRating = reviewCount > 0 ? totalRating / reviewCount : 0;
+
   return (
     <div className="mt-12 max-w-2xl">
       <div className="flex flex-col gap-6">
-        {/* Bagian Header */}
+        {/* Header Section */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -64,13 +96,12 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({
           </button>
         </div>
 
-        {/* Grid Statistik */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="flex items-center gap-3">
             <Star className="w-5 h-5 text-rose-500" />
             <div>
-              <p className="font-medium">4.9 rating</p>
-              <p className="text-sm text-gray-500">Dari 128 ulasan</p>
+              <p className="font-medium">{avgRating.toFixed(1)} rating</p>
+              <p className="text-sm text-gray-500">Dari {reviewCount} ulasan</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -82,11 +113,10 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({
           </div>
         </div>
 
-        {/* Informasi Tenant */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-gray-600">
             <Home className="w-4 h-4" />
-            <span>{tenantPropertyCount} properti terdaftar</span>
+            <span>{propertyCount} properti terdaftar</span>
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <MessageCircle className="w-4 h-4" />

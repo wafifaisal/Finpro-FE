@@ -1,4 +1,4 @@
-// pages/CreateRoomType.tsx
+// components/CreateRoomType/CreateRoomTypeForm.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -6,47 +6,25 @@ import { useRouter } from "next/navigation";
 import { Formik, Form, FieldArray, FormikHelpers } from "formik";
 import Swal from "sweetalert2";
 import { PlusCircle } from "lucide-react";
+
 import RoomCard from "./roomCard";
-import initialValues from "@/types/initialValues";
-import validationSchema from "@/types/ValidationSchema";
 import SeasonalPriceSection from "./SeasonalPrice";
 import UnavailableSection from "./UnavailableSection";
+import initialValues from "@/types/initialValues";
+import validationSchema from "@/types/ValidationSchema";
 import {
   RoomFormType,
   CreateRoomTypeFormValues,
 } from "@/types/createRoomTypes";
+import { availableFacilities } from "@/constants/AvailableFacilities";
 
 interface CreateRoomTypeProps {
   params: { property_id: number };
 }
 
-export default function CreateRoomType({ params }: CreateRoomTypeProps) {
+const CreateRoomTypeForm: React.FC<CreateRoomTypeProps> = ({ params }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const availableFacilities = [
-    { id: "WIFI", name: "WiFi" },
-    { id: "TV", name: "TV" },
-    { id: "AC", name: "AC" },
-    { id: "ROOM_SERVICES", name: "Layanan Kamar" },
-    { id: "MINI_BAR", name: "Mini Bar" },
-    { id: "LAUNDRY", name: "Laundry" },
-    { id: "SETRIKA", name: "Setrika" },
-    { id: "ALAT_PEMADAM_API", name: "Alat Pemadam Api" },
-    { id: "MICROWAVE", name: "Microwave" },
-    { id: "KULKAS", name: "Kulkas" },
-    { id: "RUANG_KERJA_KHUSUS", name: "Ruang kerja khusus" },
-    { id: "KITCHEN", name: "Dapur" },
-    { id: "HEATING", name: "Pemanas Ruangan" },
-    { id: "AIR_PURIFIER", name: "Pembersih Udara" },
-    { id: "SAFE", name: "Brankas" },
-    { id: "BATHROBES", name: "Jubah Mandi" },
-    { id: "TEA_COFFEE_MAKER", name: "Pembuat Teh/Kopi" },
-    { id: "BALCONY", name: "Balkon" },
-    { id: "BATHTUB", name: "Bak Mandi" },
-    { id: "JACUZZI", name: "Jacuzzi" },
-    { id: "PRIVATE_POOL", name: "Kolam Privat" },
-  ];
 
   const handleSubmit = async (
     values: CreateRoomTypeFormValues,
@@ -68,7 +46,6 @@ export default function CreateRoomType({ params }: CreateRoomTypeProps) {
           unavailable,
           ...basicData
         } = room;
-        // Append basic data
         Object.entries(basicData).forEach(([key, value]) => {
           formDataToSend.append(key, String(value));
         });
@@ -202,4 +179,6 @@ export default function CreateRoomType({ params }: CreateRoomTypeProps) {
       </Formik>
     </div>
   );
-}
+};
+
+export default CreateRoomTypeForm;

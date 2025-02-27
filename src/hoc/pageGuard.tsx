@@ -3,12 +3,21 @@
 import React, { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { SessionContext } from "@/context/sessionProvider";
+import Loading from "@/app/loading";
 
-export default function withGuard<P extends JSX.IntrinsicAttributes>(
+interface GuardOptions {
+  requiredRole?: "user" | "tenant";
+  redirectTo?: string;
+  routeRedirects?: {
+    [route: string]: string;
+  };
+}
+
+export default function withGuard<P extends object>(
   Component: React.ComponentType<P>,
-  options: { requiredRole?: "user" | "tenant"; redirectTo?: string } = {}
+  options: GuardOptions = {}
 ) {
-  const { requiredRole, redirectTo = "/login" } = options;
+  const { requiredRole, redirectTo = "/login", routeRedirects = {} } = options;
 
   return function GuardedComponent(props: P) {
     const { isAuth, loading, type } = useContext(SessionContext) || {};
@@ -16,50 +25,23 @@ export default function withGuard<P extends JSX.IntrinsicAttributes>(
 
     useEffect(() => {
       console.log("Guard State:", { isAuth, loading, type, requiredRole });
-
       if (!loading) {
+        const currentRoute = window.location.pathname;
+
         if (!isAuth) {
           console.warn("User is not authenticated. Redirecting to login.");
-          router.replace(redirectTo);
+          router.replace(routeRedirects[currentRoute] || redirectTo);
         } else if (requiredRole && type !== requiredRole) {
+          const redirectPath =
+            routeRedirects[currentRoute] || "/not-authorized";
           console.warn(`Role mismatch: required ${requiredRole}, got ${type}`);
-          router.replace("/not-authorized");
+          router.replace(redirectPath);
         }
       }
     }, [isAuth, loading, type, router]);
 
     if (loading) {
-      return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-900">
-          <div className="text-center">
-            {/* Spinner */}
-            <svg
-              className="animate-spin h-10 w-10 text-orange-500 mx-auto"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v8H4z"
-              ></path>
-            </svg>
-            {/* Message */}
-            <h1 className="text-3xl font-bold text-orange-500 mt-4">
-              Checking Authorization...
-            </h1>
-          </div>
-        </div>
-      );
+      return <Loading />;
     }
 
     if (!isAuth || (requiredRole && type !== requiredRole)) {

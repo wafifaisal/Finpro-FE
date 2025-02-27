@@ -152,6 +152,11 @@ export default function TenantAvatar() {
               label="Notifikasi"
               onClick={() => navigateTo("/notifications")}
             />
+            <MenuItem
+              icon={<FaUserCircle className="text-gray-600" />}
+              label="Tentang Nginepin"
+              onClick={() => navigateTo("/about")}
+            />
             <div className="pt-4 mt-4 border-t border-gray-100">
               <MenuItem
                 icon={<FaSignOutAlt className="text-rose-500" />}

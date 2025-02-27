@@ -5,10 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import PropertyCard from "@/components/main/propertycard/propertylist";
 import Pagination from "@/components/sub/search-result/Pagination";
-import { UserLocation } from "@/types/types";
+import { UserLocation, PropertyList } from "@/types/types";
 import { NoResults } from "@/components/sub/search-result/NoResult";
 import { LoadingSkeleton } from "@/components/sub/search-result/LoadingSkeleton";
-import { PropertyList } from "@/types/types";
 
 const PropertyMap = dynamic(
   () => import("@/components/sub/search-result/SearchMap"),
@@ -21,6 +20,7 @@ const PropertyMap = dynamic(
 export default function SearchResultPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
   const where = searchParams.get("where") || "";
   const checkIn = searchParams.get("checkIn") || "";
   const checkOut = searchParams.get("checkOut") || "";
@@ -34,16 +34,21 @@ export default function SearchResultPage() {
   const sortBy = searchParams.get("sortBy") || "";
   const sortOrder = searchParams.get("sortOrder") || "";
   const propertyName = searchParams.get("propertyName") || "";
+
   const [properties, setProperties] = useState<PropertyList[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [pagination, setPagination] = useState({
     totalPages: 1,
     currentPage: 1,
-    limit: 8,
+    limit: 9,
   });
   const [userLocation, setUserLocation] = useState<UserLocation>(null);
 
   const base_url_be: string = process.env.NEXT_PUBLIC_BASE_URL_BE || "";
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -75,16 +80,34 @@ export default function SearchResultPage() {
     if (sortOrder) params.append("sortOrder", sortOrder);
     if (propertyName) params.append("propertyName", propertyName);
     params.append("page", pageQuery);
-    params.append("limit", "8");
+    params.append("limit", "9");
 
     fetch(`${base_url_be}/property?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
-        setProperties(data.result || []);
+        let results = data.result || [];
+        if (sortBy === "price") {
+          results = results.sort((a: PropertyList, b: PropertyList) => {
+            const minA =
+              a.RoomTypes && a.RoomTypes.length > 0
+                ? Math.min(
+                    ...a.RoomTypes.map((rt: { price: number }) => rt.price)
+                  )
+                : Infinity;
+            const minB =
+              b.RoomTypes && b.RoomTypes.length > 0
+                ? Math.min(
+                    ...b.RoomTypes.map((rt: { price: number }) => rt.price)
+                  )
+                : Infinity;
+            return sortOrder === "asc" ? minA - minB : minB - minA;
+          });
+        }
+        setProperties(results);
         setPagination({
           totalPages: data.totalPages || 1,
           currentPage: data.currentPage || parseInt(pageQuery, 10),
-          limit: data.limit || 8,
+          limit: data.limit || 9,
         });
         setLoading(false);
       })
@@ -114,6 +137,7 @@ export default function SearchResultPage() {
     params.set("page", page.toString());
     router.push(`/property/search-result?${params.toString()}`);
   };
+
   const searchStart = checkIn ? new Date(checkIn) : new Date();
   const searchEnd = checkOut
     ? new Date(checkOut)

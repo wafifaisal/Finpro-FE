@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import Loading from "@/app/loading";
 import RoomDetail from "@/components/main/propertyDetails/RoomDetail";
-import BookingCard from "@/components/main/propertyDetails/BookingCard";
+import BookingCard from "@/components/main/propertyDetails/BookingCard/BookingCard";
 import PropertyMap from "@/components/main/propertyDetails/PropertyMap";
 import PhotoGallery from "@/components/main/propertyDetails/PhotoGallery";
 import OwnerInfo from "@/components/main/propertyDetails/OwnerInfo";
@@ -14,9 +15,12 @@ import usePropertyDetail from "@/hooks/usePropertyDetail";
 import { Review as ReviewType } from "@/types/types";
 
 const PropertyDetail = ({ params }: { params: { id: string } }) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const {
     property,
-    tenantPropertyCount,
     showAllPhotos,
     setShowAllPhotos,
     showAllFacilities,
@@ -33,7 +37,6 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
     getTomorrow,
     today,
     getTotalCapacity,
-    totals,
   } = usePropertyDetail(params.id);
 
   if (!property) {
@@ -100,7 +103,7 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
             setGuests={setGuests}
             getTotalCapacity={getTotalCapacity}
             selectedRooms={selectedRooms}
-            totals={totals}
+            onRoomSelectionChange={handleRoomQuantityChange}
           />
         </div>
 
@@ -109,10 +112,7 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
           <PropertyMap property={property} />
         </div>
 
-        <OwnerInfo
-          tenant={property.tenant}
-          tenantPropertyCount={tenantPropertyCount}
-        />
+        <OwnerInfo tenant={property.tenant} />
 
         <Reviews reviews={aggregatedReviews} />
       </main>

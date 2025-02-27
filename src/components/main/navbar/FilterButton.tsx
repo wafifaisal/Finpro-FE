@@ -16,10 +16,8 @@ const FilterButton: React.FC = () => {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  // Use the defined FilterData type here instead of an inline any type
   const handleApplyFilters = (data: FilterData) => {
     console.log("Properties fetched:", data);
-    // Do something with the data, e.g., update state or perform routing
   };
 
   return (

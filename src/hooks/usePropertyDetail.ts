@@ -1,29 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { Property, RoomSelection, Totals } from "@/types/types";
-
-interface RoomTypeDetail {
-  id: number;
-  price: number;
-  seasonal_prices?: {
-    start_date: string;
-    end_date: string;
-    price: number | string;
-  }[];
-  has_breakfast: boolean;
-  breakfast_price: number;
-  capacity: number;
-  Unavailable?: {
-    start_date: string;
-    end_date: string;
-  }[];
-}
+import { RoomTypeDetail } from "@/types/roomTypes";
 
 const usePropertyDetail = (id: string) => {
   const [property, setProperty] = useState<Property | null>(null);
-  const [tenantPropertyCount, setTenantPropertyCount] = useState<number>(0);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showAllFacilities, setShowAllFacilities] = useState(false);
   const [checkIn, setCheckIn] = useState("");
@@ -40,23 +23,6 @@ const usePropertyDetail = (id: string) => {
     return date.toISOString().split("T")[0];
   };
 
-  const countTenantProperties = useCallback(
-    async (tenantId: string): Promise<number> => {
-      try {
-        const res = await fetch(`${base_url}/tenant/${tenantId}/properties`);
-        if (!res.ok) {
-          throw new Error("Gagal mengambil properti tenant");
-        }
-        const tenantProperties = await res.json();
-        return tenantProperties.length;
-      } catch (err) {
-        console.error(err);
-        return 0;
-      }
-    },
-    [base_url]
-  );
-
   useEffect(() => {
     const fetchProperty = async () => {
       try {
@@ -64,17 +30,12 @@ const usePropertyDetail = (id: string) => {
         if (!res.ok) throw new Error("Gagal mengambil properti");
         const data: Property = await res.json();
         setProperty(data);
-
-        if (data.tenant && data.tenant.id) {
-          const count = await countTenantProperties(data.tenant.id);
-          setTenantPropertyCount(count);
-        }
       } catch (err) {
         console.error(err);
       }
     };
     fetchProperty();
-  }, [id, base_url, countTenantProperties]);
+  }, [id, base_url]);
 
   const handleRoomQuantityChange = (roomTypeId: number, change: number) => {
     setSelectedRooms((prev) => {
@@ -204,7 +165,6 @@ const usePropertyDetail = (id: string) => {
 
   return {
     property,
-    tenantPropertyCount,
     showAllPhotos,
     setShowAllPhotos,
     showAllFacilities,

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 interface ProfileImageModalProps {
   selectedImage: string | null;

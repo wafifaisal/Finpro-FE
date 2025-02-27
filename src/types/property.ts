@@ -14,7 +14,8 @@ export interface ITenant {
   email: string;
   avatar: string | null;
   no_handphone: string;
-  googleId?: string;
+  googleId?: number;
+  isVerify: boolean;
 }
 
 export type UserType = "user" | "tenant" | null;

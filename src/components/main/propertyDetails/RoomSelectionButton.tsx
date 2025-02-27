@@ -9,7 +9,6 @@ interface RoomSelectionButtonProps {
   onToggleBreakfast: (roomTypeId: number) => void;
   onRoomQuantityChange: (roomTypeId: number, change: number) => void;
   guests: number;
-  /** Tanggal booking (biasanya check‑in) dengan format "YYYY-MM-DD" */
   selectedDate: string;
 }
 
@@ -24,20 +23,23 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
   const quantity = selection?.quantity || 0;
   const isSelected = quantity > 0;
 
-  // Konversi selectedDate ke objek Date menggunakan useMemo
   const selectedDateObj = useMemo(() => new Date(selectedDate), [selectedDate]);
 
-  /**
-   * Fungsi untuk mendapatkan harga kamar sesuai dengan tanggal booking.
-   * Jika ada harga seasonal pada tanggal tersebut, gunakan harga seasonal;
-   * jika tidak, gunakan harga reguler (room.price).
-   */
   const getRoomPriceForDate = (room: RoomType, date: Date): number => {
     if (room.seasonal_prices && room.seasonal_prices.length > 0) {
       const seasonalPrice = room.seasonal_prices.find((sp) => {
-        const start = new Date(sp.start_date);
-        const end = new Date(sp.end_date);
-        return date >= start && date <= end;
+        if (sp.dates && sp.dates.length > 0) {
+          const targetStr = date.toISOString().split("T")[0];
+          return sp.dates.some((d: string) => {
+            const dStr = new Date(d).toISOString().split("T")[0];
+            return dStr === targetStr;
+          });
+        } else if (sp.start_date && sp.end_date) {
+          const start = new Date(sp.start_date);
+          const end = new Date(sp.end_date);
+          return date >= start && date <= end;
+        }
+        return false;
       });
       if (seasonalPrice) return seasonalPrice.price;
     }
@@ -49,7 +51,6 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
     [room, selectedDateObj]
   );
 
-  // Periksa ketersediaan kamar berdasarkan tanggal booking
   const isUnavailable =
     room.Unavailable &&
     room.Unavailable.some((range) => {
@@ -57,14 +58,26 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
       const end = new Date(range.end_date);
       return selectedDateObj >= start && selectedDateObj <= end;
     });
-
+  const availableCount = useMemo(() => {
+    if (room.RoomAvailability && room.RoomAvailability.length > 0) {
+      const selectedDateStr = selectedDateObj.toISOString().split("T")[0];
+      const record = room.RoomAvailability.find((ra) => {
+        const raDateStr = new Date(ra.date).toISOString().split("T")[0];
+        return raDateStr === selectedDateStr;
+      });
+      if (record) {
+        return record.availableCount;
+      }
+    }
+    return room.stock;
+  }, [room, selectedDateObj]);
   const isStockHabis = room.stock !== undefined && room.stock <= 0;
-  const isDisabled = isUnavailable || isStockHabis;
+  const isAvailableCountZero = availableCount <= 0;
+  const isDisabled = isUnavailable || isStockHabis || isAvailableCountZero;
 
   return (
     <div className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-200">
       <div className="flex flex-col gap-4">
-        {/* Bagian Harga */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <span className="text-xl font-semibold">
@@ -73,7 +86,6 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
             <span className="text-gray-500 text-sm">per malam</span>
           </div>
 
-          {/* Kontrol Pemilihan Kamar */}
           <div className="flex items-center">
             {quantity > 0 ? (
               <div className="flex items-center gap-3 border border-gray-300 px-4 py-2 rounded-full">
@@ -111,7 +123,6 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
           </div>
         </div>
 
-        {/* Detail Kamar */}
         <div className="flex items-center gap-2 text-gray-600">
           <Users className="w-4 h-4" />
           <span className="text-sm">
@@ -119,7 +130,6 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
           </span>
         </div>
 
-        {/* Pesan Peringatan */}
         {isSelected && room.capacity * quantity < guests && (
           <div className="flex items-center gap-2 text-rose-600 bg-rose-50 p-3 rounded-lg">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -129,7 +139,6 @@ const RoomSelectionButton: React.FC<RoomSelectionButtonProps> = ({
           </div>
         )}
 
-        {/* Opsi Sarapan */}
         {isSelected && room.has_breakfast && (
           <div className="pt-4 border-t border-gray-200 mt-2">
             <label className="flex items-center gap-3 cursor-pointer group">

@@ -1,4 +1,3 @@
-// utils/api.ts
 export const countTenantProperties = async (
   tenantId: string,
   baseUrl: string

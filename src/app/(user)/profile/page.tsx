@@ -10,8 +10,9 @@ import ProfilePassword from "@/components/sub/profile/passwordSection";
 import StatGrid from "@/components/sub/profile/statGrid";
 import ProfileHeader from "@/components/sub/profile/profileHeader";
 import ProfileImageModal from "@/components/sub/profile/modalHeader";
+import withGuard from "@/hoc/pageGuard";
 
-export default function ProfilePage() {
+function ProfilePage() {
   const { isAuth, type, user } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -29,7 +30,9 @@ export default function ProfilePage() {
   if (!isAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-800">Please log in to view your profile.</p>
+        <p className="text-gray-800">
+          Silakan masuk untuk melihat profil Anda.
+        </p>
       </div>
     );
   }
@@ -38,13 +41,11 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <p className="text-gray-800">
-          You are not authorized to view this page.
+          Anda tidak berwenang melihat halaman ini.
         </p>
       </div>
     );
   }
-
-  console.log("user", user);
 
   return (
     <>
@@ -52,7 +53,6 @@ export default function ProfilePage() {
       <div
         className={`min-h-screen bg-white transition-opacity duration-1000 pt-0 pb-24 md:pb-0 md:pt-24`}
       >
-        {/* Animated Background Header */}
         <div className="bg-gradient-to-r from-rose-400 to-rose-600 h-48 relative overflow-hidden">
           <div className="absolute inset-0 opacity-20">
             {[...Array(20)].map((_, i) => (
@@ -76,12 +76,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="container mx-auto px-0 md:px-4 -mt-16">
           <div className="bg-white rounded-xl shadow-lg p-8  transform transition-all duration-700 hover:shadow-2xl">
-            {/* Profile Header */}
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-              {/* Profile Header Disini */}
               <ProfileHeader
                 openModal={openModal}
                 selectedImage={selectedImage}
@@ -120,8 +117,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-
-      {/* Profile Image Modal with Animation */}
       <ProfileImageModal
         selectedImage={selectedImage}
         isOpen={isModalOpen}
@@ -130,3 +125,8 @@ export default function ProfilePage() {
     </>
   );
 }
+
+export default withGuard(ProfilePage, {
+  requiredRole: "user",
+  redirectTo: "/not-authorized",
+});
