@@ -27,7 +27,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   remove,
 }) => {
   return (
-    <div className="border rounded-3xl p-8 space-y-8">
+    <div className="border rounded-3xl p-4 md:p-8 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Tipe Kamar {roomIndex + 1}</h2>
         {roomIndex > 0 && (
@@ -147,7 +147,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       </div>
 
       {room.has_breakfast && (
-        <div className="max-w-md">
+        <div className="w-full max-w-md">
           <label className="block text-sm font-medium mb-2">
             Harga Sarapan per Orang
           </label>

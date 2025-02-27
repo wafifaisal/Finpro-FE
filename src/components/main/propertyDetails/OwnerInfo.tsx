@@ -42,7 +42,6 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Aggregate all reviews from each property owned by tenant.
   const aggregatedReviews =
     properties?.reduce((acc: Review[], property: Property) => {
       const roomReviews =
@@ -60,7 +59,6 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
   return (
     <div className="mt-12 max-w-2xl">
       <div className="flex flex-col gap-6">
-        {/* Header Section */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
