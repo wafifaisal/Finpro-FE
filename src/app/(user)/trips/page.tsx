@@ -3,7 +3,7 @@
 import Loading from "@/app/loading";
 import NoTrips from "@/components/sub/trips/noTrips";
 import TripsNavbar from "@/components/sub/trips/tripsNavbar";
-import { cancelBooking, getUserBookings } from "@/libs/booking";
+import { cancelBooking, getUserBookings } from "@/libs/userBooking";
 import { IBooking } from "@/types/booking";
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -50,7 +50,7 @@ export default function TripsPage() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen">
       <TripsNavbar />
       <div className="main-content flex flex-col container mx-auto p-8 px-32">
         <h1 className="text-2xl font-bold">Pesanan Saya</h1>

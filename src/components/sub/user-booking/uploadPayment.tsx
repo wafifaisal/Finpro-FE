@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import { uploadPaymentProof } from "@/libs/booking";
+import { uploadPaymentProof } from "@/libs/userBooking";
 import { useRouter } from "next/navigation";
 
 interface FormValues {
@@ -11,12 +11,7 @@ interface FormValues {
 }
 
 const FILE_SIZE = 1 * 1024 * 1024;
-const SUPPORTED_FORMATS = [
-  "image/jpg",
-  "image/jpeg",
-  "image/png",
-  "application/pdf",
-];
+const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/png"];
 
 const validationSchema = Yup.object().shape({
   paymentProof: Yup.mixed<File>()

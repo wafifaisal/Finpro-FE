@@ -1,4 +1,4 @@
-enum BookingStatus {
+export enum BookingStatus {
   new = "new",
   completed = "completed",
   canceled = "canceled",
@@ -29,7 +29,7 @@ export interface IBooking {
       image_url: string;
     }[];
   };
-  Review?: IReview[];
+  Review?: IReview;
 }
 
 export interface ICreateBooking {

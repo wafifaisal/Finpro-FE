@@ -3,12 +3,12 @@
 import Loading from "@/app/loading";
 import { formatCurrency } from "@/helpers/formatCurrency";
 import { formatDateDay } from "@/helpers/formatDate";
-import { getBooking } from "@/libs/booking";
+import { getBooking } from "@/libs/userBooking";
 import { IBooking } from "@/types/booking";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { LuCalendarClock } from "react-icons/lu";
-import PaymentProofUpload from "@/components/sub/booking/uploadPayment";
+import PaymentProofUpload from "@/components/sub/user-booking/uploadPayment";
 import TripsNavbar from "@/components/sub/trips/tripsNavbar";
 
 export default function BookingPage({

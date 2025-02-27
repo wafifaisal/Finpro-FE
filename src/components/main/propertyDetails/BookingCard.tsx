@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Star } from "lucide-react";
 import { Property, RoomSelection, Totals } from "@/types/types";
 import { formatCurrency } from "@/helpers/formatCurrency";
-import { createBooking } from "@/libs/booking";
+import { createBooking } from "@/libs/userBooking";
 import { ICreateBooking } from "@/types/booking";
 
 interface BookingCardProps {
