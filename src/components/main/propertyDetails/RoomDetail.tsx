@@ -7,6 +7,7 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RoomType, RoomSelection } from "@/types/types";
 import RoomSelectionButton from "./RoomSelectionButton";
 import { formatCurrency } from "@/helpers/formatCurrency";
@@ -29,9 +30,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
   selectedDate,
 }) => {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
-
   const [effectiveRoom, setEffectiveRoom] = useState<RoomType>(room);
-
   useEffect(() => {
     const fetchRoomDetail = async () => {
       try {
@@ -49,7 +48,6 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
     const interval = setInterval(fetchRoomDetail, 3000);
     return () => clearInterval(interval);
   }, [room.id, base_url]);
-
   const [facilitiesExpanded, setFacilitiesExpanded] = useState(false);
   const toggleFacilities = () => setFacilitiesExpanded((prev) => !prev);
   const facilities = effectiveRoom.facilities || [];
@@ -86,28 +84,46 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
   }, [effectiveRoom, bookingDate]);
   const availableCount = isDateUnavailable ? 0 : availableCountFromAvailability;
   const roomUnavailable = availableCount <= 0;
-
   return (
     <div className="mb-12 pb-12 border-b last:border-b-0">
-      <Swiper
-        modules={[Navigation, Pagination]}
-        navigation
-        pagination={{ clickable: true }}
-        className="h-80 rounded-xl overflow-hidden mb-6"
-      >
-        {(effectiveRoom.RoomImages || []).map((image) => (
-          <SwiperSlide key={image.id}>
-            <div className="relative w-full h-full">
-              <Image
-                src={image.image_url}
-                alt={effectiveRoom.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div className="relative w-full mb-6 group">
+        <Swiper
+          modules={[Navigation, Pagination]}
+          pagination={{
+            clickable: true,
+            bulletClass: "custom-bullet",
+            bulletActiveClass: "custom-bullet-active",
+          }}
+          navigation={{
+            nextEl: `.custom-next-${effectiveRoom.id}`,
+            prevEl: `.custom-prev-${effectiveRoom.id}`,
+          }}
+          className="h-80 rounded-xl overflow-hidden"
+        >
+          {(effectiveRoom.RoomImages || []).map((image) => (
+            <SwiperSlide key={image.id} className="w-full h-full">
+              <div className="relative w-full h-full">
+                <Image
+                  src={image.image_url}
+                  alt={effectiveRoom.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        <button
+          className={`custom-prev-${effectiveRoom.id} absolute top-1/2 left-2 z-50 bg-white/30 hover:bg-white/50 text-white p-2 rounded-full transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity`}
+        >
+          <ChevronLeft className="w-3 h-3" />
+        </button>
+        <button
+          className={`custom-next-${effectiveRoom.id} absolute top-1/2 right-2 z-50 bg-white/30 hover:bg-white/50 text-white p-2 rounded-full transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity`}
+        >
+          <ChevronRight className="w-3 h-3" />
+        </button>
+      </div>
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-start">
           <div>
