@@ -339,3 +339,5 @@ body {
 .animate-marquee-reverse {
   animation: marquee 20s linear infinite reverse;
 }
+
+.main-content { padding-top: 120px; }

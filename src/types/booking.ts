@@ -52,7 +52,7 @@ export interface IBooking {
       image_url: string;
     }[];
   };
-  Review?: IReview[];
+  Review?: IReview;
   selection?: RoomSelection;
 }
 
