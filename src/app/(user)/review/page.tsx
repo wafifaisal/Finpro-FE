@@ -13,7 +13,7 @@ import Loading from "@/app/loading";
 export default function ReviewPage() {
   const [bookings, setBookings] = useState<IBooking[]>([]);
   const [loading, setLoading] = useState(true);
-  const userId = "608cde42-46ab-4436-973d-616efdb0339c"; // Replace with actual user ID
+  const userId = "f4a225e8-b8f2-4e9f-ab1a-c79d16b9c5a8"; // Replace with actual user ID
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -36,63 +36,56 @@ export default function ReviewPage() {
   return (
     <div className="min-h-screen">
       <TripsNavbar />
-      <div className="main-content flex flex-col container mx-auto p-8 px-32">
+      <div className="main-content flex flex-col container mx-auto p-8 px-60">
         <h1 className="text-2xl font-bold">Ulasan Saya</h1>
         <div className="border-b-[1px] my-6"></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {bookings.map((booking) => (
-            <div key={booking.id} className="border rounded-lg shadow-md p-4">
-              {/* Image */}
-              {booking.room_types.RoomImages?.length ? (
-                <div className="relative h-16 w-16 my-2">
-                  <Image
-                    src={
-                      booking.room_types.RoomImages[0].image_url ||
-                      "/placeholder.jpg"
-                    }
-                    alt="Room"
-                    layout="fill"
-                    className="object-cover rounded-md"
-                  />
+
+        {bookings.map((booking) => (
+          <div
+            key={booking.id}
+            className="flex w-full bg-gray-200 mx-auto border rounded-xl shadow-md mb-10 gap-4"
+          >
+            <div className="relative h-60 w-60">
+              <Image
+                src={
+                  booking.room_types.RoomImages[0].image_url ||
+                  "/placeholder.jpg"
+                }
+                alt="Room"
+                layout="fill"
+                className="object-cover rounded-l-xl"
+              />
+            </div>
+
+            <div className="mt-4">
+              <p className="text-lg font-semibold">
+                {booking.room_types.property.name}
+              </p>
+              <p className="text-sm text-gray-600">{booking.room_types.name}</p>
+              <p className="text-sm text-gray-600">
+                {formatDateDay(booking.start_date)} -{" "}
+                {formatDateDay(booking.end_date)}
+              </p>
+            </div>
+
+            <div className="mt-4">
+              {booking.Review ? (
+                <div>
+                  <p className="text-yellow-500">
+                    ⭐ {booking.Review.rating}/5
+                  </p>
+                  <p className="text-gray-800">{booking.Review.review}</p>
                 </div>
               ) : (
-                <p className="text-gray-500">No Image Available</p>
+                <Link href={`/create-review/${booking.id}`}>
+                  <Button className="bg-blue-500 text-white w-full">
+                    Review this property
+                  </Button>
+                </Link>
               )}
-
-              {/* Details */}
-              <div className="mt-4">
-                <p className="text-lg font-semibold">
-                  {booking.room_types.property.name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {booking.room_types.name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {formatDateDay(booking.start_date)} -{" "}
-                  {formatDateDay(booking.end_date)}
-                </p>
-              </div>
-
-              {/* Review Section */}
-              <div className="mt-4">
-                {booking.Review ? (
-                  <div>
-                    <p className="text-yellow-500">
-                      ⭐ {booking.Review.rating}/5
-                    </p>
-                    <p className="text-gray-800">{booking.Review.review}</p>
-                  </div>
-                ) : (
-                  <Link href={`/create-review/${booking.id}`}>
-                    <Button className="bg-blue-500 text-white w-full">
-                      Review this property
-                    </Button>
-                  </Link>
-                )}
-              </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );

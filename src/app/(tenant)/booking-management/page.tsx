@@ -31,7 +31,7 @@ export default function BookingManagementPage() {
     "ongoing"
   );
 
-  const tenantId = "08dd8493-92d5-4aa0-a416-bf3f7a082e9a";
+  const tenantId = "77b66d85-4228-4326-b3e7-e5109ca225e6";
 
   useEffect(() => {
     const fetchBookings = async () => {
