@@ -15,11 +15,9 @@ import {
 interface EditRoomTypeProps {
   params: { property_id: number; roomtype_id: number };
 }
-
 interface RoomImage {
   image_url: string;
 }
-
 interface FetchRoomTypeResponse {
   roomType: {
     RoomImages?: RoomImage[];
@@ -29,7 +27,6 @@ interface FetchRoomTypeResponse {
     [key: string]: unknown;
   };
 }
-
 export default function EditRoomType({ params }: EditRoomTypeProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -60,8 +57,6 @@ export default function EditRoomType({ params }: EditRoomTypeProps) {
     { id: "JACUZZI", name: "Jacuzzi" },
     { id: "PRIVATE_POOL", name: "Kolam Privat" },
   ];
-
-  // Fetch room type data dari backend
   useEffect(() => {
     const fetchRoomType = async () => {
       try {

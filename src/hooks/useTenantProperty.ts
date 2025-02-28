@@ -1,4 +1,4 @@
-// hooks/useTenantProperties.ts
+"use client";
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
@@ -86,7 +86,9 @@ export const useTenantProperties = (page: number) => {
     } catch (error: unknown) {
       Swal.fire({
         title: "Kesalahan",
-        text: (error as Error).message || "Gagal menghapus properti",
+        text:
+          (error as Error).message ||
+          "Gagal menghapus properti. Pastikan semua booking untuk properti ini berstatus 'canceled' atau 'completed'.",
         icon: "error",
       });
     }
@@ -110,7 +112,7 @@ export const useTenantProperties = (page: number) => {
     ) {
       Swal.fire({
         title: "Peringatan",
-        text: "Tidak dapat menghapus tipe kamar jika hanya tersisa satu, silahkan edit tipe kamar ",
+        text: "Tidak dapat menghapus tipe kamar jika hanya tersisa satu, silahkan edit tipe kamar.",
         icon: "warning",
         confirmButtonText: "OK",
       });
@@ -151,7 +153,9 @@ export const useTenantProperties = (page: number) => {
     } catch (error: unknown) {
       Swal.fire({
         title: "Kesalahan",
-        text: (error as Error).message || "Gagal menghapus tipe kamar",
+        text:
+          (error as Error).message ||
+          "Gagal menghapus tipe kamar. Pastikan semua booking untuk tipe kamar ini berstatus 'canceled' atau 'completed'.",
         icon: "error",
       });
     }

@@ -30,6 +30,7 @@ export interface IBooking {
   total_price: number;
   details?: string;
   start_date: Date;
+  add_breakfast: boolean;
   end_date: Date;
   created_at: Date;
   updated_at: Date;
@@ -63,6 +64,7 @@ export interface ICreateBooking {
   startDate: string;
   endDate: string;
   payment_method: "Manual" | "Midtrans";
+  add_breakfast: boolean;
 }
 
 export interface IReview {

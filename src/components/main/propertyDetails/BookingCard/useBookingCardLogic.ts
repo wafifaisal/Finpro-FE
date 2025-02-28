@@ -26,8 +26,6 @@ export const useBookingCardLogic = ({
       ? validRatings.reduce((sum, rt) => sum + (rt.avg_rating || 0), 0) /
         validRatings.length
       : 0;
-
-  // Parse dates
   const checkInDate = useMemo(
     () => (checkIn ? new Date(checkIn) : null),
     [checkIn]
@@ -160,6 +158,7 @@ export const useBookingCardLogic = ({
         startDate: checkIn,
         endDate: checkOut,
         payment_method: "Manual",
+        add_breakfast: selectedRooms[0]?.addBreakfast || false,
       };
 
       const newBooking = await createBooking(bookingData);
