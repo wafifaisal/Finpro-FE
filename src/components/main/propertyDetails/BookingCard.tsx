@@ -114,6 +114,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
         numOfGuests: guests,
         startDate: checkIn,
         endDate: checkOut,
+        quantity: selectedRooms[0]?.quantity,
         payment_method: "Manual",
       };
 

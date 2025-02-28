@@ -3,20 +3,12 @@
 import Loading from "@/app/loading";
 import { formatCurrency } from "@/helpers/formatCurrency";
 import { formatDateDay } from "@/helpers/formatDate";
-<<<<<<< HEAD
-import { getBooking } from "@/libs/userBooking";
-=======
 import { getBooking } from "@/libs/booking";
->>>>>>> 3e23c60884a7ebd72589a913b65d5317a15be9d4
 import { IBooking } from "@/types/booking";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { LuCalendarClock } from "react-icons/lu";
-<<<<<<< HEAD
-import PaymentProofUpload from "@/components/sub/user-booking/uploadPayment";
-=======
 import PaymentProofUpload from "@/components/sub/booking/uploadPayment";
->>>>>>> 3e23c60884a7ebd72589a913b65d5317a15be9d4
 import TripsNavbar from "@/components/sub/trips/tripsNavbar";
 
 export default function BookingPage({
@@ -43,10 +35,6 @@ export default function BookingPage({
   }, [params.bookingId]);
 
   if (isLoading) return <Loading />;
-<<<<<<< HEAD
-
-  if (!booking) return <p>Booking not found.</p>;
-=======
   if (!booking) return <p>Booking not found.</p>;
   const startDate = new Date(booking.start_date);
   const endDate = new Date(booking.end_date);
@@ -81,7 +69,6 @@ export default function BookingPage({
     ? booking.room_types.breakfast_price * quantity * nights
     : 0;
   const computedTotal = roomCost + breakfastCost;
->>>>>>> 3e23c60884a7ebd72589a913b65d5317a15be9d4
 
   return (
     <div>
@@ -146,12 +133,8 @@ export default function BookingPage({
               </p>
             </div>
           </div>
-<<<<<<< HEAD
-          <div className="flex-1 border border-gray-400 rounded-xl h-64 p-4 sticky z-10 top-28">
-=======
 
           <div className="flex-1 border border-gray-400 rounded-xl h-fit p-4 sticky z-10 top-28">
->>>>>>> 3e23c60884a7ebd72589a913b65d5317a15be9d4
             <div className="flex gap-6 items-center">
               <div className="relative w-28 h-28 mb-4">
                 <Image
@@ -165,15 +148,6 @@ export default function BookingPage({
                 <h2 className="text-lg font-bold">{booking.room_types.name}</h2>
                 <div className="border-b-[1px] border-gray-400 mb-4"></div>
                 <h3 className="font-semibold">Detail Harga</h3>
-<<<<<<< HEAD
-                <p className="mb-4 ">
-                  {formatCurrency(booking.total_price)} x 1 malam
-                </p>
-                <div className="border-b-[1px] border-gray-400 mb-4"></div>
-                <p>
-                  <span>Total:</span> {formatCurrency(booking.total_price)}
-                </p>
-=======
                 <p className="mb-4">
                   {formatCurrency(effectivePrice)} x {quantity} kamar x {nights}{" "}
                   malam
@@ -193,7 +167,6 @@ export default function BookingPage({
                     Total: {formatCurrency(computedTotal)}
                   </p>
                 </div>
->>>>>>> 3e23c60884a7ebd72589a913b65d5317a15be9d4
               </div>
             </div>
           </div>

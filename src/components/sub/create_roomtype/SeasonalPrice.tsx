@@ -2,14 +2,8 @@
 
 import React from "react";
 import { FieldArray } from "formik";
-<<<<<<< HEAD
-import { Calendar, X } from "lucide-react";
-import { formatCurrency } from "@/helpers/formatCurrency";
-import { getHolidayName, computeRecurringDates } from "@/helpers/HolidaysUtils";
-=======
 import { Calendar } from "lucide-react";
 import { computeRecurringDates } from "@/helpers/HolidaysUtils";
->>>>>>> 3e23c60884a7ebd72589a913b65d5317a15be9d4
 import { CreateRoomTypeFormValues } from "@/types/createRoomTypes";
 import SeasonalPriceItem from "./SeasonalPriceItem";
 

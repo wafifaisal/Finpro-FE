@@ -19,7 +19,6 @@ import SideBar from "@/components/sub/tenant-booking/sideBar";
 export default function BookingManagementPage() {
   const [bookings, setBookings] = useState<IBooking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
     bookingId: string;
@@ -39,7 +38,7 @@ export default function BookingManagementPage() {
         const data = await getTenantBooking(tenantId);
         setBookings(data);
       } catch (err) {
-        setError("Failed to load bookings");
+        console.error("Failed to load bookings", err);
       } finally {
         setLoading(false);
       }
@@ -54,6 +53,7 @@ export default function BookingManagementPage() {
       toast.success("Booking confirmation email resent!");
     } catch (error) {
       toast.error("Failed to resend email");
+      console.error("Resend email failed:", error);
     }
   };
 
@@ -102,6 +102,7 @@ export default function BookingManagementPage() {
       );
     } catch (error) {
       toast.error("Failed to cancel booking");
+      console.error("Cancel booking failed:", error);
     } finally {
       setCancelDialog(null);
     }
@@ -153,8 +154,6 @@ export default function BookingManagementPage() {
                 Completed Booking
               </Button>
             </div>
-
-            {error && <p className="text-red-500">{error}</p>}
 
             {filteredBookings.length > 0 ? (
               <div className="space-y-4">
