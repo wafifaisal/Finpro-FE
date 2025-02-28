@@ -8,6 +8,7 @@ import Pagination from "@/components/sub/search-result/Pagination";
 import { UserLocation, PropertyList } from "@/types/types";
 import { NoResults } from "@/components/sub/search-result/NoResult";
 import { LoadingSkeleton } from "@/components/sub/search-result/LoadingSkeleton";
+import Footer from "@/components/main/footer/footer";
 
 const PropertyMap = dynamic(
   () => import("@/components/sub/search-result/SearchMap"),
@@ -182,6 +183,7 @@ export default function SearchResultPage() {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 }
