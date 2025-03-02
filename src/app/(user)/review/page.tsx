@@ -9,16 +9,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatDateDay } from "@/helpers/formatDate";
 import Loading from "@/app/loading";
+import { useSession } from "@/context/useSessionHook";
+import withGuard from "@/hoc/pageGuard";
 
-export default function ReviewPage() {
+function ReviewPage() {
+  const { user } = useSession();
   const [bookings, setBookings] = useState<IBooking[]>([]);
   const [loading, setLoading] = useState(true);
-  const userId = "f4a225e8-b8f2-4e9f-ab1a-c79d16b9c5a8"; // Replace with actual user ID
 
   useEffect(() => {
     const fetchReviews = async () => {
+      if (!user) return;
       try {
-        const data = await getUserReviews(userId);
+        const data = await getUserReviews(user.id);
         setBookings(data);
       } catch (error) {
         console.error("Failed to fetch reviews", error);
@@ -28,7 +31,7 @@ export default function ReviewPage() {
     };
 
     fetchReviews();
-  }, [userId]);
+  }, [user]);
 
   if (loading) {
     return <Loading />;
@@ -79,7 +82,7 @@ export default function ReviewPage() {
               ) : (
                 <Link href={`/create-review/${booking.id}`}>
                   <Button className="bg-blue-500 text-white w-full">
-                    Review this property
+                    Ulas properti ini
                   </Button>
                 </Link>
               )}
@@ -90,3 +93,8 @@ export default function ReviewPage() {
     </div>
   );
 }
+
+export default withGuard(ReviewPage, {
+  requiredRole: "user",
+  redirectTo: "/not-authorized",
+});

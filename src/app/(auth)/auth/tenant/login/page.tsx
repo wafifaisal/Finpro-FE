@@ -93,7 +93,7 @@ export default function TenantLogin() {
                       </span>
                     </div>
                   </div>
-                  <div className="mt-6">
+                  <div className="flex justify-center mt-6">
                     <SocialLoginTenant />
                   </div>
                 </div>

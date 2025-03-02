@@ -1,5 +1,3 @@
-// types/types.ts
-
 export interface Location {
   city: string;
   country: string;
@@ -23,6 +21,11 @@ export interface Review {
   rating: number;
   review: string;
   created_at?: string;
+  user?: {
+    avatar: string;
+    username: string;
+    email: string;
+  };
 }
 
 export interface Unavailable {
@@ -31,7 +34,6 @@ export interface Unavailable {
   end_date: string;
 }
 
-// Tipe untuk data seasonal price
 export interface SeasonalPrice {
   id: number;
   price: number;
@@ -60,6 +62,7 @@ export interface RoomType {
   facilities: string[];
   RoomImages: RoomImage[];
   avg_rating?: number;
+  reviewCount?: number;
   Review?: Review[];
   Unavailable?: Unavailable[];
   seasonal_prices?: SeasonalPrice[];
@@ -83,7 +86,8 @@ export interface Property {
   location: Location;
   PropertyImages: PropertyImage[];
   RoomTypes: RoomType[];
-  reviews: Review[];
+  overallRating?: number;
+  totalReviews?: number;
   tenant: Tenant;
   facilities: string[];
 }
@@ -131,9 +135,13 @@ export type PropertyList = {
       dates: string[];
     }[];
     avg_rating?: number;
+    reviewCount?: number;
     Unavailable?: { id: number; start_date: string; end_date: string }[];
+    Review?: Review[];
   }[];
   isAvailable?: boolean;
+  overallRating?: number;
+  totalReviews?: number;
 };
 
 export interface PropertyCardProps {

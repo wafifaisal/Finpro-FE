@@ -1,4 +1,7 @@
-export default function TenantReviewPage() {
+"use client";
+import withGuard from "@/hoc/pageGuard";
+
+function TenantReviewPage() {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <h1 className="text-4xl font-bold">Tenant Review Page</h1>
@@ -6,3 +9,8 @@ export default function TenantReviewPage() {
     </div>
   );
 }
+
+export default withGuard(TenantReviewPage, {
+  requiredRole: "tenant",
+  redirectTo: "/not-authorized",
+});

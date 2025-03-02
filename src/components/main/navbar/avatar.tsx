@@ -129,7 +129,7 @@ export default function Avatar() {
             <MenuItem
               icon={<FaStar className="text-gray-600" />}
               label="Ulasan"
-              onClick={() => navigateTo("/")}
+              onClick={() => navigateTo("/review")}
             />
             <MenuItem
               icon={<FaUserCircle className="text-gray-600" />}

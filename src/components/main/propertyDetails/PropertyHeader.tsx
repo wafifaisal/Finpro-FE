@@ -23,19 +23,24 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   property,
   roomtypes,
 }) => {
-  const validRatings = roomtypes.filter(
-    (rt) => rt.avg_rating !== undefined && rt.avg_rating !== null
-  );
-  const overallRating =
-    validRatings.length > 0
+  const fallbackOverallRating = (() => {
+    const validRatings = roomtypes.filter(
+      (rt) => rt.avg_rating !== undefined && rt.avg_rating !== null
+    );
+    return validRatings.length > 0
       ? validRatings.reduce((sum, rt) => sum + (rt.avg_rating || 0), 0) /
-        validRatings.length
+          validRatings.length
       : 0;
+  })();
 
-  const aggregatedReviewCount = roomtypes.reduce(
+  const overallRating = property.overallRating ?? fallbackOverallRating;
+
+  const fallbackReviewCount = roomtypes.reduce(
     (acc, rt) => acc + (rt.Review ? rt.Review.length : 0),
     0
   );
+  const aggregatedReviewCount = property.totalReviews ?? fallbackReviewCount;
+
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const shareUrl =
@@ -48,9 +53,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
         <div className="flex items-center gap-6 text-sm">
           <div className="flex items-center">
             <Star className="w-4 h-4 text-rose-500" />
-            <span className="ml-1 font-medium">
-              {overallRating ? overallRating.toFixed(1) : "0.0"}
-            </span>
+            <span className="ml-1 font-medium">{overallRating.toFixed(1)}</span>
             <span className="mx-1">·</span>
             <span className="underline hover:text-gray-600">
               {aggregatedReviewCount} ulasan
