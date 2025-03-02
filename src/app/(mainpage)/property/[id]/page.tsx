@@ -13,6 +13,7 @@ import PropertyDetails from "@/components/main/propertyDetails/PropertyDetail";
 import PhotoGrid from "@/components/main/propertyDetails/PhotoGrid";
 import usePropertyDetail from "@/hooks/usePropertyDetail";
 import { Review as ReviewType } from "@/types/types";
+import Footer from "@/components/main/footer/footer";
 
 const PropertyDetail = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
@@ -116,6 +117,7 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
 
         <Reviews reviews={aggregatedReviews} />
       </main>
+      <Footer />
     </div>
   );
 };

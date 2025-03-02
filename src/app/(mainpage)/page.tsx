@@ -14,6 +14,7 @@ import { PropertyList } from "@/types/types";
 import { NoResults } from "@/components/sub/search-result/NoResult";
 import { calculateDistance, capitalize } from "@/helpers/calculateDistance";
 import { slides } from "@/helpers/slides";
+import Footer from "@/components/main/footer/footer";
 
 type UserLocation = {
   latitude: number;
@@ -156,6 +157,7 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

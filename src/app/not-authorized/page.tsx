@@ -88,30 +88,15 @@ const NotAuthorized: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 w-full">
               <motion.button
-                whileHover={{
-                  scale: 1.03,
-                  boxShadow: "0 10px 25px -5px rgba(220, 30, 30, 0.5)",
-                }}
-                whileTap={{ scale: 0.97 }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2 }}
-                className="py-3 px-6 bg-red-600 text-white font-medium rounded-lg shadow-md hover:bg-red-700 transition-all duration-300 flex-1"
-                onClick={() => router.push("/auth/user/login")}
-              >
-                Masuk
-              </motion.button>
-
-              <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.4 }}
-                className="py-3 px-6 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-all duration-300 flex-1"
+                className="py-3 px-6 bg-rose-600 border border-gray-300 text-white font-medium rounded-lg hover:bg-rose-700 transition-all duration-300 flex-1"
                 onClick={() => router.push("/")}
               >
-                Beranda
+                Kembali ke halaman utama
               </motion.button>
             </div>
           </div>

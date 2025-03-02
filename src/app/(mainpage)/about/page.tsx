@@ -13,6 +13,7 @@ import {
   MapPinHouse,
   ChartLineIcon,
 } from "lucide-react";
+import Footer from "@/components/main/footer/footer";
 
 const Portfolio: React.FC = () => {
   return (
@@ -58,8 +59,6 @@ const Portfolio: React.FC = () => {
           </motion.p>
         </div>
       </div>
-
-      {/* Nginepin Section */}
       <div className="relative flex flex-col items-center justify-center h-[40vh] bg-white">
         <svg viewBox="0 0 1320 300" className="absolute w-full h-full">
           <text
@@ -73,8 +72,6 @@ const Portfolio: React.FC = () => {
           </text>
         </svg>
       </div>
-
-      {/* Sarah's Section */}
       <DeveloperSection
         name="Wafi Faisal Falah"
         role="Product Experience Lead"
@@ -97,8 +94,6 @@ const Portfolio: React.FC = () => {
           description="Mengelola properti dengan efisien melalui sistem terintegrasi dan komunikasi yang lancar."
         />
       </DeveloperSection>
-
-      {/* Alex's Section */}
       <DeveloperSection
         name="Afga Ghifari Jamaludin"
         role="Technical Transactions Lead"
@@ -126,6 +121,7 @@ const Portfolio: React.FC = () => {
           description="Menyediakan laporan dan analisis mendalam untuk mendukung pengambilan keputusan strategis."
         />
       </DeveloperSection>
+      <Footer />
     </div>
   );
 };
