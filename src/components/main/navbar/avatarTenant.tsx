@@ -145,12 +145,12 @@ export default function TenantAvatar() {
             <MenuItem
               icon={<FaFileInvoiceDollar className="text-gray-600" />}
               label="Proses Pembayaran"
-              onClick={() => navigateTo("/payments")}
+              onClick={() => navigateTo("/booking-management")}
             />
             <MenuItem
               icon={<FaBell className="text-gray-600" />}
               label="Notifikasi"
-              onClick={() => navigateTo("/notifications")}
+              onClick={() => navigateTo("/tenant-review")}
             />
             <MenuItem
               icon={<FaUserCircle className="text-gray-600" />}

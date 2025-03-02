@@ -20,7 +20,6 @@ const BookingItem: React.FC<BookingItemProps> = ({ booking, onCancel }) => {
   );
   const quantity = booking.quantity || 1;
 
-  // Hitung breakdown untuk harga kamar per malam (seasonal dan regular)
   let seasonalNights = 0;
   let regularNights = 0;
   let seasonalCost = 0;

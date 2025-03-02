@@ -156,7 +156,9 @@ const RegisterForm: React.FC = () => {
             </div>
           </div>
 
-          <SocialLogin />
+          <div className="flex justify-center">
+            <SocialLogin />
+          </div>
 
           <p className="text-center text-sm text-gray-600 mt-8">
             Dengan membuat akun, Anda menyetujui ketentuan kami{" "}

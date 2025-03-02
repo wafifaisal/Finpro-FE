@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Property, Tenant, RoomType, Review } from "@/types/types";
+import { Tenant } from "@/types/types";
 import { Star, Shield, Home, MessageCircle, CheckCircle } from "lucide-react";
 
 interface OwnerInfoProps {
@@ -10,18 +10,18 @@ interface OwnerInfoProps {
 }
 
 const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
-  const { id, email, createdAt, properties } = tenant;
+  const { id, email, createdAt, avatar, name } = tenant;
   const joinYear = new Date(createdAt).getFullYear();
   const [copied, setCopied] = useState(false);
   const [propertyCount, setPropertyCount] = useState<number>(0);
+  const [totalReviews, setTotalReviews] = useState<number>(0);
+  const [avgRating, setAvgRating] = useState<number>(0);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
   useEffect(() => {
     async function fetchPropertyCount() {
       try {
-        const res = await fetch(`${base_url}/tenant/count-properties/${id}`, {
-          method: "GET",
-        });
+        const res = await fetch(`${base_url}/tenant/count-properties/${id}`);
         if (!res.ok) {
           throw new Error("Gagal mengambil properti tenant");
         }
@@ -31,9 +31,24 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
         console.error(err);
       }
     }
-    if (id) {
-      fetchPropertyCount();
+    if (id) fetchPropertyCount();
+  }, [id, base_url]);
+
+  useEffect(() => {
+    async function fetchReviewStats() {
+      try {
+        const res = await fetch(`${base_url}/tenant/count-reviews/${id}`);
+        if (!res.ok) {
+          throw new Error("Gagal mengambil data review tenant");
+        }
+        const data = await res.json();
+        setTotalReviews(data.totalReviews);
+        setAvgRating(data.avgRating);
+      } catch (err) {
+        console.error(err);
+      }
     }
+    if (id) fetchReviewStats();
   }, [id, base_url]);
 
   const handleCopyEmail = () => {
@@ -42,20 +57,6 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const aggregatedReviews =
-    properties?.reduce((acc: Review[], property: Property) => {
-      const roomReviews =
-        property.RoomTypes.flatMap((room: RoomType) => room.Review || []) || [];
-      return [...acc, ...roomReviews];
-    }, []) || [];
-
-  const totalRating = aggregatedReviews.reduce(
-    (sum: number, review: Review) => sum + review.rating,
-    0
-  );
-  const reviewCount = aggregatedReviews.length;
-  const avgRating = reviewCount > 0 ? totalRating / reviewCount : 0;
-
   return (
     <div className="mt-12 max-w-2xl">
       <div className="flex flex-col gap-6">
@@ -63,8 +64,8 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
           <div className="flex items-center gap-4">
             <div className="relative">
               <Image
-                src={tenant.avatar}
-                alt={tenant.name}
+                src={avatar}
+                alt={name}
                 width={64}
                 height={64}
                 className="rounded-full object-cover ring-2 ring-offset-2 ring-gray-100"
@@ -74,9 +75,7 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
               </div>
             </div>
             <div>
-              <h2 className="text-xl font-semibold">
-                Ditenant oleh {tenant.name}
-              </h2>
+              <h2 className="text-xl font-semibold">Ditenant oleh {name}</h2>
               <p className="text-gray-500 text-sm">
                 Bergabung pada tahun {joinYear}
               </p>
@@ -99,7 +98,9 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
             <Star className="w-5 h-5 text-rose-500" />
             <div>
               <p className="font-medium">{avgRating.toFixed(1)} rating</p>
-              <p className="text-sm text-gray-500">Dari {reviewCount} ulasan</p>
+              <p className="text-sm text-gray-500">
+                Dari {totalReviews} ulasan
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">

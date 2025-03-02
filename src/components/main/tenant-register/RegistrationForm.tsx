@@ -130,7 +130,9 @@ const RegistrationForm = () => {
           </div>
         </div>
 
-        <SocialLoginTenant />
+        <div className="flex justify-center">
+          <SocialLoginTenant />
+        </div>
 
         <div className="mt-8 text-center">
           <p className="text-center text-sm text-gray-600 mt-8">

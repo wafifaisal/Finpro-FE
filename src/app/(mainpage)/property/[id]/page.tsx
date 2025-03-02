@@ -115,6 +115,7 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
 
         <OwnerInfo tenant={property.tenant} />
 
+        {/* Pass aggregated reviews to the Reviews component */}
         <Reviews reviews={aggregatedReviews} />
       </main>
       <Footer />

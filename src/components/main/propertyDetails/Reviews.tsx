@@ -2,10 +2,11 @@
 
 import React from "react";
 import { Star } from "lucide-react";
-import { Property } from "@/types/types";
+import { Review } from "@/types/types";
+import Image from "next/image";
 
 interface ReviewsProps {
-  reviews: Property["reviews"];
+  reviews: Review[];
 }
 
 const Reviews: React.FC<ReviewsProps> = ({ reviews }) => {
@@ -15,11 +16,31 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews }) => {
       {reviews && reviews.length > 0 ? (
         reviews.map((review) => (
           <div key={review.id} className="mb-4 border-b pb-4">
-            <div className="flex items-center">
-              <Star className="w-4 h-4 text-rose-500" />
-              <span className="ml-1 font-medium">{review.rating}</span>
+            <div className="flex items-center justify-between">
+              {review.user && (
+                <div className="flex items-center space-x-2">
+                  <Image
+                    src={review.user.avatar}
+                    alt={review.user.username}
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div>
+                    <p className="font-medium">{review.user.username}</p>
+                    <p className="text-sm text-gray-600">{review.user.email}</p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center space-x-1">
+                <Star className="w-4 h-4 text-rose-500" />
+                <span className="font-medium">{review.rating} / 5</span>
+              </div>
             </div>
-            <p className="mt-2">{review.review}</p>
+            <div
+              className="mt-2"
+              dangerouslySetInnerHTML={{ __html: review.review }}
+            ></div>
           </div>
         ))
       ) : (
