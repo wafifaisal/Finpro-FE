@@ -75,12 +75,9 @@ function ProfilePage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="container mx-auto px-0 md:px-4 -mt-16">
           <div className="bg-white rounded-xl shadow-lg p-8  transform transition-all duration-700 hover:shadow-2xl">
-            {/* Profile Header */}
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-              {/* Profile Header Disini */}
               <ProfileHeader
                 openModal={openModal}
                 selectedImage={selectedImage}
