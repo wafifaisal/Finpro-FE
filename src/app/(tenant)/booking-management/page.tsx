@@ -30,7 +30,7 @@ export default function BookingManagementPage() {
     "ongoing"
   );
 
-  const tenantId = "77b66d85-4228-4326-b3e7-e5109ca225e6";
+  const tenantId = "15881def-f8ab-4074-8b2f-78d0afe414bb";
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -210,8 +210,8 @@ export default function BookingManagementPage() {
                             <Image
                               src={selectedImage || booking.payment_proof}
                               alt="Bukti Pembayaran"
-                              width={500} // Set an appropriate width
-                              height={500} // Set an appropriate height
+                              width={500}
+                              height={500}
                               className="w-full h-auto max-h-[80vh] object-contain"
                             />
                           </DialogContent>
@@ -258,11 +258,7 @@ export default function BookingManagementPage() {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent>
               <p className="text-lg">
-                Apakah Anda yakin ingin mengubah status pesanan menjadi{" "}
-                <strong>
-                  {confirmDialog?.status === "completed" ? "Selesai" : "Baru"}
-                </strong>
-                ?
+                Apakah Anda yakin ingin menerima bukti pesanan?
               </p>
               <div className="flex justify-end gap-4 mt-4">
                 <Button
