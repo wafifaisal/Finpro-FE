@@ -11,10 +11,9 @@ export default function StatGrid() {
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
-  // Deteksi ukuran layar untuk format pengeluaran
   useEffect(() => {
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 640); // breakpoint misalnya <640px
+      setIsSmallScreen(window.innerWidth < 640);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -83,15 +82,12 @@ export default function StatGrid() {
           console.error("No authentication token found");
           return;
         }
-        const response = await fetch(
-          `${base_url}/review-reply/count-reviews/${tenantId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${base_url}/review-reply/count-reviews`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

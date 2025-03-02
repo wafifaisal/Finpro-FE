@@ -21,7 +21,7 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
   useEffect(() => {
     async function fetchPropertyCount() {
       try {
-        const res = await fetch(`${base_url}/tenant/count-properties/${id}`);
+        const res = await fetch(`${base_url}/tenant/count-properties`);
         if (!res.ok) {
           throw new Error("Gagal mengambil properti tenant");
         }
