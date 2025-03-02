@@ -65,7 +65,6 @@ export default function StatGrid() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        // Pastikan backend mengembalikan { totalExpenditure: number }
         setSalesProfit(data.totalExpenditure);
       } catch (error) {
         console.error("Error fetching sales profit:", error);
