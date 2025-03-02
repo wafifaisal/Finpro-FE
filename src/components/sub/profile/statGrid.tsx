@@ -1,12 +1,25 @@
 "use client";
 import { useEffect, useState } from "react";
 import { FaStar, FaTicketAlt } from "react-icons/fa";
-import { RiDiscountPercentFill } from "react-icons/ri";
+import { RiMoneyDollarBoxFill } from "react-icons/ri";
 
 export default function StatGrid() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [bookingCount, setBookingCount] = useState<number>(0);
+  const [reviewCount, setReviewCount] = useState<number>(0);
+  const [expenditure, setExpenditure] = useState<number>(0);
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
+
+  // Deteksi ukuran layar
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 640); // breakpoint sesuai Tailwind 'sm'
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchBookingCount = async () => {
@@ -35,22 +48,88 @@ export default function StatGrid() {
       }
     };
 
+    const fetchExpenditure = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("No authentication token found");
+          return;
+        }
+        const response = await fetch(
+          `${base_url}/user-bookings/total-expenditure`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setExpenditure(data.totalExpenditure);
+      } catch (error) {
+        console.error("Error fetching expenditure:", error);
+      }
+    };
+
+    const fetchReviewCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("No authentication token found");
+          return;
+        }
+        const response = await fetch(`${base_url}/reviews/count`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setReviewCount(data.totalReview);
+      } catch (error) {
+        console.error("Error fetching review count:", error);
+      }
+    };
+
     fetchBookingCount();
+    fetchExpenditure();
+    fetchReviewCount();
   }, [base_url]);
 
+  const formatExpenditure = (value: number) => {
+    if (isSmallScreen) {
+      const abbreviated = value / 1000;
+      return `Rp${abbreviated.toFixed(1)}K`;
+    }
+    return value.toLocaleString("id-ID", {
+      style: "currency",
+      currency: "IDR",
+    });
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+    <div className="px-0 md:px-4 mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {[
         {
           icon: FaTicketAlt,
-          label: "Your Tickets",
+          label: "Jumlah Booking",
           value: bookingCount.toString(),
         },
-        { icon: FaStar, label: "Reviews", value: "0" },
         {
-          icon: RiDiscountPercentFill,
-          label: "Active Discounts",
-          value: "0",
+          icon: FaStar,
+          label: "Jumlah Review",
+          value: reviewCount.toString(),
+        },
+        {
+          icon: RiMoneyDollarBoxFill,
+          label: "Total Pengeluaran Anda",
+          value: formatExpenditure(expenditure),
         },
       ].map((stat, index) => (
         <div
