@@ -19,7 +19,6 @@ export const useBookingCardLogic = ({
   const router = useRouter();
   const { user } = useSession();
 
-  // Gunakan overallRating dari property jika ada, jika tidak hitung dari room types.
   const overallRating = useMemo(() => {
     if (property.overallRating != null) {
       return property.overallRating;
