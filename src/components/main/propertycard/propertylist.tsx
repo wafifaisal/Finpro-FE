@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { PropertyCardProps } from "@/types/types";
 import { PropertyImageSlider } from "./PropertyImageSlider";
 import { PropertyDetails } from "./PropertyDetails";
@@ -15,74 +15,72 @@ export default function PropertyCard({
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
   const overallRating = property.overallRating ?? 0;
-
-  const effectiveStart = searchStart ? searchStart : new Date();
-  const effectiveEnd = searchEnd
-    ? searchEnd
-    : new Date(effectiveStart.getTime() + 24 * 60 * 60 * 1000);
-
-  const lowestRegularPrice = Math.min(
-    ...property.RoomTypes.map((room) => room.price)
+  const { effectiveStart, effectiveEnd } = useMemo(() => {
+    const start = searchStart ? new Date(searchStart) : new Date();
+    const end = searchEnd
+      ? new Date(searchEnd)
+      : new Date(start.getTime() + 24 * 60 * 60 * 1000);
+    return { effectiveStart: start, effectiveEnd: end };
+  }, [searchStart, searchEnd]);
+  const lowestRegularPrice = useMemo(
+    () => Math.min(...property.RoomTypes.map((room) => room.price)),
+    [property.RoomTypes]
   );
+  const lowestEffectivePrice = useMemo(() => {
+    return property.RoomTypes.reduce((min, room) => {
+      let effectiveRoomPrice = room.price;
 
-  const lowestEffectivePrice = property.RoomTypes.reduce((min, room) => {
-    let effectiveRoomPrice = room.price;
-    if (room.seasonal_prices && room.seasonal_prices.length > 0) {
-      const applicableSeasonal = room.seasonal_prices.find((sp) => {
-        if (sp.dates && sp.dates.length > 0) {
-          const targetStr = effectiveStart.toISOString().split("T")[0];
-          return sp.dates.some((d: string) => {
-            const dStr = new Date(d).toISOString().split("T")[0];
-            return dStr === targetStr;
-          });
-        } else if (sp.start_date && sp.end_date) {
-          const spStart = new Date(sp.start_date);
-          const spEnd = new Date(sp.end_date);
-          return effectiveStart >= spStart && effectiveStart <= spEnd;
+      if (room.seasonal_prices?.length) {
+        const applicableSeasonal = room.seasonal_prices.find((sp) => {
+          if (sp.dates?.length) {
+            const targetStr = effectiveStart.toISOString().split("T")[0];
+            return sp.dates.some((d: string) => {
+              return new Date(d).toISOString().split("T")[0] === targetStr;
+            });
+          } else if (sp.start_date && sp.end_date) {
+            const spStart = new Date(sp.start_date);
+            const spEnd = new Date(sp.end_date);
+            return effectiveStart >= spStart && effectiveStart <= spEnd;
+          }
+          return false;
+        });
+
+        if (applicableSeasonal) {
+          effectiveRoomPrice = applicableSeasonal.price;
         }
-        return false;
-      });
-      if (applicableSeasonal) {
-        effectiveRoomPrice = applicableSeasonal.price;
       }
-    }
-    return Math.min(min, effectiveRoomPrice);
-  }, Infinity);
+
+      return Math.min(min, effectiveRoomPrice);
+    }, Infinity);
+  }, [property.RoomTypes, effectiveStart]);
 
   const finalPrice = lowestEffectivePrice;
   const showDiscount = lowestRegularPrice > lowestEffectivePrice;
-
-  const isAnyRoomAvailable = property.RoomTypes.some((room) => {
-    let roomUnavailable = false;
-    if (room.Unavailable && room.Unavailable.length > 0) {
-      roomUnavailable = room.Unavailable.some((range) => {
+  const isAnyRoomAvailable = useMemo(() => {
+    return property.RoomTypes.some((room) => {
+      let roomUnavailable = room.Unavailable?.some((range) => {
         const rangeStart = new Date(range.start_date);
         const rangeEnd = new Date(range.end_date);
         return effectiveStart <= rangeEnd && effectiveEnd >= rangeStart;
       });
-    }
-    if (
-      Array.isArray(room.RoomAvailability) &&
-      room.RoomAvailability.length > 0
-    ) {
-      const roomHasZeroAvailability = room.RoomAvailability.some((ra) => {
-        const raDate = new Date(ra.date);
-        return (
-          effectiveStart <= raDate &&
-          raDate < effectiveEnd &&
-          ra.availableCount === 0
-        );
-      });
-      if (roomHasZeroAvailability) {
-        roomUnavailable = true;
+
+      if (!roomUnavailable && Array.isArray(room.RoomAvailability)) {
+        roomUnavailable = room.RoomAvailability.some((ra) => {
+          const raDate = new Date(ra.date);
+          return (
+            effectiveStart <= raDate &&
+            raDate < effectiveEnd &&
+            ra.availableCount === 0
+          );
+        });
       }
-    }
-    return !roomUnavailable;
-  });
 
-  const disableButton = property.isAvailable === false || !isAnyRoomAvailable;
+      return !roomUnavailable;
+    });
+  }, [property.RoomTypes, effectiveStart, effectiveEnd]);
 
-  const handlePropertyClick = async () => {
+  const disableButton = !property.isAvailable || !isAnyRoomAvailable;
+  const handlePropertyClick = useCallback(async () => {
     try {
       await fetch(`${base_url}/property/click?id=${property.id}`, {
         method: "POST",
@@ -90,7 +88,7 @@ export default function PropertyCard({
     } catch (error) {
       console.error("Error incrementing click rate:", error);
     }
-  };
+  }, [base_url, property.id]);
 
   if (loading) {
     return (

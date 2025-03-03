@@ -1,7 +1,6 @@
-// components/main/propertyDetails/PhotoGallery.tsx
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { Property } from "@/types/types";
@@ -12,6 +11,22 @@ interface PhotoGalleryProps {
 }
 
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ property, onClose }) => {
+  const images = useMemo(
+    () =>
+      property.PropertyImages.map((image) => (
+        <div key={image.id} className="relative mb-4 break-inside-avoid">
+          <Image
+            src={image.image_url}
+            alt={property.name}
+            width={600}
+            height={400}
+            className="rounded-lg"
+          />
+        </div>
+      )),
+    [property.PropertyImages, property.name]
+  );
+
   return (
     <div className="fixed inset-0 bg-black z-50 overflow-auto">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -21,22 +36,10 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ property, onClose }) => {
         >
           <ChevronLeft className="w-6 h-6 text-white" />
         </button>
-        <div className="columns-2 md:columns-3 gap-4 pt-16">
-          {property.PropertyImages.map((image) => (
-            <div key={image.id} className="relative mb-4 break-inside-avoid">
-              <Image
-                src={image.image_url}
-                alt={property.name}
-                width={600}
-                height={400}
-                className="rounded-lg"
-              />
-            </div>
-          ))}
-        </div>
+        <div className="columns-2 md:columns-3 gap-4 pt-16">{images}</div>
       </div>
     </div>
   );
 };
 
-export default PhotoGallery;
+export default React.memo(PhotoGallery);
