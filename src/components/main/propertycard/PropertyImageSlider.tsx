@@ -74,8 +74,11 @@ export function PropertyImageSlider({
                   src={img.image_url}
                   alt={property.name}
                   fill
-                  loading="lazy"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  priority={index === 0}
                   style={{ objectFit: "cover" }}
+                  placeholder="blur"
+                  blurDataURL={img.image_url}
                 />
                 {imageOverlay}
               </Link>
@@ -106,8 +109,11 @@ export function PropertyImageSlider({
             src="/nginepin-logo.png"
             alt={property.name}
             fill
+            loading="lazy"
             style={{ objectFit: "contain" }}
             className="rounded-t-2xl"
+            placeholder="blur"
+            blurDataURL="/placeholder.png"
           />
           {imageOverlay}
         </Link>
