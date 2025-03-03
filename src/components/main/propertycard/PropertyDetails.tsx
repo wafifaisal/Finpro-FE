@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { FaLocationDot, FaStar } from "react-icons/fa6";
 import { formatCurrency } from "@/helpers/formatCurrency";
@@ -16,7 +17,7 @@ interface PropertyDetailsProps {
   handlePropertyClick: () => void;
 }
 
-export function PropertyDetails({
+const PropertyDetailsComponent = ({
   property,
   userLocation,
   overallRating,
@@ -24,7 +25,20 @@ export function PropertyDetails({
   showDiscount,
   regularPrice,
   handlePropertyClick,
-}: PropertyDetailsProps) {
+}: PropertyDetailsProps) => {
+  const distanceText = useMemo(() => {
+    if (userLocation) {
+      const distanceValue = calculateDistance(
+        userLocation.latitude,
+        userLocation.longitude,
+        property.location.latitude,
+        property.location.longitude
+      );
+      return `${formatDistance(distanceValue)} dari lokasi Anda`;
+    }
+    return null;
+  }, [userLocation, property.location.latitude, property.location.longitude]);
+
   return (
     <div className="py-2 px-2">
       <div className="flex justify-between">
@@ -44,18 +58,8 @@ export function PropertyDetails({
             {property.location.city}
           </p>
         </div>
-        {userLocation && (
-          <p className="text-sm text-gray-500 pl-4">
-            {formatDistance(
-              calculateDistance(
-                userLocation.latitude,
-                userLocation.longitude,
-                property.location.latitude,
-                property.location.longitude
-              )
-            )}{" "}
-            dari lokasi Anda
-          </p>
+        {userLocation && distanceText && (
+          <p className="text-sm text-gray-500 pl-4">{distanceText}</p>
         )}
       </div>
       <div className="flex items-center space-x-1 truncate">
@@ -90,4 +94,6 @@ export function PropertyDetails({
       </div>
     </div>
   );
-}
+};
+
+export const PropertyDetails = React.memo(PropertyDetailsComponent);
