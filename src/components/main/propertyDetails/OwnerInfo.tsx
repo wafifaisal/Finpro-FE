@@ -10,7 +10,7 @@ interface OwnerInfoProps {
 }
 
 const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
-  const { id, email, createdAt, avatar, name } = tenant;
+  const { email, createdAt, avatar, name } = tenant;
   const joinYear = new Date(createdAt).getFullYear();
   const [copied, setCopied] = useState(false);
   const [propertyCount, setPropertyCount] = useState<number>(0);
@@ -21,7 +21,9 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
   useEffect(() => {
     async function fetchPropertyCount() {
       try {
-        const res = await fetch(`${base_url}/tenant/count-properties/${id}`);
+        const res = await fetch(
+          `${base_url}/property/tenant/${tenant.id}/count-properties`
+        );
         if (!res.ok) {
           throw new Error("Gagal mengambil properti tenant");
         }
@@ -31,13 +33,15 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
         console.error(err);
       }
     }
-    if (id) fetchPropertyCount();
-  }, [id, base_url]);
+    if (tenant.id) fetchPropertyCount();
+  }, [tenant.id, base_url]);
 
   useEffect(() => {
     async function fetchReviewStats() {
       try {
-        const res = await fetch(`${base_url}/tenant/count-reviews`);
+        const res = await fetch(
+          `${base_url}/tenant/count-reviews/${tenant.id}`
+        );
         if (!res.ok) {
           throw new Error("Gagal mengambil data review tenant");
         }
@@ -48,8 +52,8 @@ const OwnerInfo: React.FC<OwnerInfoProps> = ({ tenant }) => {
         console.error(err);
       }
     }
-    if (id) fetchReviewStats();
-  }, [id, base_url]);
+    if (tenant.id) fetchReviewStats();
+  }, [tenant.id, base_url]);
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(email);
