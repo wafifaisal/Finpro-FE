@@ -29,8 +29,9 @@ export default function TenantReviewPage() {
       try {
         const data = await getReviewsByTenant(tenantId);
         setReviews(data);
-      } catch (err) {
+      } catch (error) {
         setError("Failed to load reviews.");
+        console.error("Error fetching reviews:", error);
       } finally {
         setLoading(false);
       }
@@ -57,7 +58,7 @@ export default function TenantReviewPage() {
       setReviews((prevReviews) =>
         prevReviews.map((review) =>
           review.id === selectedReviewId
-            ? { ...review, reply: newReply } // Update review with reply
+            ? { ...review, reply: newReply }
             : review
         )
       );

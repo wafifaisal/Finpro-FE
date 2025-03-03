@@ -1,12 +1,11 @@
 import { Star } from "lucide-react";
 
-export default function Rating({
-  setFieldValue,
-  values,
-}: {
-  setFieldValue: any;
+interface RatingProps {
+  setFieldValue: (field: string, value: number) => void;
   values: number;
-}) {
+}
+
+export default function Rating({ setFieldValue, values }: RatingProps) {
   const handleRating = (rating: number) => {
     setFieldValue("rating", rating);
   };
