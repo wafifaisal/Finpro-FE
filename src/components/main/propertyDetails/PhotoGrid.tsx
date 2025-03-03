@@ -30,6 +30,7 @@ const PhotoGrid: React.FC<PhotoGridProps> = ({
           src={firstImage.image_url}
           alt={property.name}
           fill
+          loading="lazy"
           className="object-cover group-hover:brightness-95 transition"
         />
       </div>

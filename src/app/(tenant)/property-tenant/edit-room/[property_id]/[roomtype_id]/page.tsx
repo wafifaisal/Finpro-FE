@@ -9,7 +9,7 @@ interface PageProps {
 
 export default function EditPropertyPage({ params }: PageProps) {
   return (
-    <div>
+    <div className="pt-0 md:pt-20">
       <EditRoomType params={params} />
     </div>
   );
