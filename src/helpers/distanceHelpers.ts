@@ -1,5 +1,3 @@
-// helpers/distanceHelpers.ts
-
 export const calculateDistance = (
   lat1: number,
   lon1: number,
@@ -8,7 +6,7 @@ export const calculateDistance = (
 ): number => {
   const lat2Num = parseFloat(lat2);
   const lon2Num = parseFloat(lon2);
-  const R = 6371; // Radius bumi dalam km
+  const R = 6371;
   const dLat = ((lat2Num - lat1) * Math.PI) / 180;
   const dLon = ((lon2Num - lon1) * Math.PI) / 180;
   const a =

@@ -63,7 +63,7 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
   );
 
   return (
-    <div className="pt-20 min-h-screen bg-white">
+    <div className="pt-0 md:pt-20 min-h-screen bg-white">
       <main className="max-w-5xl mx-auto px-4 py-8">
         <PropertyHeader property={property} roomtypes={property.RoomTypes} />
 

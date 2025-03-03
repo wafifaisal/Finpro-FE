@@ -74,6 +74,7 @@ export function PropertyImageSlider({
                   src={img.image_url}
                   alt={property.name}
                   fill
+                  loading="lazy"
                   style={{ objectFit: "cover" }}
                 />
                 {imageOverlay}

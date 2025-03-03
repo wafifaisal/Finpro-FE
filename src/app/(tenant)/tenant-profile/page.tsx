@@ -51,7 +51,6 @@ function ProfilePage() {
       <div
         className={`min-h-screen container max-w-full bg-white transition-opacity duration-1000 pt-0 pb-24 md:pb-0 md:pt-24`}
       >
-        {/* Animated Background Header */}
         <div className="bg-gradient-to-r from-rose-400 to-rose-600 h-48 relative overflow-hidden">
           <div className="absolute inset-0 opacity-20">
             {[...Array(20)].map((_, i) => (

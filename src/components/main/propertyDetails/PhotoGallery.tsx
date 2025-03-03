@@ -20,6 +20,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ property, onClose }) => {
             alt={property.name}
             width={600}
             height={400}
+            loading="lazy"
             className="rounded-lg"
           />
         </div>

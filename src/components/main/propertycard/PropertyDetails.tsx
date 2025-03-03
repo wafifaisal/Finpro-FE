@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { FaLocationDot, FaStar } from "react-icons/fa6";
+import { Loader2 } from "lucide-react";
 import { formatCurrency } from "@/helpers/formatCurrency";
 import { calculateDistance, formatDistance } from "@/helpers/distanceHelpers";
 import { PropertyCardProps } from "@/types/types";
@@ -26,6 +27,8 @@ const PropertyDetailsComponent = ({
   regularPrice,
   handlePropertyClick,
 }: PropertyDetailsProps) => {
+  const [buttonLoading, setButtonLoading] = useState(false);
+
   const distanceText = useMemo(() => {
     if (userLocation) {
       const distanceValue = calculateDistance(
@@ -38,6 +41,11 @@ const PropertyDetailsComponent = ({
     }
     return null;
   }, [userLocation, property.location.latitude, property.location.longitude]);
+
+  const handleButtonClick = () => {
+    setButtonLoading(true);
+    handlePropertyClick();
+  };
 
   return (
     <div className="py-2 px-2">
@@ -80,14 +88,18 @@ const PropertyDetailsComponent = ({
         <span className="text-sm text-gray-500">/ malam</span>
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-center">
-        <Link href={`/property/${property.id}`} onClick={handlePropertyClick}>
+        <Link href={`/property/${property.id}`} onClick={handleButtonClick}>
           <button className="border text-white hover:text-black duration-300 relative group cursor-pointer overflow-hidden h-10 w-44 rounded-md bg-red-500 p-2 font-extrabold hover:bg-sky-700">
             <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-16 h-16 rounded-full group-hover:scale-150 duration-700 right-12 top-12 bg-[#EB5A3C]"></div>
             <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-12 h-12 rounded-full group-hover:scale-150 duration-700 right-20 -top-6 bg-[#DF9755]"></div>
             <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-8 h-8 rounded-full group-hover:scale-150 duration-700 right-32 top-6 bg-[#E7D283]"></div>
             <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-4 h-4 rounded-full group-hover:scale-150 duration-700 right-2 top-12 bg-[#EDF4C2]"></div>
             <p className="z-10 absolute bottom-2 left-0 text-sm truncate w-full">
-              Cek Ketersediaan
+              {buttonLoading ? (
+                <Loader2 className="animate-spin mx-auto" />
+              ) : (
+                "Cek Ketersediaan"
+              )}
             </p>
           </button>
         </Link>

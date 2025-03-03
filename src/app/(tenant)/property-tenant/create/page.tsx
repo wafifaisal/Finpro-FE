@@ -5,7 +5,7 @@ import withGuard from "@/hoc/pageGuard";
 
 function CreatePropertyPage() {
   return (
-    <div>
+    <div className="pt-0 md:pt-20">
       <PropertyForm />
     </div>
   );
