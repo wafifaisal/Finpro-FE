@@ -65,7 +65,8 @@ export default function LoginUser() {
         <div
           className="absolute inset-0 bg-cover bg-center z-0"
           style={{
-            backgroundImage: "url('/background.jpg')",
+            backgroundImage:
+              "url('https://res.cloudinary.com/dkyco4yqp/image/upload/v1740935991/layered-waves-haikei_z0zvuk.png')",
             filter: "brightness(0.9)",
           }}
         ></div>
@@ -183,7 +184,9 @@ export default function LoginUser() {
               <div className="flex-grow border-t border-gray-300"></div>
             </div>
 
-            <SocialLogin />
+            <div className="flex justify-center">
+              <SocialLogin />
+            </div>
 
             <div className="text-center text-sm mt-6">
               Belum punya akun?{" "}

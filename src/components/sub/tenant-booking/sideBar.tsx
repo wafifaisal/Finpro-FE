@@ -25,7 +25,7 @@ export default function Sidebar() {
       <Link
         className={`flex gap-2 font-semibold w-44 p-2 rounded-md ${
           pathname === "/tenant-review"
-            ? "bg-red-500 text-white"
+            ? "bg-gray-100 text-red-500 hover:text-red-700"
             : "text-gray-800"
         }`}
         href="/tenant-review"
@@ -36,11 +36,11 @@ export default function Sidebar() {
 
       <Link
         className={`flex gap-2 font-semibold w-44 p-2 rounded-md ${
-          pathname === "/tenant-report"
-            ? "bg-red-500 text-white"
+          pathname === "/report"
+            ? "bg-gray-100 text-red-500 hover:text-red-700"
             : "text-gray-800"
         }`}
-        href="/tenant-report"
+        href="/report"
       >
         <IoMdAnalytics className="text-2xl" />
         <p>Laporan</p>

@@ -13,8 +13,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import withGuard from "@/hoc/pageGuard";
+import { useSession } from "@/context/useSessionHook";
 
-export default function TenantReviewPage() {
+function TenantReviewPage() {
+  const { tenant } = useSession();
   const [reviews, setReviews] = useState<IReview[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,12 +25,12 @@ export default function TenantReviewPage() {
   const [submitting, setSubmitting] = useState<{ [key: number]: boolean }>({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
-  const tenantId = "15881def-f8ab-4074-8b2f-78d0afe414bb";
 
   useEffect(() => {
     async function fetchReviews() {
+      if (!tenant) return;
       try {
-        const data = await getReviewsByTenant(tenantId);
+        const data = await getReviewsByTenant(tenant.id);
         setReviews(data);
       } catch (error) {
         setError("Failed to load reviews.");
@@ -37,7 +40,7 @@ export default function TenantReviewPage() {
       }
     }
     fetchReviews();
-  }, [tenantId]);
+  }, [tenant?.id]);
 
   const handleReplyChange = (reviewId: number, value: string) => {
     setReply((prev) => ({ ...prev, [reviewId]: value }));
@@ -49,8 +52,12 @@ export default function TenantReviewPage() {
     setSubmitting((prev) => ({ ...prev, [selectedReviewId]: true }));
 
     try {
+      if (!tenant) {
+        alert("Tenant information is missing.");
+        return;
+      }
       const newReply = await createReviewReply(
-        tenantId,
+        tenant.id,
         selectedReviewId,
         reply[selectedReviewId]
       );
@@ -80,12 +87,12 @@ export default function TenantReviewPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <TripsNavbar />
       <div className="flex">
         <SideBar />
-        <div className="w-[70%]">
-          <div className="main-content flex flex-col container mx-auto p-8 px-20 mb-20">
+        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
+          <div className="main-content flex flex-col p-4 md:p-8 mb-20">
             <h1 className="text-xl font-bold">Balas Ulasan</h1>
             <div className="border-b-[1px] my-6"></div>
 
@@ -124,7 +131,7 @@ export default function TenantReviewPage() {
                         }
                       />
                       <button
-                        className="bg-blue-500 text-white px-4 py-2 mt-2 rounded"
+                        className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 mt-2 rounded"
                         disabled={submitting[review.id]}
                         onClick={() => openReplyDialog(review.id)}
                       >
@@ -164,3 +171,8 @@ export default function TenantReviewPage() {
     </div>
   );
 }
+
+export default withGuard(TenantReviewPage, {
+  requiredRole: "tenant",
+  redirectTo: "/not-authorized",
+});

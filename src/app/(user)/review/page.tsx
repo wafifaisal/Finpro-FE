@@ -9,19 +9,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatDateDay } from "@/helpers/formatDate";
 import Loading from "@/app/loading";
+import { useSession } from "@/context/useSessionHook";
+import withGuard from "@/hoc/pageGuard";
+import { FaQuoteLeft } from "react-icons/fa";
 import { LuCalendarArrowUp, LuCalendarArrowDown } from "react-icons/lu";
-import { FaQuoteLeft } from "react-icons/fa6";
 import { MdOutlineRateReview } from "react-icons/md";
 
-export default function ReviewPage() {
+function ReviewPage() {
+  const { user } = useSession();
   const [bookings, setBookings] = useState<IBooking[]>([]);
   const [loading, setLoading] = useState(true);
-  const userId = "2cc09e1c-6cfa-4c7a-8a37-b7b3b3399260"; // Replace with actual user ID
 
   useEffect(() => {
     const fetchReviews = async () => {
+      if (!user) return;
       try {
-        const data = await getUserReviews(userId);
+        const data = await getUserReviews(user.id);
         setBookings(data);
       } catch (error) {
         console.error("Failed to fetch reviews", error);
@@ -31,7 +34,7 @@ export default function ReviewPage() {
     };
 
     fetchReviews();
-  }, [userId]);
+  }, [user]);
 
   if (loading) {
     return <Loading />;
@@ -112,7 +115,7 @@ export default function ReviewPage() {
                   </>
                 ) : (
                   <Link href={`/review/${booking.id}`}>
-                    <Button className="bg-red-700 hover:bg-red-500 text-white font-semibold w-full rounded-xl">
+                    <Button className="bg-rose-500 hover:bg-rose-600 text-white font-semibold w-full rounded-xl">
                       <div className="flex gap-1">
                         <p>Ulas Sekarang</p>
                         <MdOutlineRateReview className="mt-1" />
@@ -128,3 +131,8 @@ export default function ReviewPage() {
     </div>
   );
 }
+
+export default withGuard(ReviewPage, {
+  requiredRole: "user",
+  redirectTo: "/not-authorized",
+});

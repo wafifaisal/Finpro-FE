@@ -24,7 +24,6 @@ export default function withGuard<P extends object>(
     const router = useRouter();
 
     useEffect(() => {
-      console.log("Guard State:", { isAuth, loading, type, requiredRole });
       if (!loading) {
         const currentRoute = window.location.pathname;
 

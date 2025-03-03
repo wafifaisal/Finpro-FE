@@ -22,7 +22,6 @@ const TenantRegisterForm = () => {
 
       <div className="container mx-auto px-4 py-12 relative">
         <div className="max-w-7xl mx-auto">
-          {/* Header Section */}
           <div className="text-center mb-12">
             <Image
               src="/nginepin-logo.png"

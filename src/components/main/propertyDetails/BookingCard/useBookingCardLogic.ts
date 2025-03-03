@@ -18,14 +18,20 @@ export const useBookingCardLogic = ({
   const { isAuth, type, loading } = useContext(SessionContext) || {};
   const router = useRouter();
   const { user } = useSession();
-  const validRatings = property.RoomTypes.filter(
-    (rt) => rt.avg_rating !== undefined && rt.avg_rating !== null
-  );
-  const overallRating =
-    validRatings.length > 0
+
+  const overallRating = useMemo(() => {
+    if (property.overallRating != null) {
+      return property.overallRating;
+    }
+    const validRatings = property.RoomTypes.filter(
+      (rt) => rt.avg_rating != null
+    );
+    return validRatings.length > 0
       ? validRatings.reduce((sum, rt) => sum + (rt.avg_rating || 0), 0) /
-        validRatings.length
+          validRatings.length
       : 0;
+  }, [property]);
+
   const checkInDate = useMemo(
     () => (checkIn ? new Date(checkIn) : null),
     [checkIn]
@@ -126,6 +132,7 @@ export const useBookingCardLogic = ({
       total: roomCost + breakfastCost,
     };
   }, [checkInDate, checkOutDate, nights, selectedRooms, property.RoomTypes]);
+
   const handleBooking = async () => {
     if (loading) return;
     if (!isAuth) {

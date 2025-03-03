@@ -16,6 +16,8 @@ import {
 import { DatePicker, Select, Button } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
+import TripsNavbar from "@/components/sub/trips/tripsNavbar";
+import SideBar from "@/components/sub/tenant-booking/sideBar";
 
 const { RangePicker } = DatePicker;
 
@@ -55,54 +57,67 @@ const ReportPage = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Laporan Penjualan</h1>
+    <div className="h-min-screen">
+      <TripsNavbar />
+      <div className="flex">
+        <SideBar />
+        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
+          <div className="flex flex-col container mx-auto p-8">
+            <div className="flex gap-4 mb-6">
+              <RangePicker
+                value={[dayjs(dateRange[0]), dayjs(dateRange[1])]}
+                onChange={(dates: [Dayjs | null, Dayjs | null] | null) =>
+                  setDateRange(
+                    dates && dates[0] && dates[1]
+                      ? [
+                          dates[0].format("YYYY-MM-DD"),
+                          dates[1].format("YYYY-MM-DD"),
+                        ]
+                      : [defaultStartDate, defaultEndDate] // Reset if cleared
+                  )
+                }
+              />
+              <Select
+                value={sortBy}
+                onChange={(value: "date" | "total_penjualan") =>
+                  setSortBy(value)
+                }
+                style={{ width: 200 }}
+              >
+                <Select.Option value="date">Tanggal</Select.Option>
+                <Select.Option value="total_penjualan">
+                  Total Penjualan
+                </Select.Option>
+              </Select>
+              <Button type="default" onClick={fetchSalesReport}>
+                Tampilkan
+              </Button>
+            </div>
 
-      <div className="flex gap-4 mb-6">
-        <RangePicker
-          value={[dayjs(dateRange[0]), dayjs(dateRange[1])]}
-          onChange={(dates: [Dayjs | null, Dayjs | null] | null) =>
-            setDateRange(
-              dates && dates[0] && dates[1]
-                ? [dates[0].format("YYYY-MM-DD"), dates[1].format("YYYY-MM-DD")]
-                : [defaultStartDate, defaultEndDate] // Reset if cleared
-            )
-          }
-        />
-        <Select
-          value={sortBy}
-          onChange={(value: "date" | "total_penjualan") => setSortBy(value)}
-          style={{ width: 200 }}
-        >
-          <Select.Option value="date">Tanggal</Select.Option>
-          <Select.Option value="total_penjualan">Total Penjualan</Select.Option>
-        </Select>
-        <Button type="primary" onClick={fetchSalesReport}>
-          Tampilkan
-        </Button>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart
+                data={salesData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="created_at"
+                  tickFormatter={(tick) => dayjs(tick).format("YYYY-MM-DD")}
+                />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="total_price"
+                  name="Total Penjualan"
+                  stroke="#8884d8"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
-
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart
-          data={salesData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="created_at"
-            tickFormatter={(tick) => dayjs(tick).format("YYYY-MM-DD")}
-          />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="total_price"
-            name="Total Penjualan"
-            stroke="#8884d8"
-          />
-        </LineChart>
-      </ResponsiveContainer>
     </div>
   );
 };

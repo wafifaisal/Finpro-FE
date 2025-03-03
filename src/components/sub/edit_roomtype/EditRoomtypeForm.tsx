@@ -28,7 +28,7 @@ const EditRoomTypeForm: FC<EditRoomTypeFormProps> = ({
   availableFacilities,
 }) => {
   return (
-    <div className="max-w-6xl mx-auto p-8 bg-white">
+    <div className="max-w-6xl mx-auto p-8 bg-white md:pt-28 pt-0">
       <h1 className="text-4xl font-bold mb-12">Edit Tipe Kamar</h1>
       <Formik
         initialValues={initialValues}
