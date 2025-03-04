@@ -1,8 +1,4 @@
 import { Property, RoomSelection } from "@/types/types";
-
-/**
- * Format harga singkat. Contoh: Rp1.400.000 → "1.4k"
- */
 export const formatShortCurrency = (price: number): string => {
   return `${(price / 1000000).toFixed(1)}k`;
 };

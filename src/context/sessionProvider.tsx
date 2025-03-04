@@ -43,7 +43,6 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({
         throw new Error("No token found");
       }
 
-      // Decode token and check expiration
       const tokenPayload = JSON.parse(atob(token.split(".")[1]));
       if (tokenPayload.exp * 1000 < Date.now()) {
         throw new Error("Token expired");
@@ -87,7 +86,7 @@ export const SessionProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.removeItem("token");
     resetSession();
     window.location.href = "/";
-  }, [resetSession]); // ✅ Menambahkan resetSession ke dependensi
+  }, [resetSession]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");

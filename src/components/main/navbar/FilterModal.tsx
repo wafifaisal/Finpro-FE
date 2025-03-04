@@ -1,4 +1,3 @@
-// components/FilterModal.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -37,18 +36,21 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const initialPropertyName = searchParams.get("propertyName") || "";
+  const initialPropertyName =
+    searchParams.get("propertyName") || initialFilters?.propertyName || "";
   const [propertyName, setPropertyName] = useState<string>(initialPropertyName);
-
   const [sliderValue, setSliderValue] = useState<[number, number]>([0, 0]);
   const [inputMin, setInputMin] = useState<string>("");
   const [inputMax, setInputMax] = useState<string>("");
-
   const [dbPriceRange, setDbPriceRange] = useState<{
     min: number;
     max: number;
-  }>({ min: 0, max: 1000 });
+  }>({
+    min: 0,
+    max: 1000,
+  });
   const [isLoading, setIsLoading] = useState(true);
+
   const [selectedRoomFacilities, setSelectedRoomFacilities] = useState<
     string[]
   >(initialFilters?.roomFacilities || []);
@@ -57,18 +59,23 @@ const FilterModal: React.FC<FilterModalProps> = ({
   >(initialFilters?.propertyFacilities || []);
   const [sortOption, setSortOption] = useState<string>("name-asc");
 
-  // Muat rentang harga dari backend
   useEffect(() => {
     const loadPriceRange = async () => {
       try {
         const data = await fetchPriceRange();
         setDbPriceRange({ min: data.minPrice, max: data.maxPrice });
+        const minPriceQuery = searchParams.get("minPrice");
+        const maxPriceQuery = searchParams.get("maxPrice");
         const defaultMin =
-          initialFilters?.minPrice !== undefined
+          minPriceQuery !== null
+            ? parseInt(minPriceQuery, 10)
+            : initialFilters?.minPrice !== undefined
             ? initialFilters.minPrice
             : data.minPrice;
         const defaultMax =
-          initialFilters?.maxPrice !== undefined
+          maxPriceQuery !== null
+            ? parseInt(maxPriceQuery, 10)
+            : initialFilters?.maxPrice !== undefined
             ? initialFilters.maxPrice
             : data.maxPrice;
         setSliderValue([defaultMin, defaultMax]);
@@ -81,7 +88,23 @@ const FilterModal: React.FC<FilterModalProps> = ({
       }
     };
     loadPriceRange();
-  }, [initialFilters]);
+  }, [initialFilters, searchParams]);
+
+  useEffect(() => {
+    const roomFacilitiesQuery = searchParams.get("roomFacilities");
+    if (roomFacilitiesQuery) {
+      setSelectedRoomFacilities(roomFacilitiesQuery.split(","));
+    }
+    const propertyFacilitiesQuery = searchParams.get("propertyFacilities");
+    if (propertyFacilitiesQuery) {
+      setSelectedPropertyFacilities(propertyFacilitiesQuery.split(","));
+    }
+    const sortBy = searchParams.get("sortBy");
+    const sortOrder = searchParams.get("sortOrder");
+    if (sortBy && sortOrder) {
+      setSortOption(`${sortBy}-${sortOrder}`);
+    }
+  }, []);
 
   const handleSliderChange = (newValue: [number, number]) => {
     setSliderValue(newValue);
@@ -139,6 +162,16 @@ const FilterModal: React.FC<FilterModalProps> = ({
     setSelectedPropertyFacilities([]);
     setSortOption("name-asc");
     setPropertyName("");
+    const queryParams = new URLSearchParams(searchParams.toString());
+    queryParams.delete("propertyName");
+    queryParams.delete("minPrice");
+    queryParams.delete("maxPrice");
+    queryParams.delete("roomFacilities");
+    queryParams.delete("propertyFacilities");
+    queryParams.delete("sortBy");
+    queryParams.delete("sortOrder");
+    queryParams.set("page", "1");
+    router.push(`/property/search-result?${queryParams.toString()}`);
   };
 
   if (isLoading) {

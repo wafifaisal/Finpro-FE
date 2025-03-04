@@ -1,4 +1,3 @@
-// components/FilterModalFooter.tsx
 import React from "react";
 
 interface FilterModalFooterProps {

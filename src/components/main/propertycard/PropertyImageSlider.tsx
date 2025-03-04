@@ -68,14 +68,18 @@ export function PropertyImageSlider({
             <SwiperSlide key={index} className="w-full h-full">
               <Link
                 href={`/property/${property.id}`}
+                target="_blank"
                 onClick={handlePropertyClick}
               >
                 <Image
                   src={img.image_url}
                   alt={property.name}
                   fill
-                  loading="lazy"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  priority={index === 0}
                   style={{ objectFit: "cover" }}
+                  placeholder="blur"
+                  blurDataURL={img.image_url}
                 />
                 {imageOverlay}
               </Link>
@@ -100,14 +104,18 @@ export function PropertyImageSlider({
         <Link
           href={`/property/${property.id}`}
           onClick={handlePropertyClick}
+          target="_blank"
           className="relative block"
         >
           <Image
             src="/nginepin-logo.png"
             alt={property.name}
             fill
+            loading="lazy"
             style={{ objectFit: "contain" }}
             className="rounded-t-2xl"
+            placeholder="blur"
+            blurDataURL="/placeholder.png"
           />
           {imageOverlay}
         </Link>
