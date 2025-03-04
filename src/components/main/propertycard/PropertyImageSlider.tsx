@@ -68,6 +68,7 @@ export function PropertyImageSlider({
             <SwiperSlide key={index} className="w-full h-full">
               <Link
                 href={`/property/${property.id}`}
+                target="_blank"
                 onClick={handlePropertyClick}
               >
                 <Image
@@ -103,6 +104,7 @@ export function PropertyImageSlider({
         <Link
           href={`/property/${property.id}`}
           onClick={handlePropertyClick}
+          target="_blank"
           className="relative block"
         >
           <Image

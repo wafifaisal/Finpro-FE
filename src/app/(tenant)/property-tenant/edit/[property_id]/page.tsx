@@ -9,7 +9,7 @@ export default function EditPropertyPage({ params }: PageProps) {
   const property_id = params.property_id;
 
   return (
-    <div className="pt-0 md:pt-20">
+    <div className="pb-10 pt-0 md:pb-0 md:pt-20">
       <EditPropertyForm params={{ property_id }} />
     </div>
   );
