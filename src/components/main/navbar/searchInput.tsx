@@ -67,39 +67,47 @@ export default function useSearchbar() {
   }, [pathname]);
 
   useEffect(() => {
-    const whereQuery = searchParams.get("where");
-    const checkInQuery = searchParams.get("checkIn");
-    const checkOutQuery = searchParams.get("checkOut");
-    const whoQuery = searchParams.get("who");
-    const categoryQuery = searchParams.get("category"); // Ambil query "category"
-
-    if (
-      whereQuery ||
-      checkInQuery ||
-      checkOutQuery ||
-      whoQuery ||
-      categoryQuery
-    ) {
-      setSearchValues((prev) => {
-        const newCheckIn: Date = checkInQuery
-          ? new Date(checkInQuery)
-          : prev.checkIn || new Date();
-        const newCheckOut: Date = checkOutQuery
-          ? new Date(checkOutQuery)
-          : prev.checkOut || new Date();
-        return {
-          ...prev,
-          where: whereQuery || prev.where,
-          checkIn: newCheckIn,
-          checkOut: newCheckOut,
-          who: whoQuery ? parseInt(whoQuery, 10) : prev.who,
-          // Jika perlu, Anda bisa menyimpan category ke state juga, misalnya:
-          // category: categoryQuery || "",
-          dateRange: [newCheckIn, newCheckOut],
-        };
+    if (pathname === "/") {
+      setSearchValues({
+        where: "",
+        checkIn: today,
+        checkOut: tomorrow,
+        who: 1,
+        dateRange: [today, tomorrow],
       });
+    } else {
+      const whereQuery = searchParams.get("where");
+      const checkInQuery = searchParams.get("checkIn");
+      const checkOutQuery = searchParams.get("checkOut");
+      const whoQuery = searchParams.get("who");
+      const categoryQuery = searchParams.get("category");
+
+      if (
+        whereQuery ||
+        checkInQuery ||
+        checkOutQuery ||
+        whoQuery ||
+        categoryQuery
+      ) {
+        setSearchValues((prev) => {
+          const newCheckIn: Date = checkInQuery
+            ? new Date(checkInQuery)
+            : prev.checkIn || new Date();
+          const newCheckOut: Date = checkOutQuery
+            ? new Date(checkOutQuery)
+            : prev.checkOut || new Date();
+          return {
+            ...prev,
+            where: whereQuery || prev.where,
+            checkIn: newCheckIn,
+            checkOut: newCheckOut,
+            who: whoQuery ? parseInt(whoQuery, 10) : prev.who,
+            dateRange: [newCheckIn, newCheckOut],
+          };
+        });
+      }
     }
-  }, []);
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
