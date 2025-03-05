@@ -1,5 +1,7 @@
+"use client";
+
 import React, { useRef, useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { getIndonesianCityImage, SearchFields } from "@/constants/constants";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -10,6 +12,7 @@ export default function DesktopSearchbar() {
   const suggestionRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
 
   const {
     searchValues,
@@ -188,11 +191,19 @@ export default function DesktopSearchbar() {
           </div>
         ))}
         <button
-          onClick={handleSearch}
-          disabled={isSearchDisabled}
+          onClick={async () => {
+            setIsSearchLoading(true);
+            await handleSearch();
+            setIsSearchLoading(false);
+          }}
+          disabled={isSearchDisabled || isSearchLoading}
           className="p-3 rounded-full bg-gradient-to-r from-rose-500 to-pink-600 text-white hover:from-rose-600 hover:to-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Search className="w-3 h-3" />
+          {isSearchLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Search className="w-3 h-3" />
+          )}
         </button>
       </div>
     </div>

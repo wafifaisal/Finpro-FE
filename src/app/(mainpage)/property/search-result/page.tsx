@@ -145,45 +145,47 @@ export default function SearchResultPage() {
     : new Date(searchStart.getTime() + 24 * 60 * 60 * 1000);
 
   return (
-    <div className="container mx-auto p-4 py-48">
-      {loading ? (
-        <LoadingSkeleton userLocation={userLocation} />
-      ) : properties.length === 0 ? (
-        <NoResults />
-      ) : (
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="md:w-2/3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-              {properties.map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  userLocation={userLocation}
-                  searchStart={searchStart}
-                  searchEnd={searchEnd}
+    <>
+      <div className="container mx-auto p-4 py-48">
+        {loading ? (
+          <LoadingSkeleton userLocation={userLocation} />
+        ) : properties.length === 0 ? (
+          <NoResults />
+        ) : (
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="md:w-2/3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                {properties.map((property) => (
+                  <PropertyCard
+                    key={property.id}
+                    property={property}
+                    userLocation={userLocation}
+                    searchStart={searchStart}
+                    searchEnd={searchEnd}
+                  />
+                ))}
+              </div>
+              {pagination.totalPages > 1 && (
+                <Pagination
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  onPageChange={handlePageChange}
                 />
-              ))}
+              )}
             </div>
-            {pagination.totalPages > 1 && (
-              <Pagination
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                onPageChange={handlePageChange}
-              />
-            )}
-          </div>
-          <div className="md:w-1/3">
-            <div className="sticky top-48">
-              <PropertyMap
-                properties={properties}
-                userLocation={userLocation}
-                router={router}
-              />
+            <div className="md:w-1/3">
+              <div className="sticky top-48">
+                <PropertyMap
+                  properties={properties}
+                  userLocation={userLocation}
+                  router={router}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       <Footer />
-    </div>
+    </>
   );
 }

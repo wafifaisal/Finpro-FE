@@ -4,12 +4,20 @@ import { useDebounce } from "use-debounce";
 import "react-datepicker/dist/react-datepicker.css";
 import { SearchValues, Property } from "../../../types/types";
 
+const formatDateLocal = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function useSearchbar() {
   const base_url_be = process.env.NEXT_PUBLIC_BASE_URL_BE;
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
@@ -29,7 +37,6 @@ export default function useSearchbar() {
   const isSearchDisabled = Object.values(searchValues).every(
     (val) => val === "" || val === null
   );
-
   useEffect(() => {
     const savedScrollPos = sessionStorage.getItem("scrollPos");
     if (savedScrollPos) {
@@ -59,16 +66,50 @@ export default function useSearchbar() {
     }
   }, [pathname]);
 
-  // Perbarui query parameter setiap kali checkIn atau checkOut berubah
+  useEffect(() => {
+    const whereQuery = searchParams.get("where");
+    const checkInQuery = searchParams.get("checkIn");
+    const checkOutQuery = searchParams.get("checkOut");
+    const whoQuery = searchParams.get("who");
+    const categoryQuery = searchParams.get("category"); // Ambil query "category"
+
+    if (
+      whereQuery ||
+      checkInQuery ||
+      checkOutQuery ||
+      whoQuery ||
+      categoryQuery
+    ) {
+      setSearchValues((prev) => {
+        const newCheckIn: Date = checkInQuery
+          ? new Date(checkInQuery)
+          : prev.checkIn || new Date();
+        const newCheckOut: Date = checkOutQuery
+          ? new Date(checkOutQuery)
+          : prev.checkOut || new Date();
+        return {
+          ...prev,
+          where: whereQuery || prev.where,
+          checkIn: newCheckIn,
+          checkOut: newCheckOut,
+          who: whoQuery ? parseInt(whoQuery, 10) : prev.who,
+          // Jika perlu, Anda bisa menyimpan category ke state juga, misalnya:
+          // category: categoryQuery || "",
+          dateRange: [newCheckIn, newCheckOut],
+        };
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (searchValues.checkIn) {
-      params.set("checkIn", searchValues.checkIn.toISOString().split("T")[0]);
+      params.set("checkIn", formatDateLocal(searchValues.checkIn));
     } else {
       params.delete("checkIn");
     }
     if (searchValues.checkOut) {
-      params.set("checkOut", searchValues.checkOut.toISOString().split("T")[0]);
+      params.set("checkOut", formatDateLocal(searchValues.checkOut));
     } else {
       params.delete("checkOut");
     }
@@ -107,7 +148,6 @@ export default function useSearchbar() {
     }
   }, [base_url_be, text]);
 
-  // Perbarui query parameter untuk keyword dan fetch properties saat keyword berubah
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (text) {
@@ -123,16 +163,14 @@ export default function useSearchbar() {
     const params = new URLSearchParams();
     if (searchValues.where) params.append("where", searchValues.where);
     if (searchValues.checkIn)
-      params.append(
-        "checkIn",
-        searchValues.checkIn.toISOString().split("T")[0]
-      );
+      params.append("checkIn", formatDateLocal(searchValues.checkIn));
     if (searchValues.checkOut)
-      params.append(
-        "checkOut",
-        searchValues.checkOut.toISOString().split("T")[0]
-      );
+      params.append("checkOut", formatDateLocal(searchValues.checkOut));
     if (searchValues.who) params.append("who", searchValues.who.toString());
+    const categoryQuery = searchParams.get("category");
+    if (categoryQuery) {
+      params.append("category", categoryQuery);
+    }
 
     try {
       await fetch(`${base_url_be}/property?${params.toString()}`);

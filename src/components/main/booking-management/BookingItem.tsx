@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { BookingStatus, IBooking } from "@/types/booking";
-import { getStatusBadgeStyles, getStatusText } from "./bookingUtils";
+import { getStatusBadgeStyles, getStatusText } from "./BookingUtils";
 
 interface BookingItemProps {
   booking: IBooking;

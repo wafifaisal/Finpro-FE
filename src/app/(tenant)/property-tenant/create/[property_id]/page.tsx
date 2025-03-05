@@ -11,7 +11,7 @@ export default function Page({ params }: PageProps) {
   const property_id = params.property_id;
 
   return (
-    <div className="p-8">
+    <div className="p-8 pb-10 pt-0 md:pb-0 md:pt-12">
       <CreateRoomType params={{ property_id }} />
     </div>
   );

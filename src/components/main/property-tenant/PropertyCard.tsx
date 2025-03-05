@@ -29,7 +29,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   return (
     <div className="w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto p-4">
-      {/* Banner peringatan jika belum ada tipe kamar */}
       {(!property.RoomTypes || property.RoomTypes.length === 0) && (
         <div className="flex items-center mb-2">
           <span className="text-red-600 text-xl font-bold mr-2">!</span>
@@ -39,7 +38,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         </div>
       )}
       <div className="flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
-        {/* Gambar Properti */}
         <div className="w-full md:w-1/3 h-56 relative">
           <Image
             src={
@@ -48,11 +46,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 : "/placeholder.jpg"
             }
             fill
+            loading="lazy"
             alt={property.name}
             className="object-cover"
           />
         </div>
-        {/* Detail Properti */}
         <div className="flex-1 py-2 px-4 sm:px-6 space-y-2">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-rose-600">

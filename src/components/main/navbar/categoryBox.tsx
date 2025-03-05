@@ -16,7 +16,8 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
 }) => {
   const router = useRouter();
   const params = useSearchParams();
-  const pathname = usePathname(); // Mendapatkan path saat ini
+  const pathname = usePathname();
+  const isSemuaProperti = label.toLowerCase() === "semua properti";
 
   const handleClick = useCallback(() => {
     let currentQuery: Record<string, string | undefined> = {};
@@ -24,32 +25,37 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
       currentQuery = qs.parse(params.toString()) as Record<string, string>;
     }
 
-    const updateQuery: Record<string, string | undefined> = {
-      ...currentQuery,
-      category: label.toLowerCase(),
-    };
-
-    if (params?.get("category") === label.toLowerCase()) {
-      delete updateQuery.category;
+    if (isSemuaProperti) {
+      delete currentQuery.category;
+    } else {
+      if (currentQuery.category === label.toLowerCase()) {
+        delete currentQuery.category;
+      } else {
+        currentQuery.category = label.toLowerCase();
+      }
     }
 
     const url = qs.stringifyUrl(
       {
         url: pathname,
-        query: updateQuery,
+        query: currentQuery,
       },
       { skipNull: true }
     );
 
     router.push(url);
-  }, [router, params, label, pathname]);
+  }, [router, params, label, pathname, isSemuaProperti]);
 
   return (
     <div
       onClick={handleClick}
-      className={`flex flex-col items-center justify-center gap-1 px-3 py-1 border-b-2 hover:text-neutral-800 transition cursor-pointer ${
-        selected ? "border-b-neutral-800" : "border-transparent"
-      } ${selected ? "text-neutral-800" : "text-neutral-500"}`}
+      className={`flex flex-col items-center justify-center gap-1 px-3 py-1 transition cursor-pointer ${
+        isSemuaProperti
+          ? "border-b-0 text-neutral-500 hover:text-neutral-800"
+          : selected
+          ? "border-b-2 border-b-neutral-800 text-neutral-800"
+          : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-800"
+      }`}
     >
       <Icon className="sm:text-3xl md:text-xl lg:text-xl" />
       <div className="font-medium text-xs">{label}</div>

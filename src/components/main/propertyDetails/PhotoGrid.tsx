@@ -1,7 +1,6 @@
-// components/main/propertyDetails/PhotoGrid.tsx
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import { Property } from "@/types/types";
 
@@ -14,17 +13,28 @@ const PhotoGrid: React.FC<PhotoGridProps> = ({
   property,
   setShowAllPhotos,
 }) => {
+  const firstImage = useMemo(
+    () => property.PropertyImages[0],
+    [property.PropertyImages]
+  );
+
+  const otherImages = useMemo(
+    () => property.PropertyImages.slice(1, 5),
+    [property.PropertyImages]
+  );
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 h-[400px] mb-12 rounded-xl overflow-hidden relative">
       <div className="col-span-1 md:col-span-2 md:row-span-2 relative group">
         <Image
-          src={property.PropertyImages[0].image_url}
+          src={firstImage.image_url}
           alt={property.name}
           fill
+          loading="lazy"
           className="object-cover group-hover:brightness-95 transition"
         />
       </div>
-      {property.PropertyImages.slice(1, 5).map((image, idx) => (
+      {otherImages.map((image, idx) => (
         <div key={image.id} className="relative group">
           <Image
             src={image.image_url}
@@ -44,4 +54,4 @@ const PhotoGrid: React.FC<PhotoGridProps> = ({
   );
 };
 
-export default PhotoGrid;
+export default React.memo(PhotoGrid);
