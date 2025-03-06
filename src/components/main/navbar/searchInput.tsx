@@ -4,7 +4,8 @@ import { useDebounce } from "use-debounce";
 import "react-datepicker/dist/react-datepicker.css";
 import { SearchValues, Property } from "../../../types/types";
 
-const formatDateLocal = (date: Date) => {
+// Fungsi format tanggal dengan waktu lokal
+const formatDateLocal = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -17,17 +18,18 @@ export default function useSearchbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [suggestions, setSuggestions] = useState<string[]>([]);
-
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
+  // Menambahkan properti "category" pada state
   const [searchValues, setSearchValues] = useState<SearchValues>({
     where: "",
     checkIn: today,
     checkOut: tomorrow,
     who: 1,
     dateRange: [today, tomorrow],
+    category: "", // properti category ditambahkan
   });
 
   const [text] = useDebounce(searchValues.where, 1000);
@@ -37,6 +39,7 @@ export default function useSearchbar() {
   const isSearchDisabled = Object.values(searchValues).every(
     (val) => val === "" || val === null
   );
+
   useEffect(() => {
     const savedScrollPos = sessionStorage.getItem("scrollPos");
     if (savedScrollPos) {
@@ -67,49 +70,6 @@ export default function useSearchbar() {
   }, [pathname]);
 
   useEffect(() => {
-    if (pathname === "/") {
-      setSearchValues({
-        where: "",
-        checkIn: today,
-        checkOut: tomorrow,
-        who: 1,
-        dateRange: [today, tomorrow],
-      });
-    } else {
-      const whereQuery = searchParams.get("where");
-      const checkInQuery = searchParams.get("checkIn");
-      const checkOutQuery = searchParams.get("checkOut");
-      const whoQuery = searchParams.get("who");
-      const categoryQuery = searchParams.get("category");
-
-      if (
-        whereQuery ||
-        checkInQuery ||
-        checkOutQuery ||
-        whoQuery ||
-        categoryQuery
-      ) {
-        setSearchValues((prev) => {
-          const newCheckIn: Date = checkInQuery
-            ? new Date(checkInQuery)
-            : prev.checkIn || new Date();
-          const newCheckOut: Date = checkOutQuery
-            ? new Date(checkOutQuery)
-            : prev.checkOut || new Date();
-          return {
-            ...prev,
-            where: whereQuery || prev.where,
-            checkIn: newCheckIn,
-            checkOut: newCheckOut,
-            who: whoQuery ? parseInt(whoQuery, 10) : prev.who,
-            dateRange: [newCheckIn, newCheckOut],
-          };
-        });
-      }
-    }
-  }, [pathname, searchParams]);
-
-  useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (searchValues.checkIn) {
       params.set("checkIn", formatDateLocal(searchValues.checkIn));
@@ -121,10 +81,16 @@ export default function useSearchbar() {
     } else {
       params.delete("checkOut");
     }
+    if (searchValues.category) {
+      params.set("category", String(searchValues.category));
+    } else {
+      params.delete("category");
+    }
     router.replace(`${pathname}?${params.toString()}`);
   }, [
     searchValues.checkIn,
     searchValues.checkOut,
+    searchValues.category,
     pathname,
     router,
     searchParams,
@@ -175,10 +141,8 @@ export default function useSearchbar() {
     if (searchValues.checkOut)
       params.append("checkOut", formatDateLocal(searchValues.checkOut));
     if (searchValues.who) params.append("who", searchValues.who.toString());
-    const categoryQuery = searchParams.get("category");
-    if (categoryQuery) {
-      params.append("category", categoryQuery);
-    }
+    if (searchValues.category)
+      params.append("category", String(searchValues.category));
 
     try {
       await fetch(`${base_url_be}/property?${params.toString()}`);

@@ -22,34 +22,31 @@ import {
 } from "react-icons/gi";
 import { FaPaw, FaChild } from "react-icons/fa";
 
-// Tipe Facility (sesuaikan dengan definisi Anda di "@/types")
 export interface Facility {
   id: string;
   name: string;
   icon: string;
 }
 
-// Mapping dari id fasilitas ke komponen ikon yang sesuai
 const iconMapping: Record<string, IconType> = {
-  PEMANDANGAN_KOTA: MdLocationCity, // Misal: ikon kota
-  PEMANDANGAN_ALAM: GiMountainCave, // Misal: ikon pegunungan/alam
-  AKSES_PANTAI: GiPalmTree, // Misal: ikon pohon palem
-  TAMAN: MdLocalFlorist, // Misal: ikon bunga
-  RAMAH_HEWAN_PELIHARAAN: FaPaw, // Ikon hewan (paw)
-  RESTAURANT: MdRestaurantMenu, // Ikon restoran
-  BAR: GiMartini, // Ikon bar
-  CONFERENCE_ROOM: MdMeetingRoom, // Ikon ruang konferensi
-  PARKIR_GRATIS: MdLocalParking, // Ikon parkir
-  KOLAM_RENANG: MdPool, // Ikon kolam renang
-  GYM: MdFitnessCenter, // Ikon gym
-  SPA: MdSpa, // Ikon spa
-  TAMAN_BERMAIN: FaChild, // Misal: ikon anak (playground)
-  DEKAT_WISATA: GiCarousel, // Misal: ikon kota (bisa disesuaikan)
-  BUDGET: GiWallet, // Misal: ikon dompet untuk kategori budget
-  MEWAH: GiDiamondTrophy, // Misal: ikon trofi/permata untuk kategori mewah
+  PEMANDANGAN_KOTA: MdLocationCity,
+  PEMANDANGAN_ALAM: GiMountainCave,
+  AKSES_PANTAI: GiPalmTree,
+  TAMAN: MdLocalFlorist,
+  RAMAH_HEWAN_PELIHARAAN: FaPaw,
+  RESTAURANT: MdRestaurantMenu,
+  BAR: GiMartini,
+  CONFERENCE_ROOM: MdMeetingRoom,
+  PARKIR_GRATIS: MdLocalParking,
+  KOLAM_RENANG: MdPool,
+  GYM: MdFitnessCenter,
+  SPA: MdSpa,
+  TAMAN_BERMAIN: FaChild,
+  DEKAT_WISATA: GiCarousel,
+  BUDGET: GiWallet,
+  MEWAH: GiDiamondTrophy,
 };
 
-// Data sample facilities sesuai permintaan
 export const SAMPLE_FACILITIES: Facility[] = [
   {
     id: "PEMANDANGAN_KOTA",
@@ -82,7 +79,7 @@ export const SAMPLE_FACILITIES: Facility[] = [
 ];
 
 interface FacilitiesSectionProps {
-  facilities: string[]; // Array id fasilitas yang dipilih (contoh: ["GYM", "PARKIR_GRATIS"])
+  facilities: string[];
   toggleFacility: (facilityId: string) => void;
   error?: string | string[];
   sampleFacilities: Facility[];
