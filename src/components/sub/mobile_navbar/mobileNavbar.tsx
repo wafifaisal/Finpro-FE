@@ -4,7 +4,7 @@ import Link from "next/link";
 import { X, Menu, Grid } from "lucide-react";
 import Image from "next/image";
 import Searchbar from "@/components/main/navbar/searchBar";
-import Categories from "./mobileCategories";
+import MobileCategories from "./mobileCategories";
 import { useSession } from "@/context/useSessionHook";
 import Avatar from "@/components/main/navbar/avatar";
 import { usePathname } from "next/navigation";
@@ -66,7 +66,9 @@ const MobileNavbar = () => {
                 <X size={24} />
               </button>
             </div>
-            <Categories />
+            <MobileCategories
+              onCategorySelect={() => setIsCategoriesOpen(false)}
+            />
           </div>
         </div>
       )}
@@ -115,7 +117,6 @@ const MobileNavbar = () => {
                 width={16}
                 height={16}
                 className="w-auto cursor-pointer"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
               />
             </button>
           )}

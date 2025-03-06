@@ -57,7 +57,7 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
           : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-800"
       }`}
     >
-      <Icon className="sm:text-3xl md:text-xl lg:text-xl" />
+      <Icon className="text-3xl md:text-xl" />
       <div className="font-medium text-xs">{label}</div>
     </div>
   );

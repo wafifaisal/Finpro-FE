@@ -1,69 +1,115 @@
 "use client";
-
-import { FaHome, FaHotel, FaBuilding, FaHouseUser } from "react-icons/fa";
+import React from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
+import { FaHotel, FaBuilding, FaHouseUser, FaList } from "react-icons/fa";
 import { PiIslandFill } from "react-icons/pi";
 import { MdOutlineVilla } from "react-icons/md";
-import CategoryBox from "../../main/navbar/categoryBox";
-import { usePathname, useSearchParams } from "next/navigation";
+import FilterButton from "../../main/navbar/FilterButton";
+import CategoryBox from "@/components/main/navbar/categoryBox";
 
 export const categories = [
   {
     label: "Hotel",
     icon: FaHotel,
-    link: "/property?type=hotel",
     desc: "Properti ini berupa Hotel",
   },
   {
     label: "Villa",
     icon: MdOutlineVilla,
-    link: "/property?type=villa",
     desc: "Properti ini berupa Villa",
-  },
-  {
-    label: "Rumah",
-    icon: FaHome,
-    link: "/property?type=house",
-    desc: "Properti ini berupa Rumah",
   },
   {
     label: "Apartmen",
     icon: FaBuilding,
-    link: "/property?type=apartment",
     desc: "Properti ini berupa Apartmen",
   },
   {
     label: "Resor",
     icon: PiIslandFill,
-    link: "/property?type=resort",
     desc: "Properti ini berupa Resor",
   },
   {
     label: "Guest House",
     icon: FaHouseUser,
-    link: "/property?type=guest-house",
     desc: "Properti ini berupa Guest House",
   },
 ];
 
-const MobileCategories = () => {
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
+
+interface MobileCategoriesProps {
+  onCategorySelect: () => void;
+}
+
+const MobileCategories: React.FC<MobileCategoriesProps> = ({
+  onCategorySelect,
+}) => {
   const params = useSearchParams();
-  const category = params?.get("category");
+  const activeCategory = params?.get("category");
   const pathname = usePathname();
   const isMainPage = pathname === "/" || pathname === "/property/search-result";
 
   if (!isMainPage) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 p-0 gap-10 sm:p-5 text-4xl">
-      {categories.map((item) => (
-        <CategoryBox
-          key={item.label}
-          label={item.label}
-          selected={category === item.label}
-          icon={item.icon}
-        />
-      ))}
-    </div>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="block md:hidden border-t py-3 w-full my-2 bg-white"
+    >
+      {" "}
+      <div className="flex flex-col overflow-y-hidden px-4 gap-4">
+        {activeCategory && (
+          <motion.div variants={itemVariants}>
+            <div onClick={onCategorySelect} className="cursor-pointer">
+              <CategoryBox
+                label="Semua Properti"
+                icon={FaList}
+                selected={true}
+              />
+            </div>
+          </motion.div>
+        )}
+
+        {categories.map((item) => (
+          <motion.div key={item.label} variants={itemVariants}>
+            <div onClick={onCategorySelect} className="cursor-pointer">
+              <CategoryBox
+                label={item.label}
+                selected={activeCategory === item.label.toLowerCase()}
+                icon={item.icon}
+              />
+            </div>
+          </motion.div>
+        ))}
+
+        {pathname === "/property/search-result" && (
+          <motion.div variants={itemVariants}>
+            <div className="border-b my-5">
+              <p className="font-bold">Filter Pencarian</p>
+            </div>
+            <div className="flex justify-center">
+              <FilterButton />
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
   );
 };
 

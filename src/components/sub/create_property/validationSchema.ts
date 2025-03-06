@@ -17,7 +17,12 @@ export const validationSchema = Yup.object({
   desc: Yup.string()
     .required("Deskripsi wajib diisi")
     .min(20, "Deskripsi harus terdiri dari minimal 20 karakter"),
-  category: Yup.string().required("Kategori wajib diisi"),
+  category: Yup.string()
+    .oneOf(
+      ["Hotel", "Villa", "Apartmen", "Resor", "Guest House"],
+      "Kategori harus salah satu dari: Hotel, Villa, Apartmen, Resor, Guest House"
+    )
+    .required("Kategori wajib diisi"),
   terms_condition: Yup.string().required("Syarat & ketentuan wajib diisi"),
   address: Yup.string().required("Alamat wajib diisi"),
   country: Yup.string().required("Negara wajib diisi"),
