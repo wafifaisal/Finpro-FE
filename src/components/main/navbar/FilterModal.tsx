@@ -35,6 +35,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
 
   const initialPropertyName =
     searchParams.get("propertyName") || initialFilters?.propertyName || "";
@@ -88,7 +89,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
       }
     };
     loadPriceRange();
-  }, [initialFilters, searchParams]);
+  }, [initialFilters, queryString, searchParams]);
 
   useEffect(() => {
     const roomFacilitiesQuery = searchParams.get("roomFacilities");
@@ -104,7 +105,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
     if (sortBy && sortOrder) {
       setSortOption(`${sortBy}-${sortOrder}`);
     }
-  }, []);
+  }, [queryString, searchParams]);
 
   const handleSliderChange = (newValue: [number, number]) => {
     setSliderValue(newValue);

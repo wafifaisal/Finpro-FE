@@ -100,7 +100,7 @@ const FilterModalMobile: React.FC<FilterModalMobileProps> = ({
     if (sortBy && sortOrder) {
       setSortOption(`${sortBy}-${sortOrder}`);
     }
-  }, []);
+  }, [searchParams]);
 
   const handleSliderChange = (newValue: [number, number]) => {
     setSliderValue(newValue);
