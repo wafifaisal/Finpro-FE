@@ -83,8 +83,10 @@ const BookingDateAndGuest: React.FC<BookingDateAndGuestProps> = ({
           selectsRange
           minDate={todayDate}
           renderDayContents={(day, date) => {
+            const adjustedDate = new Date(date);
+            adjustedDate.setDate(adjustedDate.getDate() - 1);
             const price = formatShortCurrency(
-              getCheapestPriceForDate(date, property)
+              getCheapestPriceForDate(adjustedDate, property)
             );
             return (
               <div className="flex flex-col items-center justify-center w-full h-full">
