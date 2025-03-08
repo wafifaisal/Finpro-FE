@@ -1,4 +1,3 @@
-// constants/facilities.ts
 import {
   Wifi,
   Tv,

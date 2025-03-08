@@ -40,7 +40,6 @@ const FloatingBackground: React.FC = () => {
       new THREE.SphereGeometry(0.4, 24, 24),
     ];
 
-    // Brand colors
     const brandColors = ["#DC1E1E", "#F39C12", "#F1C40F", "#E67E22"];
 
     const createObject = (

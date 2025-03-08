@@ -36,7 +36,6 @@ const getTotalStockForDate = (date: Date, property: Property): number => {
     const isMarkedUnavailable = roomType.Unavailable?.some((unavail) => {
       const startStr = getLocalDateString(new Date(unavail.start_date));
       const endStr = getLocalDateString(new Date(unavail.end_date));
-      // Range unavailable inklusif untuk start dan end date
       return dateStr >= startStr && dateStr <= endStr;
     });
     if (isMarkedUnavailable) {

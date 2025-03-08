@@ -8,7 +8,6 @@ export const formatDate = (
     throw new Error("Invalid date provided.");
   }
 
-  // Ensure the date is a valid Date object
   const dateObj = typeof date === "string" ? new Date(date) : date;
 
   if (isNaN(dateObj.getTime())) {

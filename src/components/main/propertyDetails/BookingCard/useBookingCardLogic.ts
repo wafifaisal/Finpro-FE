@@ -168,10 +168,23 @@ export const useBookingCardLogic = ({
         add_breakfast: selectedRooms[0]?.addBreakfast || false,
       };
 
-      const newBooking = await createBooking(bookingData);
-      console.log("Booking successful:", newBooking);
-    } catch (error) {
+      await createBooking(bookingData);
+
+      Swal.fire({
+        icon: "success",
+        title: "Booking berhasil!",
+        text: "Pemesanan Anda berhasil dibuat.",
+      });
+    } catch (error: unknown) {
       console.error("Booking failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Booking gagal",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Pesanan lebih banyak dari jumlah kamar tersedia",
+      });
     }
   };
 

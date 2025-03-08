@@ -1,4 +1,3 @@
-// components/SortOptionsFilter.tsx
 import React from "react";
 
 interface SortOptionsFilterProps {
