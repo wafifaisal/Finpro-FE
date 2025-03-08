@@ -84,7 +84,7 @@ const BookingDateAndGuest: React.FC<BookingDateAndGuestProps> = ({
           minDate={todayDate}
           renderDayContents={(day, date) => {
             const adjustedDate = new Date(date);
-            adjustedDate.setDate(adjustedDate.getDate() - 1);
+            adjustedDate.setDate(adjustedDate.getDate() + 1);
             const price = formatShortCurrency(
               getCheapestPriceForDate(adjustedDate, property)
             );
