@@ -64,7 +64,6 @@ export default function useSearchbar() {
       window.addEventListener("scroll", handleScroll);
       return () => window.removeEventListener("scroll", handleScroll);
     } else {
-      // Di halaman selain home, selalu tampilkan navbar dengan background (isScrolled true)
       setIsScrolled(true);
     }
   }, [pathname]);

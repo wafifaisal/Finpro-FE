@@ -124,8 +124,6 @@ const FloatingBackground: React.FC = () => {
     window.addEventListener("resize", handleResize);
 
     animate();
-
-    // Cleanup saat komponen di-unmount
     return () => {
       cancelAnimationFrame(frameId);
       window.removeEventListener("mousemove", handleMouseMove);

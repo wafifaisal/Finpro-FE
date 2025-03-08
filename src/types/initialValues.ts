@@ -1,5 +1,3 @@
-// constants/initialValues.ts
-
 import { CreateRoomTypeFormValues } from "@/types/createRoomTypes";
 
 const initialValues: CreateRoomTypeFormValues = {

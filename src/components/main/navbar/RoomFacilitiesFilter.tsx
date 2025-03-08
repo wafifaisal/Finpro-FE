@@ -1,4 +1,3 @@
-// components/RoomFacilitiesFilter.tsx
 import React from "react";
 import { ROOM_FACILITIES } from "../../../constants/facilities";
 

@@ -1,4 +1,3 @@
-// components/PropertyFacilitiesFilter.tsx
 import React from "react";
 import { PROPERTY_FACILITIES } from "../../../constants/facilities";
 

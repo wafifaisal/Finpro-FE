@@ -1,4 +1,3 @@
-// components/UnavailableSection.tsx
 "use client";
 
 import React from "react";

@@ -22,7 +22,6 @@ const FilterButton: React.FC<FilterButtonProps> = ({ onOpen }) => {
   }, []);
 
   const handleOpenModal = () => {
-    // Panggil callback onOpen untuk menutup kategori
     if (onOpen) onOpen();
     setIsModalOpen(true);
   };
