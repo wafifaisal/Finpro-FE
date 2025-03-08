@@ -3,6 +3,7 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Swal from "sweetalert2";
 import {
   formatShortCurrency,
   getCheapestPriceForDate,
@@ -22,19 +23,27 @@ interface BookingDateAndGuestProps {
   getTotalCapacity: () => number;
 }
 
+const getLocalDateString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  const day = ("0" + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+};
+
 const getTotalStockForDate = (date: Date, property: Property): number => {
-  const dateStr = date.toISOString().split("T")[0];
+  const dateStr = getLocalDateString(date);
   return property.RoomTypes.reduce((sum, roomType) => {
     const isMarkedUnavailable = roomType.Unavailable?.some((unavail) => {
-      const startStr = new Date(unavail.start_date).toISOString().split("T")[0];
-      const endStr = new Date(unavail.end_date).toISOString().split("T")[0];
+      const startStr = getLocalDateString(new Date(unavail.start_date));
+      const endStr = getLocalDateString(new Date(unavail.end_date));
+      // Range unavailable inklusif untuk start dan end date
       return dateStr >= startStr && dateStr <= endStr;
     });
     if (isMarkedUnavailable) {
       return sum;
     }
     const record = roomType.RoomAvailability?.find((ra) => {
-      const raDateStr = new Date(ra.date).toISOString().split("T")[0];
+      const raDateStr = getLocalDateString(new Date(ra.date));
       return raDateStr === dateStr;
     });
     const available = record ? record.availableCount : roomType.stock;
@@ -64,15 +73,31 @@ const BookingDateAndGuest: React.FC<BookingDateAndGuestProps> = ({
           onChange={(dates: [Date | null, Date | null]) => {
             const [start, end] = dates;
             if (start) {
-              setCheckIn(start.toISOString().split("T")[0]);
+              setCheckIn(getLocalDateString(start));
             } else {
               setCheckIn("");
             }
-            if (end) {
-              if (start && end.getTime() === start.getTime()) {
+            if (start && end) {
+              let validRange = true;
+              const currentDate = new Date(start);
+              while (currentDate < end) {
+                if (
+                  getTotalStockForDate(new Date(currentDate), property) === 0
+                ) {
+                  validRange = false;
+                  break;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+              }
+              if (!validRange) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Salah satu tanggal dalam rentang pilihan Anda tidak tersedia.",
+                });
                 setCheckOut("");
               } else {
-                setCheckOut(end.toISOString().split("T")[0]);
+                setCheckOut(getLocalDateString(end));
               }
             } else {
               setCheckOut("");
@@ -83,8 +108,14 @@ const BookingDateAndGuest: React.FC<BookingDateAndGuestProps> = ({
           selectsRange
           minDate={todayDate}
           renderDayContents={(day, date) => {
-            const adjustedDate = new Date(date);
-            adjustedDate.setDate(adjustedDate.getDate() + 1);
+            const localDate = new Date(
+              date.getFullYear(),
+              date.getMonth(),
+              date.getDate()
+            );
+            const adjustedDate = new Date(
+              localDate.getTime() - localDate.getTimezoneOffset() * 60000
+            );
             const price = formatShortCurrency(
               getCheapestPriceForDate(adjustedDate, property)
             );

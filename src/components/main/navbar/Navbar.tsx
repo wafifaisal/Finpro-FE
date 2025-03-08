@@ -14,10 +14,14 @@ const Navbar = () => {
   const { isAuth } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
   const pathname = usePathname();
 
   useEffect(() => {
+    if (pathname === "/") {
+      sessionStorage.removeItem("scrollY");
+      window.scrollTo(0, 0);
+    }
+
     const savedScrollY = sessionStorage.getItem("scrollY");
     if (savedScrollY) {
       window.scrollTo(0, parseInt(savedScrollY, 10));
@@ -33,10 +37,6 @@ const Navbar = () => {
       setIsScrolled(window.scrollY > 0);
       sessionStorage.setItem("scrollY", window.scrollY.toString());
     };
-
-    if (window.scrollY > 0) {
-      setIsScrolled(true);
-    }
 
     window.addEventListener("scroll", handleScroll);
     return () => {
