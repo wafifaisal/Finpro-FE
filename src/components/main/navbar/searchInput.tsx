@@ -4,7 +4,6 @@ import { useDebounce } from "use-debounce";
 import "react-datepicker/dist/react-datepicker.css";
 import { SearchValues, Property } from "../../../types/types";
 
-// Fungsi format tanggal dengan waktu lokal
 const formatDateLocal = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -22,14 +21,13 @@ export default function useSearchbar() {
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
-  // Menambahkan properti "category" pada state
   const [searchValues, setSearchValues] = useState<SearchValues>({
     where: "",
     checkIn: today,
     checkOut: tomorrow,
     who: 1,
     dateRange: [today, tomorrow],
-    category: "", // properti category ditambahkan
+    category: "",
   });
 
   const [text] = useDebounce(searchValues.where, 1000);
@@ -39,7 +37,6 @@ export default function useSearchbar() {
   const isSearchDisabled = Object.values(searchValues).every(
     (val) => val === "" || val === null
   );
-
   useEffect(() => {
     const savedScrollPos = sessionStorage.getItem("scrollPos");
     if (savedScrollPos) {
@@ -48,24 +45,27 @@ export default function useSearchbar() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      sessionStorage.setItem("scrollPos", window.scrollY.toString());
-      if (pathname !== "/") {
-        setIsScrolled(true);
+    if (pathname === "/") {
+      const savedScrollPos = sessionStorage.getItem("scrollPos");
+      if (savedScrollPos) {
+        const scrollPos = parseInt(savedScrollPos, 10);
+        window.scrollTo(0, scrollPos);
+        setIsScrolled(scrollPos > 0);
       } else {
-        setIsScrolled(window.scrollY > 0);
+        setIsScrolled(false);
       }
-    };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [pathname]);
+      const handleScroll = () => {
+        const scrollY = window.scrollY;
+        sessionStorage.setItem("scrollPos", scrollY.toString());
+        setIsScrolled(scrollY > 0);
+      };
 
-  useEffect(() => {
-    if (pathname !== "/") {
-      setIsScrolled(true);
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
     } else {
-      setIsScrolled(window.scrollY > 0);
+      // Di halaman selain home, selalu tampilkan navbar dengan background (isScrolled true)
+      setIsScrolled(true);
     }
   }, [pathname]);
 
