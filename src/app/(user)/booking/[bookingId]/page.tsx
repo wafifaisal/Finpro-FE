@@ -69,80 +69,13 @@ function BookingPage({ params }: { params: { bookingId: string } }) {
     fetchBooking();
   }, [params.bookingId]);
 
-  // Pastikan booking telah terload sebelum perhitungan
-  let computedTotal = 0;
-  let seasonalNights = 0;
-  let regularNights = 0;
-  let seasonalCost = 0;
-  let regularCost = 0;
-  let breakfastCost = 0;
-  let nights = 0;
-  let quantity = 1;
-
-  if (booking) {
-    const startDate = new Date(booking.start_date);
-    const endDate = new Date(booking.end_date);
-    nights = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    quantity = booking.quantity || 1;
-
-    for (let i = 0; i < nights; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(currentDate.getDate() + i);
-      let priceForNight = booking.room_types.price;
-      let isSeasonal = false;
-      if (
-        booking.room_types.seasonal_prices &&
-        booking.room_types.seasonal_prices.length > 0
-      ) {
-        for (const sp of booking.room_types.seasonal_prices) {
-          if (sp.dates && sp.dates.length > 0) {
-            const target = currentDate.toISOString().split("T")[0];
-            if (
-              sp.dates.some(
-                (d: string) =>
-                  new Date(d).toISOString().split("T")[0] === target
-              )
-            ) {
-              priceForNight = Number(sp.price);
-              isSeasonal = true;
-              break;
-            }
-          } else if (sp.start_date && sp.end_date) {
-            const spStart = new Date(sp.start_date);
-            const spEnd = new Date(sp.end_date);
-            if (currentDate >= spStart && currentDate <= spEnd) {
-              priceForNight = Number(sp.price);
-              isSeasonal = true;
-              break;
-            }
-          }
-        }
-      }
-      if (isSeasonal) {
-        seasonalNights++;
-        seasonalCost += priceForNight * quantity;
-      } else {
-        regularNights++;
-        regularCost += priceForNight * quantity;
-      }
-    }
-
-    const roomCost = seasonalCost + regularCost;
-    breakfastCost =
-      booking.room_types.has_breakfast && booking.add_breakfast
-        ? booking.room_types.breakfast_price * quantity * nights
-        : 0;
-    computedTotal = roomCost + breakfastCost;
-  }
-
+  // Effect to handle Midtrans payment when "Midtrans" is selected
   useEffect(() => {
     if (selectedPaymentMethod === "Midtrans" && booking) {
       const midtransPayment = async () => {
         try {
-          // Menggunakan computedTotal yang sudah termasuk biaya breakfast
-          const snapToken = await getSnapToken(booking.id, computedTotal);
+          const quantity = booking.quantity || 1;
+          const snapToken = await getSnapToken(booking.id, quantity);
           if (typeof window !== "undefined" && window.snap) {
             window.snap.pay(snapToken, {
               onSuccess: async function (result: MidtransSnapResult) {
@@ -179,10 +112,69 @@ function BookingPage({ params }: { params: { bookingId: string } }) {
 
       midtransPayment();
     }
-  }, [selectedPaymentMethod, booking, computedTotal]);
+  }, [selectedPaymentMethod, booking]);
 
   if (isLoading) return <Loading />;
   if (!booking) return <p>Booking not found.</p>;
+
+  const startDate = new Date(booking.start_date);
+  const endDate = new Date(booking.end_date);
+  const nights = Math.ceil(
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const quantity = booking.quantity || 1;
+  let seasonalNights = 0;
+  let regularNights = 0;
+  let seasonalCost = 0;
+  let regularCost = 0;
+
+  for (let i = 0; i < nights; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(currentDate.getDate() + i);
+    let priceForNight = booking.room_types.price;
+    let isSeasonal = false;
+    if (
+      booking.room_types.seasonal_prices &&
+      booking.room_types.seasonal_prices.length > 0
+    ) {
+      for (const sp of booking.room_types.seasonal_prices) {
+        if (sp.dates && sp.dates.length > 0) {
+          const target = currentDate.toISOString().split("T")[0];
+          if (
+            sp.dates.some(
+              (d: string) => new Date(d).toISOString().split("T")[0] === target
+            )
+          ) {
+            priceForNight = Number(sp.price);
+            isSeasonal = true;
+            break;
+          }
+        } else if (sp.start_date && sp.end_date) {
+          const spStart = new Date(sp.start_date);
+          const spEnd = new Date(sp.end_date);
+          if (currentDate >= spStart && currentDate <= spEnd) {
+            priceForNight = Number(sp.price);
+            isSeasonal = true;
+            break;
+          }
+        }
+      }
+    }
+    if (isSeasonal) {
+      seasonalNights++;
+      seasonalCost += priceForNight * quantity;
+    } else {
+      regularNights++;
+      regularCost += priceForNight * quantity;
+    }
+  }
+
+  const roomCost = seasonalCost + regularCost;
+  const breakfastCost =
+    booking.room_types.has_breakfast && booking.add_breakfast
+      ? booking.room_types.breakfast_price * quantity * nights
+      : 0;
+  const computedTotal = roomCost + breakfastCost;
 
   return (
     <div>
@@ -295,7 +287,7 @@ function BookingPage({ params }: { params: { bookingId: string } }) {
             regularNights={regularNights}
             quantity={quantity}
             nights={nights}
-            roomCost={seasonalCost + regularCost}
+            roomCost={roomCost}
             breakfastCost={breakfastCost}
             computedTotal={computedTotal}
           />
