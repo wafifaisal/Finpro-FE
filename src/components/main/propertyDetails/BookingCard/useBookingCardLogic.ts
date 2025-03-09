@@ -168,13 +168,14 @@ export const useBookingCardLogic = ({
         add_breakfast: selectedRooms[0]?.addBreakfast || false,
       };
 
-      await createBooking(bookingData);
+      const newBooking = await createBooking(bookingData);
 
       Swal.fire({
         icon: "success",
         title: "Booking berhasil!",
         text: "Pemesanan Anda berhasil dibuat.",
       });
+      router.push(`/booking/${newBooking.id}`);
     } catch (error: unknown) {
       console.error("Booking failed:", error);
       Swal.fire({

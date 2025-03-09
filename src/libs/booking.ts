@@ -35,42 +35,6 @@ export const getBooking = async (bookingId: string): Promise<IBooking> => {
   }
 };
 
-export const uploadPaymentProof = async (
-  bookingId: string,
-  formData: FormData
-): Promise<string> => {
-  try {
-    const response = await fetch(`${BASE_URL}/user-bookings/payment-proof`, {
-      method: "PATCH",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    Swal.fire({
-      icon: "success",
-      title: "Berhasil!",
-      text: data.message || "Bukti pembayaran berhasil diunggah.",
-    });
-    return data.message;
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Gagal mengunggah bukti pembayaran.";
-    console.error("Gagal mengunggah bukti pembayaran:", errorMessage);
-    Swal.fire({
-      icon: "error",
-      title: "Kesalahan!",
-      text: errorMessage,
-    });
-    throw error;
-  }
-};
-
 export const createBooking = async (
   bookingData: ICreateBooking
 ): Promise<IBooking> => {

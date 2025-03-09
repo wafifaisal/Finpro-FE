@@ -1,3 +1,5 @@
+import { IReview } from "./review";
+
 export enum BookingStatus {
   new = "new",
   completed = "completed",
@@ -52,7 +54,7 @@ export interface IBooking {
       image_url: string;
     }[];
   };
-  Review?: IReview;
+  Review?: IReview[];
   selection?: RoomSelection;
 }
 
@@ -65,16 +67,4 @@ export interface ICreateBooking {
   endDate: string;
   payment_method: "Manual" | "Midtrans";
   add_breakfast: boolean;
-}
-
-export interface IReview {
-  id: number;
-  rating: number;
-  review: string;
-  user_id: string;
-  room_types_id: number;
-  booking_id: string;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: Date;
 }

@@ -1,23 +1,58 @@
 "use client";
 
 import Loading from "@/app/loading";
-import { formatCurrency } from "@/helpers/formatCurrency";
 import { formatDateDay } from "@/helpers/formatDate";
 import { getBooking } from "@/libs/booking";
 import { IBooking } from "@/types/booking";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { LuCalendarClock } from "react-icons/lu";
 import PaymentProofUpload from "@/components/sub/booking/uploadPayment";
 import TripsNavbar from "@/components/sub/trips/tripsNavbar";
+import BookingDetails from "@/components/sub/booking/bookingDetails";
+import { getSnapToken, midtransWebHook } from "@/libs/payment";
+import withGuard from "@/hoc/pageGuard";
+import { RiSecurePaymentFill } from "react-icons/ri";
 
-export default function BookingPage({
-  params,
-}: {
-  params: { bookingId: string };
-}) {
+declare global {
+  interface Window {
+    snap?: {
+      pay: (
+        snapToken: string,
+        options: {
+          onSuccess: (result: MidtransSnapResult) => void;
+          onPending: (result: MidtransSnapResult) => void;
+          onError: (result: MidtransSnapResult) => void;
+          onClose: () => void;
+        }
+      ) => void;
+    };
+  }
+}
+interface MidtransSnapResult {
+  transaction_status: string;
+  order_id: string;
+}
+
+function BookingPage({ params }: { params: { bookingId: string } }) {
   const [booking, setBooking] = useState<IBooking | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    string | null
+  >(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !window.snap) {
+      const script = document.createElement("script");
+      script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+      script.type = "text/javascript";
+      script.async = true;
+      script.setAttribute(
+        "data-client-key",
+        process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || ""
+      );
+      document.body.appendChild(script);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchBooking = async () => {
@@ -33,6 +68,51 @@ export default function BookingPage({
 
     fetchBooking();
   }, [params.bookingId]);
+
+  // Effect to handle Midtrans payment when "Midtrans" is selected
+  useEffect(() => {
+    if (selectedPaymentMethod === "Midtrans" && booking) {
+      const midtransPayment = async () => {
+        try {
+          const quantity = booking.quantity || 1;
+          const snapToken = await getSnapToken(booking.id, quantity);
+          if (typeof window !== "undefined" && window.snap) {
+            window.snap.pay(snapToken, {
+              onSuccess: async function (result: MidtransSnapResult) {
+                console.log("Payment success", result);
+                try {
+                  await midtransWebHook(
+                    result.transaction_status,
+                    result.order_id
+                  );
+                } catch (webhookError) {
+                  console.error(
+                    "Error calling midtrans webhook:",
+                    webhookError
+                  );
+                }
+              },
+              onPending: function (result: MidtransSnapResult) {
+                console.log("Payment pending", result);
+              },
+              onError: function (result: MidtransSnapResult) {
+                console.log("Payment error", result);
+              },
+              onClose: function () {
+                console.log("Payment popup closed");
+              },
+            });
+          } else {
+            console.error("Midtrans Snap script not loaded");
+          }
+        } catch (error) {
+          console.error("Error in midtrans payment:", error);
+        }
+      };
+
+      midtransPayment();
+    }
+  }, [selectedPaymentMethod, booking]);
 
   if (isLoading) return <Loading />;
   if (!booking) return <p>Booking not found.</p>;
@@ -61,10 +141,9 @@ export default function BookingPage({
         if (sp.dates && sp.dates.length > 0) {
           const target = currentDate.toISOString().split("T")[0];
           if (
-            sp.dates.some((d: string) => {
-              const dStr = new Date(d).toISOString().split("T")[0];
-              return dStr === target;
-            })
+            sp.dates.some(
+              (d: string) => new Date(d).toISOString().split("T")[0] === target
+            )
           ) {
             priceForNight = Number(sp.price);
             isSeasonal = true;
@@ -91,12 +170,10 @@ export default function BookingPage({
   }
 
   const roomCost = seasonalCost + regularCost;
-
   const breakfastCost =
     booking.room_types.has_breakfast && booking.add_breakfast
       ? booking.room_types.breakfast_price * quantity * nights
       : 0;
-
   const computedTotal = roomCost + breakfastCost;
 
   return (
@@ -128,10 +205,10 @@ export default function BookingPage({
                 Reservasi yang sudah dibuat tidak dapat di-refund
               </p>
             </div>
-            <div className="border-b-[1px] my-6"></div>
-            <div className="flex gap-4 mb-2 items-center">
+            <div className="border-b-[1px] my-4"></div>
+            <div className="flex gap-4 items-center">
               <LuCalendarClock className="text-9xl text-red-700" />
-              <p className="font-semibold">
+              <p className="font-semibold text-sm">
                 Reservasi Anda tidak akan terkonfirmasi hingga Tenant menerima
                 permohonan Anda (dalam waktu 24 jam) khusus untuk pembayaran
                 manual.{" "}
@@ -140,14 +217,56 @@ export default function BookingPage({
                 </span>
               </p>
             </div>
+            <div className="flex gap-4 mb-2 items-center">
+              <RiSecurePaymentFill className="text-5xl text-red-700" />
+              <p className="font-semibold text-sm">
+                Pembayaran menggunakan Midtrans akan langsung terkonfirmasi.
+              </p>
+            </div>
             <div className="border-b-[1px] my-6"></div>
-            <div>
+            {/* Payment Method Section */}
+            <div className="flex flex-col mb-2">
               <div className="flex justify-between mb-2">
                 <p className="font-semibold">Metode Pembayaran</p>
-                <p>{booking.payment_method}</p>
+                <p>
+                  {booking.payment_method ||
+                    selectedPaymentMethod ||
+                    "Belum Dipilih"}
+                </p>
               </div>
-              {booking.payment_method === "Manual" && (
+              {!booking.payment_method && (
+                <div className="flex mb-4 w-full justify-around mt-2">
+                  <button
+                    onClick={() => setSelectedPaymentMethod("Manual")}
+                    className={`px-4 py-2 rounded-l w-full border ${
+                      selectedPaymentMethod === "Manual"
+                        ? "text-rose-700 font-semibold hover:text-rose-500 bg-gray-100 hover:bg-gray-200"
+                        : "text-black"
+                    }`}
+                  >
+                    Manual
+                  </button>
+                  <button
+                    onClick={() => setSelectedPaymentMethod("Midtrans")}
+                    className={`px-4 py-2 rounded-r w-full border ${
+                      selectedPaymentMethod === "Midtrans"
+                        ? " text-rose-700 font-semibold hover:text-rose-500 bg-gray-100 hover:bg-gray-200"
+                        : " text-black"
+                    }`}
+                  >
+                    Midtrans
+                  </button>
+                </div>
+              )}
+              {selectedPaymentMethod === "Manual" && (
                 <PaymentProofUpload bookingId={booking.id} />
+              )}
+              {selectedPaymentMethod === "Midtrans" && (
+                <div className="my-4">
+                  <p className="font-semibold text-gray-600">
+                    Redirecting to Midtrans payment gateway...
+                  </p>
+                </div>
               )}
             </div>
             <div className="border-b-[1px] my-6"></div>
@@ -162,71 +281,23 @@ export default function BookingPage({
               </p>
             </div>
           </div>
-
-          <div className="flex-1 border border-gray-400 rounded-xl h-fit p-4 sticky z-10 top-28">
-            <div className="flex gap-6 items-center">
-              <div className="relative w-28 h-28 mb-4">
-                <Image
-                  src={booking.room_types.RoomImages[0].image_url}
-                  alt={booking.room_types.name}
-                  layout="fill"
-                  className="object-cover rounded-lg"
-                />
-              </div>
-              <div className="flex flex-col w-[375px]">
-                <h2 className="text-lg font-bold">{booking.room_types.name}</h2>
-                <div className="border-b-[1px] border-gray-400 mb-4"></div>
-                <h3 className="font-semibold">Detail Harga</h3>
-                {seasonalNights > 0 || regularNights > 0 ? (
-                  <div className="mb-4 space-y-1">
-                    {regularNights > 0 && (
-                      <p className="text-sm">
-                        {formatCurrency(booking.room_types.price)} x {quantity}{" "}
-                        kamar x {regularNights} malam (Harga Reguler)
-                      </p>
-                    )}
-                    {seasonalNights > 0 && (
-                      <p className="text-sm">
-                        {booking.room_types.seasonal_prices &&
-                        booking.room_types.seasonal_prices[0]
-                          ? formatCurrency(
-                              Number(
-                                booking.room_types.seasonal_prices[0].price
-                              )
-                            )
-                          : formatCurrency(booking.room_types.price)}{" "}
-                        x {quantity} kamar x {seasonalNights} malam (Harga
-                        Musiman)
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <p className="mb-4">
-                    {formatCurrency(booking.room_types.price)} x {quantity}{" "}
-                    kamar x {nights} malam
-                  </p>
-                )}
-                <div className="border-b-[1px] border-gray-400 mb-4"></div>
-                <div className="space-y-2">
-                  <p>
-                    <span>Biaya Kamar: </span> {formatCurrency(roomCost)}
-                  </p>
-                  {booking.room_types.has_breakfast &&
-                    booking.add_breakfast && (
-                      <p>
-                        <span>Biaya Sarapan: </span>{" "}
-                        {formatCurrency(breakfastCost)}
-                      </p>
-                    )}
-                  <p className="font-bold">
-                    Total: {formatCurrency(computedTotal)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BookingDetails
+            booking={booking}
+            seasonalNights={seasonalNights}
+            regularNights={regularNights}
+            quantity={quantity}
+            nights={nights}
+            roomCost={roomCost}
+            breakfastCost={breakfastCost}
+            computedTotal={computedTotal}
+          />
         </div>
       </div>
     </div>
   );
 }
+
+export default withGuard(BookingPage, {
+  requiredRole: "user",
+  redirectTo: "/not-authorized",
+});

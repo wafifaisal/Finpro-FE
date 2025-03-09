@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import { uploadPaymentProof } from "@/libs/booking";
+import { uploadPaymentProof } from "@/libs/payment";
 import { useRouter } from "next/navigation";
 
 interface FormValues {

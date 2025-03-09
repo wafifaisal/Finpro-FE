@@ -103,7 +103,7 @@ export default function BookingManagementPage() {
   return (
     <div className="min-h-screen bg-white">
       <TripsNavbar />
-      <div className="flex pt-0 md:pt-24">
+      <div className="flex">
         <SideBar />
         <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
           <div className="main-content flex flex-col p-4 md:p-8 mb-20">
