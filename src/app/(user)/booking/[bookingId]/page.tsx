@@ -13,6 +13,26 @@ import { getSnapToken, midtransWebHook } from "@/libs/payment";
 import withGuard from "@/hoc/pageGuard";
 import { RiSecurePaymentFill } from "react-icons/ri";
 
+declare global {
+  interface Window {
+    snap?: {
+      pay: (
+        snapToken: string,
+        options: {
+          onSuccess: (result: MidtransSnapResult) => void;
+          onPending: (result: MidtransSnapResult) => void;
+          onError: (result: MidtransSnapResult) => void;
+          onClose: () => void;
+        }
+      ) => void;
+    };
+  }
+}
+interface MidtransSnapResult {
+  transaction_status: string;
+  order_id: string;
+}
+
 function BookingPage({ params }: { params: { bookingId: string } }) {
   const [booking, setBooking] = useState<IBooking | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +41,7 @@ function BookingPage({ params }: { params: { bookingId: string } }) {
   >(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && !(window as any).snap) {
+    if (typeof window !== "undefined" && !window.snap) {
       const script = document.createElement("script");
       script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
       script.type = "text/javascript";
@@ -56,16 +76,15 @@ function BookingPage({ params }: { params: { bookingId: string } }) {
         try {
           const quantity = booking.quantity || 1;
           const snapToken = await getSnapToken(booking.id, quantity);
-          if (typeof window !== "undefined" && (window as any).snap) {
-            (window as any).snap.pay(snapToken, {
-              onSuccess: async function (result: any) {
+          if (typeof window !== "undefined" && window.snap) {
+            window.snap.pay(snapToken, {
+              onSuccess: async function (result: MidtransSnapResult) {
                 console.log("Payment success", result);
                 try {
                   await midtransWebHook(
                     result.transaction_status,
                     result.order_id
                   );
-                  // Optionally, redirect or display a success message here
                 } catch (webhookError) {
                   console.error(
                     "Error calling midtrans webhook:",
@@ -73,10 +92,10 @@ function BookingPage({ params }: { params: { bookingId: string } }) {
                   );
                 }
               },
-              onPending: function (result: any) {
+              onPending: function (result: MidtransSnapResult) {
                 console.log("Payment pending", result);
               },
-              onError: function (result: any) {
+              onError: function (result: MidtransSnapResult) {
                 console.log("Payment error", result);
               },
               onClose: function () {

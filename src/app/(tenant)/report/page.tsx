@@ -39,14 +39,12 @@ const ReportPage = () => {
 
   const tenantId = tenant.id;
 
-  // Set default dates: start is one month before today, end is today.
   const today = dayjs();
   const defaultStartDate = today.subtract(1, "month").toDate();
   const defaultEndDate = today.toDate();
 
-  // We'll use aggregated data for the chart.
   const [salesData, setSalesData] = useState<AggregatedSalesData[]>([]);
-  const [sortBy, setSortBy] = useState<"date" | "total_penjualan">("date");
+  const sortBy: "date" | "total_penjualan" = "date";
   const [dateRange, setDateRange] = useState<[Date, Date]>([
     defaultStartDate,
     defaultEndDate,
@@ -140,13 +138,11 @@ const ReportPage = () => {
                 />
                 <YAxis
                   tickFormatter={(tick) => formatCurrency(tick)}
-                  tick={<CustomizedYAxisTick />}
+                  tick={(props) => <CustomizedYAxisTick {...props} />}
                   className="text-sm"
                 />
                 <Tooltip
-                  formatter={(value: any) =>
-                    typeof value === "number" ? formatCurrency(value) : value
-                  }
+                  formatter={(value: number) => formatCurrency(value)}
                   labelFormatter={(label) => formatDate(label, "MMMM dd, yyyy")}
                 />
                 <Legend />

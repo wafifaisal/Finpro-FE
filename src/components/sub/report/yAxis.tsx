@@ -1,4 +1,12 @@
-export const CustomizedYAxisTick = (props: any) => {
+interface CustomizedYAxisTickProps {
+  x: number;
+  y: number;
+  payload: {
+    value: string;
+  };
+}
+
+export const CustomizedYAxisTick = (props: CustomizedYAxisTickProps) => {
   const { x, y, payload } = props;
   const text = payload.value;
   const threshold = 9;
