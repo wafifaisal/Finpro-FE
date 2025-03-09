@@ -46,8 +46,8 @@ const BookingCard: React.FC<BookingCardProps> = (props) => {
         />
         {bookingUnavailable && (
           <p className="text-red-500 font-semibold mb-2">
-            Salah satu tipe kamar yang dipilih melebihi ketersediaan untuk
-            tanggal yang dipilih.
+            Salah satu tipe kamar pada tanggal yang dipilih sedang tidak
+            tersedia.
           </p>
         )}
         <button
