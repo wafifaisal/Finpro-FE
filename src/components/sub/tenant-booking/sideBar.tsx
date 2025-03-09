@@ -9,12 +9,12 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="main-content w-[30%] flex flex-col items-end gap-4">
+    <div className="main-content w-[20%] min-h-screen flex flex-col items-center gap-4 bg-gray-100">
       <Link
         className={`flex gap-2 font-semibold w-44 p-2 rounded-md ${
           pathname === "/booking-management"
-            ? "bg-gray-100 text-red-500 hover:text-red-700"
-            : "text-gray-800"
+            ? "text-red-500 hover:text-red-700 border-b-2 border-red-500"
+            : "text-gray-800 border-b-2 border-gray-800"
         }`}
         href="/booking-management"
       >
@@ -23,10 +23,10 @@ export default function Sidebar() {
       </Link>
 
       <Link
-        className={`flex gap-2 font-semibold w-44 p-2 rounded-md ${
+        className={`flex justify-center gap-2 font-semibold w-44 p-2 rounded-md ${
           pathname === "/tenant-review"
-            ? "bg-gray-100 text-red-500 hover:text-red-700"
-            : "text-gray-800"
+            ? "text-red-500 hover:text-red-700 border-b-2 border-red-500"
+            : "text-gray-800 border-b-2 border-gray-800"
         }`}
         href="/tenant-review"
       >
@@ -35,10 +35,10 @@ export default function Sidebar() {
       </Link>
 
       <Link
-        className={`flex gap-2 font-semibold w-44 p-2 rounded-md ${
+        className={`flex justify-center gap-2 font-semibold w-44 p-2 rounded-md ${
           pathname === "/report"
-            ? "bg-gray-100 text-red-500 hover:text-red-700"
-            : "text-gray-800"
+            ? "text-red-500 hover:text-red-700 border-b-2 border-red-500"
+            : "text-gray-800 border-b-2 border-gray-800"
         }`}
         href="/report"
       >

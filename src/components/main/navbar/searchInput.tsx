@@ -99,7 +99,7 @@ export default function useSearchbar() {
         };
       });
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());

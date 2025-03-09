@@ -104,7 +104,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
     if (sortBy && sortOrder) {
       setSortOption(`${sortBy}-${sortOrder}`);
     }
-  }, []);
+  }, [searchParams]);
 
   const handleSliderChange = (newValue: [number, number]) => {
     setSliderValue(newValue);

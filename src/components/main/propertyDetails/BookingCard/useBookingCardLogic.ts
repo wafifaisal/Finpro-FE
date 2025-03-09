@@ -170,6 +170,7 @@ export const useBookingCardLogic = ({
 
       const newBooking = await createBooking(bookingData);
       console.log("Booking successful:", newBooking);
+      router.push(`/booking/${newBooking.id}`);
     } catch (error) {
       console.error("Booking failed:", error);
     }

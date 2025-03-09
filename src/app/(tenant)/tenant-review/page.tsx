@@ -40,7 +40,7 @@ function TenantReviewPage() {
       }
     }
     fetchReviews();
-  }, [tenant?.id]);
+  }, [tenant]);
 
   const handleReplyChange = (reviewId: number, value: string) => {
     setReply((prev) => ({ ...prev, [reviewId]: value }));
