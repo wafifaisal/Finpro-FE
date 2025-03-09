@@ -14,6 +14,7 @@ import {
   FaFileInvoiceDollar,
 } from "react-icons/fa";
 import Image from "next/image";
+import { IoMdAnalytics } from "react-icons/io";
 
 export default function TenantAvatar() {
   const { isAuth, tenant, logout } = useSession();
@@ -144,13 +145,18 @@ export default function TenantAvatar() {
             />
             <MenuItem
               icon={<FaFileInvoiceDollar className="text-gray-600" />}
-              label="Proses Pembayaran"
+              label="Manajemen Reservasi"
               onClick={() => navigateTo("/booking-management")}
             />
             <MenuItem
               icon={<FaBell className="text-gray-600" />}
               label="Notifikasi"
               onClick={() => navigateTo("/tenant-review")}
+            />
+            <MenuItem
+              icon={<IoMdAnalytics className="text-gray-600" />}
+              label="Laporan & Analisis"
+              onClick={() => navigateTo("/tenant-report")}
             />
             <MenuItem
               icon={<FaUserCircle className="text-gray-600" />}

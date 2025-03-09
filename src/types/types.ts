@@ -1,3 +1,5 @@
+import { IReviewReplies } from "./review";
+
 export interface Location {
   city: string;
   country: string;
@@ -26,6 +28,7 @@ export interface Review {
     username: string;
     email: string;
   };
+  reply?: IReviewReplies | null;
 }
 
 export interface Unavailable {

@@ -53,9 +53,18 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews, itemsPerPage = 5 }) => {
               </div>
             </div>
             <div
-              className="mt-2"
+              className="text-gray-600 mt-2"
               dangerouslySetInnerHTML={{ __html: review.review }}
             ></div>
+            {review.reply && (
+              <div className="mt-4 p-2 bg-gray-100 rounded">
+                <p className="text-sm font-medium">Tenant Reply:</p>
+                <div
+                  className="text-gray-600 mt-1"
+                  dangerouslySetInnerHTML={{ __html: review.reply?.reply }}
+                ></div>
+              </div>
+            )}
           </div>
         ))
       ) : (
