@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { getReviewsByTenant, createReviewReply } from "@/libs/tenantReview";
 import { IReview } from "@/types/review";
 import SideBar from "@/components/sub/tenant-booking/sideBar";
@@ -105,20 +106,58 @@ function TenantReviewPage() {
             ) : (
               reviews.map((review) => (
                 <div key={review.id} className="border p-4 rounded-lg mb-4">
+                  {review.propertyName && (
+                    <p className="text-lg font-bold mb-1">
+                      {review.propertyName}
+                    </p>
+                  )}
+                  {review.user && (
+                    <div className="flex items-center mb-2 border-b-[1px] pb-2">
+                      {review.user.avatar && (
+                        <Image
+                          src={review.user.avatar}
+                          alt={review.user.name}
+                          width={32}
+                          height={32}
+                          className="rounded-full mr-2"
+                        />
+                      )}
+                      <span className="text-sm font-semibold">
+                        {review.user.name}
+                      </span>
+                    </div>
+                  )}
                   <p
-                    className="font-semibold"
-                    dangerouslySetInnerHTML={{
-                      __html: review.review,
-                    }}
+                    dangerouslySetInnerHTML={{ __html: review.review }}
+                    className="text-sm text-gray-600 font-semibold"
                   ></p>
-                  <p className="text-gray-600 text-sm">
-                    Rating: {review.rating}/5
-                  </p>
+                  {/* Star rating display */}
+                  <div className="flex items-center my-2">
+                    {Array.from({ length: review.rating }).map((_, index) => (
+                      <span key={index} className="text-rose-500 text-xl">
+                        ★
+                      </span>
+                    ))}
+                    {Array.from({ length: 5 - review.rating }).map(
+                      (_, index) => (
+                        <span key={index} className="text-gray-300 text-xl">
+                          ★
+                        </span>
+                      )
+                    )}
+                    <span className="ml-2 text-sm text-gray-600">
+                      ({review.rating}/5)
+                    </span>
+                  </div>
 
                   {review.reply ? (
                     <div className="mt-2 p-2 bg-gray-100 rounded">
-                      <p className="text-sm text-gray-800">Tenant Reply:</p>
-                      <p className="text-gray-600">{review.reply.reply}</p>
+                      <p className="text-sm text-gray-800 font-semibold">
+                        Balasan:
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {review.reply.reply}
+                      </p>
                     </div>
                   ) : (
                     <>
