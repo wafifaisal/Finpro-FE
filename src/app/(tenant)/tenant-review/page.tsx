@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import withGuard from "@/hoc/pageGuard";
 import { useSession } from "@/context/useSessionHook";
+import Swal from "sweetalert2";
 
 function TenantReviewPage() {
   const { tenant } = useSession();
@@ -54,7 +55,11 @@ function TenantReviewPage() {
 
     try {
       if (!tenant) {
-        alert("Tenant information is missing.");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Tenant information is missing.",
+        });
         return;
       }
       const newReply = await createReviewReply(
@@ -72,10 +77,18 @@ function TenantReviewPage() {
       );
 
       setReply((prev) => ({ ...prev, [selectedReviewId]: "" }));
-      alert("Reply submitted successfully!");
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Reply submitted successfully!",
+      });
     } catch (error) {
       console.error("Error submitting reply:", error);
-      alert("Failed to submit reply.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to submit reply.",
+      });
     } finally {
       setSubmitting((prev) => ({ ...prev, [selectedReviewId]: false }));
       setIsDialogOpen(false);
