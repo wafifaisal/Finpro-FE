@@ -7,6 +7,13 @@ import { ICreateBooking } from "@/types/booking";
 import { useSession } from "@/context/useSessionHook";
 import { BookingCardProps } from "./interfaceBookingCard";
 
+const getLocalDateString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  const day = ("0" + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+};
+
 export const useBookingCardLogic = ({
   property,
   checkIn,
@@ -49,7 +56,6 @@ export const useBookingCardLogic = ({
             (1000 * 60 * 60 * 24)
         )
       : 0;
-
   const getMinAvailability = useCallback(
     (roomId: number): number => {
       const room = property.RoomTypes.find((rt) => rt.id === roomId);
@@ -63,17 +69,35 @@ export const useBookingCardLogic = ({
         current.setDate(current.getDate() + 1);
       }
 
-      dates.forEach((date) => {
-        const dateStr = date.toISOString().split("T")[0];
-        const record = room.RoomAvailability?.find((ra) => {
-          const raDateStr = new Date(ra.date).toISOString().split("T")[0];
-          return raDateStr === dateStr;
-        });
-        const availForDate = record ? record.availableCount : room.stock;
-        if (availForDate < minAvail) {
-          minAvail = availForDate;
+      for (const date of dates) {
+        const dateStr = getLocalDateString(date);
+        if (room.Unavailable && room.Unavailable.length > 0) {
+          const isUnavailable = room.Unavailable.some((unavail) => {
+            const startStr = getLocalDateString(new Date(unavail.start_date));
+            const endStr = getLocalDateString(new Date(unavail.end_date));
+            return dateStr >= startStr && dateStr <= endStr;
+          });
+          if (isUnavailable) {
+            minAvail = 0;
+            break;
+          }
         }
-      });
+
+        if (room.RoomAvailability && room.RoomAvailability.length > 0) {
+          const record = room.RoomAvailability.find((ra) => {
+            const raDateStr = getLocalDateString(new Date(ra.date));
+            return raDateStr === dateStr;
+          });
+          const availForDate = record ? record.availableCount : room.stock;
+          if (availForDate < minAvail) {
+            minAvail = availForDate;
+          }
+        } else {
+          if (room.stock < minAvail) {
+            minAvail = room.stock;
+          }
+        }
+      }
       return minAvail;
     },
     [property.RoomTypes, checkInDate, checkOutDate]
@@ -104,9 +128,9 @@ export const useBookingCardLogic = ({
         roomType.seasonal_prices &&
         roomType.seasonal_prices.find((sp) => {
           if (sp.dates && sp.dates.length > 0) {
-            const target = checkInDate.toISOString().split("T")[0];
+            const target = getLocalDateString(checkInDate);
             return sp.dates.some((d: string) => {
-              const dStr = new Date(d).toISOString().split("T")[0];
+              const dStr = getLocalDateString(new Date(d));
               return dStr === target;
             });
           } else if (sp.start_date && sp.end_date) {
