@@ -102,7 +102,7 @@ function ReviewPage() {
                       <p>Anda menulis</p>
                     </div>
                     <div className="flex gap-2 text-sm mt-8">
-                      <p className="text-white bg-yellow-500 rounded-l-3xl rounded-tr-3xl w-8 h-8 text-center content-center">
+                      <p className="text-white bg-yellow-500 rounded-l-3xl rounded-tr-3xl w-8 h-8 p-2 text-center content-center">
                         {booking.Review[0]?.rating}/5
                       </p>
                       <p

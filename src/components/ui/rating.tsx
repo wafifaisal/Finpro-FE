@@ -16,7 +16,7 @@ export default function Rating({ setFieldValue, values }: RatingProps) {
         <Star
           key={star}
           className={`cursor-pointer w-8 h-8 ${
-            star <= values ? "text-yellow-400" : "text-gray-300"
+            star <= values ? "text-rose-500" : "text-gray-300"
           }`}
           onClick={() => handleRating(star)}
         />

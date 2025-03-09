@@ -21,12 +21,15 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useSession } from "@/context/useSessionHook";
+import withGuard from "@/hoc/pageGuard";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
-export default function CreateReviewPage() {
+function CreateReviewPage() {
   const { bookingId } = useParams();
   const router = useRouter();
+  const session = useSession();
   const [booking, setBooking] = useState<IBooking | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,8 +54,13 @@ export default function CreateReviewPage() {
   const handleAdd = async (values: { rating: number; description: string }) => {
     try {
       setIsLoading(true);
+      const userId = session?.user?.id;
+      if (!userId) {
+        toast.error("User not authenticated");
+        return;
+      }
       await submitReview({
-        userId: "2cc09e1c-6cfa-4c7a-8a37-b7b3b3399260",
+        userId,
         bookingId: bookingId as string,
         rating: values.rating,
         comment: values.description,
@@ -193,3 +201,8 @@ export default function CreateReviewPage() {
     </div>
   );
 }
+
+export default withGuard(CreateReviewPage, {
+  requiredRole: "user",
+  redirectTo: "/not-authorized",
+});
