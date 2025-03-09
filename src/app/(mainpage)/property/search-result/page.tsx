@@ -146,7 +146,7 @@ export default function SearchResultPage() {
 
   return (
     <>
-      <div className="container mx-auto p-4 py-48">
+      <div className="container mx-auto p-4 py-28 md:py-48">
         {loading ? (
           <LoadingSkeleton userLocation={userLocation} />
         ) : properties.length === 0 ? (

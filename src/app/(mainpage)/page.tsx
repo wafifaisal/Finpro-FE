@@ -29,7 +29,7 @@ const HomePage = () => {
   const searchParams = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 10);
   }, []);
 
   useEffect(() => {

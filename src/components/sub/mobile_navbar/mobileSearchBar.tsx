@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, X, Plus, Minus, Loader } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -8,8 +8,10 @@ import { usePathname } from "next/navigation";
 const MobileSearchBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
   const pathname = usePathname();
-
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const suggestionRef = useRef<HTMLUListElement | null>(null);
   const {
     searchValues,
     setSearchValues,
@@ -27,17 +29,27 @@ const MobileSearchBar = () => {
     }
   }, [pathname]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent): void {
+      if (
+        suggestionRef.current &&
+        !suggestionRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setIsLocationOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleSearchClick = async () => {
     setLoading(true);
     await handleSearch();
     setIsExpanded(false);
     setLoading(false);
   };
-
-  const isSearchDisabled = Object.values(searchValues).some(
-    (value) => value === "" || value === null
-  );
-
   return (
     <div className="md:hidden">
       <div className="fixed top-0 left-0 right-0 z-40 p-4">
@@ -47,7 +59,9 @@ const MobileSearchBar = () => {
         >
           <div className="flex items-center space-x-3">
             <Search size={20} className="text-gray-600" />
-            <span className="text-gray-600">Mau Kemana Hari Ini?</span>
+            <span className="text-gray-600">
+              {searchValues.where ? searchValues.where : "Mau Kemana Hari Ini?"}
+            </span>
           </div>
         </button>
       </div>
@@ -67,23 +81,32 @@ const MobileSearchBar = () => {
               <div className="bg-gray-100 rounded-lg p-3">
                 <label className="text-xs text-gray-600">Lokasi</label>
                 <input
+                  ref={inputRef}
                   type="text"
                   placeholder="Masukkan lokasi"
                   value={searchValues.where}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setSearchValues((prev) => ({
                       ...prev,
                       where: e.target.value,
-                    }))
-                  }
+                    }));
+                    setIsLocationOpen(true);
+                  }}
+                  onFocus={() => setIsLocationOpen(true)}
                   className="w-full outline-none bg-transparent text-sm mt-1"
                 />
-                {suggestions.length > 0 && (
-                  <ul className="mt-2 bg-white border rounded-md shadow-md">
+                {isLocationOpen && suggestions.length > 0 && (
+                  <ul
+                    ref={suggestionRef}
+                    className="mt-2 bg-white border rounded-md shadow-md"
+                  >
                     {suggestions.map((suggestion, index) => (
                       <li
                         key={index}
-                        onClick={() => handleSuggestionClick(suggestion)}
+                        onClick={() => {
+                          handleSuggestionClick(suggestion);
+                          setIsLocationOpen(false);
+                        }}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       >
                         {highlightMatch(suggestion, searchValues.where)}
@@ -145,12 +168,11 @@ const MobileSearchBar = () => {
                   </button>
                 </div>
               </div>
-
               <button
                 onClick={handleSearchClick}
-                disabled={isSearchDisabled || loading}
+                disabled={loading}
                 className={`w-full py-3 rounded-lg flex items-center justify-center space-x-2 ${
-                  isSearchDisabled || loading
+                  loading
                     ? "bg-gray-300 text-gray-500"
                     : "bg-red-500 text-white"
                 }`}
@@ -174,5 +196,4 @@ const MobileSearchBar = () => {
     </div>
   );
 };
-
 export default MobileSearchBar;

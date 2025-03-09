@@ -1,4 +1,3 @@
-// components/PriceRangeSlider.tsx
 "use client";
 import React from "react";
 import { formatCurrency } from "../../../helpers/formatCurrency";

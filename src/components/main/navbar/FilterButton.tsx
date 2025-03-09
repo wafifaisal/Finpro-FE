@@ -1,28 +1,35 @@
 "use client";
-import React, { useState } from "react";
-import FilterModal from "./FilterModal"; // Ensure the path is correct
+import React, { useState, useEffect } from "react";
+import FilterModal from "./FilterModal";
+import FilterModalMobile from "@/components/sub/mobile_navbar/FilterModalMobile";
 
-// Define a type for the data received from the backend
-interface FilterData {
-  totalPages: number;
-  currentPage: number;
-  limit: number;
-  result: unknown[];
+interface FilterButtonProps {
+  onOpen?: () => void;
 }
 
-const FilterButton: React.FC = () => {
+const FilterButton: React.FC<FilterButtonProps> = ({ onOpen }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
 
-  const handleApplyFilters = (data: FilterData) => {
-    console.log("Properties fetched:", data);
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  const handleOpenModal = () => {
+    if (onOpen) onOpen();
+    setIsModalOpen(true);
   };
+
+  const handleCloseModal = () => setIsModalOpen(false);
 
   return (
     <>
-      {/* Airbnb-style filter button */}
       <button
         onClick={handleOpenModal}
         className="flex items-center gap-2 px-4 py-2 border rounded-full shadow hover:bg-gray-100 transition"
@@ -49,9 +56,12 @@ const FilterButton: React.FC = () => {
         <span className="text-gray-700 font-medium">Filter</span>
       </button>
 
-      {isModalOpen && (
-        <FilterModal onClose={handleCloseModal} onApply={handleApplyFilters} />
-      )}
+      {isModalOpen &&
+        (isMobile ? (
+          <FilterModalMobile onClose={handleCloseModal} />
+        ) : (
+          <FilterModal onClose={handleCloseModal} />
+        ))}
     </>
   );
 };

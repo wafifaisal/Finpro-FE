@@ -40,6 +40,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formik }) => {
           </label>
           <input
             {...formik.getFieldProps("category")}
+            placeholder="mis :Hotel, Villa, Apartmen, Resor, Guest House"
             className={`w-full px-4 py-3 rounded-lg border ${
               formik.touched.category && formik.errors.category
                 ? "border-rose-500"

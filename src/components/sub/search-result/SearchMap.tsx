@@ -9,7 +9,6 @@ import { formatCurrency, getValidCoordinate } from "@/libs/maps";
 import { PropertyList, UserLocation } from "@/types/types";
 import "leaflet/dist/leaflet.css";
 
-// Konfigurasi ikon default Leaflet
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
@@ -19,11 +18,9 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// Komponen untuk mengubah tampilan peta (center) secara dinamis
 function ChangeMapView({ center }: { center: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    // Memindahkan peta ke lokasi center baru dengan animasi
     map.setView(center, map.getZoom(), { animate: true });
   }, [center, map]);
   return null;
@@ -38,7 +35,6 @@ const PropertyMap = ({
   userLocation: UserLocation;
   router: ReturnType<typeof useRouter>;
 }) => {
-  // Panggil hook secara unconditional terlebih dahulu.
   const defaultCenter: [number, number] = useMemo(() => {
     for (const property of properties) {
       const lat = getValidCoordinate(property.location.latitude);
@@ -57,14 +53,11 @@ const PropertyMap = ({
     return [0, 0];
   }, [userLocation, properties]);
 
-  // Lakukan early return setelah semua hook terpanggil.
   if (properties.length === 0) return null;
 
-  // Ambil parameter dari URL (misalnya untuk checkIn/checkOut)
   const searchParams = new URLSearchParams(window.location.search);
   const checkInParam = searchParams.get("checkIn") || "";
   const checkOutParam = searchParams.get("checkOut") || "";
-
   const searchStart = checkInParam ? new Date(checkInParam) : new Date();
   const searchEnd = checkOutParam
     ? new Date(checkOutParam)
@@ -78,7 +71,6 @@ const PropertyMap = ({
         scrollWheelZoom={true}
         style={{ height: "470px", width: "100%" }}
       >
-        {/* Komponen ini akan memindahkan peta ke defaultCenter setiap kali berubah */}
         <ChangeMapView center={defaultCenter} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -48,6 +48,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
     const interval = setInterval(fetchRoomDetail, 3000);
     return () => clearInterval(interval);
   }, [room.id, base_url]);
+
   const [facilitiesExpanded, setFacilitiesExpanded] = useState(false);
   const toggleFacilities = () => setFacilitiesExpanded((prev) => !prev);
   const facilities = effectiveRoom.facilities || [];
@@ -55,6 +56,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
     ? facilities
     : facilities.slice(0, 5);
   const bookingDate = useMemo(() => new Date(selectedDate), [selectedDate]);
+
   const availableCountFromAvailability = useMemo(() => {
     if (
       effectiveRoom.RoomAvailability &&
@@ -71,6 +73,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
     }
     return effectiveRoom.stock;
   }, [effectiveRoom, bookingDate]);
+
   const isDateUnavailable = useMemo(() => {
     if (effectiveRoom.Unavailable && effectiveRoom.Unavailable.length > 0) {
       const selectedDateStr = bookingDate.toISOString().split("T")[0];
@@ -82,11 +85,20 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
     }
     return false;
   }, [effectiveRoom, bookingDate]);
+
   const availableCount = isDateUnavailable ? 0 : availableCountFromAvailability;
   const roomUnavailable = availableCount <= 0;
+
   return (
     <div className="mb-12 pb-12 border-b last:border-b-0">
       <div className="relative w-full mb-6 group">
+        {roomUnavailable && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <p className="text-white text-xl font-bold">
+              Kamar ini tidak tersedia
+            </p>
+          </div>
+        )}
         <Swiper
           modules={[Navigation, Pagination]}
           pagination={{
@@ -141,7 +153,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
             </div>
             {(availableCount <= 0 || roomUnavailable) && (
               <p className="mt-2 text-red-500 font-semibold">
-                Property Tidak Tersedia
+                Kamar Tidak Tersedia
               </p>
             )}
           </div>

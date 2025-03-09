@@ -1,4 +1,3 @@
-// components/PriceRangeFilter.tsx
 import React from "react";
 import PriceRangeSlider from "./priceRangeSlider";
 

@@ -169,10 +169,23 @@ export const useBookingCardLogic = ({
       };
 
       const newBooking = await createBooking(bookingData);
-      console.log("Booking successful:", newBooking);
+
+      Swal.fire({
+        icon: "success",
+        title: "Booking berhasil!",
+        text: "Pemesanan Anda berhasil dibuat.",
+      });
       router.push(`/booking/${newBooking.id}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Booking failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Booking gagal",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Pesanan lebih banyak dari jumlah kamar tersedia",
+      });
     }
   };
 

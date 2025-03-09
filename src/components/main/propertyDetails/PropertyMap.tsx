@@ -1,4 +1,3 @@
-// components/main/propertyDetails/PropertyMap.tsx
 "use client";
 
 import React from "react";

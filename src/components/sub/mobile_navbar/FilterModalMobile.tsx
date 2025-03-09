@@ -2,15 +2,15 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchPriceRange } from "../../../helpers/property";
-import FilterModalHeader from "./FilterModalHeader";
-import FilterModalFooter from "./FilterModalFooter";
-import PropertyNameFilter from "./PropertyNameFilter";
-import PriceRangeFilter from "./PriceRangeFilter";
-import RoomFacilitiesFilter from "./RoomFacilitiesFilter";
-import PropertyFacilitiesFilter from "./PropertyFacilitiesFilter";
-import SortOptionsFilter from "./SortOptionsFilter";
+import FilterModalHeader from "@/components/main/navbar/FilterModalHeader";
+import PropertyNameFilter from "@/components/main/navbar/PropertyNameFilter";
+import PriceRangeFilter from "@/components/main/navbar/PriceRangeFilter";
+import RoomFacilitiesFilter from "@/components/main/navbar/RoomFacilitiesFilter";
+import PropertyFacilitiesFilter from "@/components/main/navbar/PropertyFacilitiesFilter";
+import SortOptionsFilter from "@/components/main/navbar/SortOptionsFilter";
+import FilterModalFooter from "@/components/main/navbar/FilterModalFooter";
 
-interface FilterModalProps {
+interface FilterModalMobileProps {
   onClose: () => void;
   onApply?: (data: {
     totalPages: number;
@@ -29,13 +29,12 @@ interface FilterModalProps {
   };
 }
 
-const FilterModal: React.FC<FilterModalProps> = ({
+const FilterModalMobile: React.FC<FilterModalMobileProps> = ({
   onClose,
   initialFilters,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryString = searchParams.toString();
 
   const initialPropertyName =
     searchParams.get("propertyName") || initialFilters?.propertyName || "";
@@ -51,7 +50,6 @@ const FilterModal: React.FC<FilterModalProps> = ({
     max: 1000,
   });
   const [isLoading, setIsLoading] = useState(true);
-
   const [selectedRoomFacilities, setSelectedRoomFacilities] = useState<
     string[]
   >(initialFilters?.roomFacilities || []);
@@ -70,15 +68,11 @@ const FilterModal: React.FC<FilterModalProps> = ({
         const defaultMin =
           minPriceQuery !== null
             ? parseInt(minPriceQuery, 10)
-            : initialFilters?.minPrice !== undefined
-            ? initialFilters.minPrice
-            : data.minPrice;
+            : initialFilters?.minPrice ?? data.minPrice;
         const defaultMax =
           maxPriceQuery !== null
             ? parseInt(maxPriceQuery, 10)
-            : initialFilters?.maxPrice !== undefined
-            ? initialFilters.maxPrice
-            : data.maxPrice;
+            : initialFilters?.maxPrice ?? data.maxPrice;
         setSliderValue([defaultMin, defaultMax]);
         setInputMin(String(defaultMin));
         setInputMax(String(defaultMax));
@@ -88,8 +82,9 @@ const FilterModal: React.FC<FilterModalProps> = ({
         setIsLoading(false);
       }
     };
+
     loadPriceRange();
-  }, [initialFilters, queryString, searchParams]);
+  }, [initialFilters, searchParams]);
 
   useEffect(() => {
     const roomFacilitiesQuery = searchParams.get("roomFacilities");
@@ -105,7 +100,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
     if (sortBy && sortOrder) {
       setSortOption(`${sortBy}-${sortOrder}`);
     }
-  }, [queryString, searchParams]);
+  }, [searchParams]);
 
   const handleSliderChange = (newValue: [number, number]) => {
     setSliderValue(newValue);
@@ -177,7 +172,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
   if (isLoading) {
     return (
-      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 h-screen -top-[87px]">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
         <div className="bg-white rounded-xl p-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
         </div>
@@ -186,10 +181,10 @@ const FilterModal: React.FC<FilterModalProps> = ({
   }
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 h-screen -top-[87px]">
-      <div className="bg-white rounded-xl shadow-xl w-11/12 max-w-2xl max-h-[60vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-50">
+      <div className="bg-white w-full rounded-t-2xl shadow-xl max-h-[90vh] overflow-hidden">
         <FilterModalHeader onClose={onClose} />
-        <div className="overflow-y-auto px-6 py-4 max-h-[calc(50vh-120px)]">
+        <div className="overflow-y-auto px-4 py-4 max-h-[calc(90vh-140px)]">
           <PropertyNameFilter
             propertyName={propertyName}
             setPropertyName={setPropertyName}
@@ -218,4 +213,4 @@ const FilterModal: React.FC<FilterModalProps> = ({
   );
 };
 
-export default FilterModal;
+export default FilterModalMobile;

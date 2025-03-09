@@ -4,7 +4,7 @@ import { useDebounce } from "use-debounce";
 import "react-datepicker/dist/react-datepicker.css";
 import { SearchValues, Property } from "../../../types/types";
 
-const formatDateLocal = (date: Date) => {
+const formatDateLocal = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -17,7 +17,6 @@ export default function useSearchbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [suggestions, setSuggestions] = useState<string[]>([]);
-
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
@@ -28,6 +27,7 @@ export default function useSearchbar() {
     checkOut: tomorrow,
     who: 1,
     dateRange: [today, tomorrow],
+    category: "",
   });
 
   const [text] = useDebounce(searchValues.where, 1000);
@@ -45,61 +45,28 @@ export default function useSearchbar() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      sessionStorage.setItem("scrollPos", window.scrollY.toString());
-      if (pathname !== "/") {
-        setIsScrolled(true);
+    if (pathname === "/") {
+      const savedScrollPos = sessionStorage.getItem("scrollPos");
+      if (savedScrollPos) {
+        const scrollPos = parseInt(savedScrollPos, 10);
+        window.scrollTo(0, scrollPos);
+        setIsScrolled(scrollPos > 0);
       } else {
-        setIsScrolled(window.scrollY > 0);
+        setIsScrolled(false);
       }
-    };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [pathname]);
+      const handleScroll = () => {
+        const scrollY = window.scrollY;
+        sessionStorage.setItem("scrollPos", scrollY.toString());
+        setIsScrolled(scrollY > 0);
+      };
 
-  useEffect(() => {
-    if (pathname !== "/") {
-      setIsScrolled(true);
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
     } else {
-      setIsScrolled(window.scrollY > 0);
+      setIsScrolled(true);
     }
   }, [pathname]);
-
-  useEffect(() => {
-    const whereQuery = searchParams.get("where");
-    const checkInQuery = searchParams.get("checkIn");
-    const checkOutQuery = searchParams.get("checkOut");
-    const whoQuery = searchParams.get("who");
-    const categoryQuery = searchParams.get("category"); // Ambil query "category"
-
-    if (
-      whereQuery ||
-      checkInQuery ||
-      checkOutQuery ||
-      whoQuery ||
-      categoryQuery
-    ) {
-      setSearchValues((prev) => {
-        const newCheckIn: Date = checkInQuery
-          ? new Date(checkInQuery)
-          : prev.checkIn || new Date();
-        const newCheckOut: Date = checkOutQuery
-          ? new Date(checkOutQuery)
-          : prev.checkOut || new Date();
-        return {
-          ...prev,
-          where: whereQuery || prev.where,
-          checkIn: newCheckIn,
-          checkOut: newCheckOut,
-          who: whoQuery ? parseInt(whoQuery, 10) : prev.who,
-          // Jika perlu, Anda bisa menyimpan category ke state juga, misalnya:
-          // category: categoryQuery || "",
-          dateRange: [newCheckIn, newCheckOut],
-        };
-      });
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -113,10 +80,16 @@ export default function useSearchbar() {
     } else {
       params.delete("checkOut");
     }
+    if (searchValues.category) {
+      params.set("category", String(searchValues.category));
+    } else {
+      params.delete("category");
+    }
     router.replace(`${pathname}?${params.toString()}`);
   }, [
     searchValues.checkIn,
     searchValues.checkOut,
+    searchValues.category,
     pathname,
     router,
     searchParams,
@@ -167,10 +140,8 @@ export default function useSearchbar() {
     if (searchValues.checkOut)
       params.append("checkOut", formatDateLocal(searchValues.checkOut));
     if (searchValues.who) params.append("who", searchValues.who.toString());
-    const categoryQuery = searchParams.get("category");
-    if (categoryQuery) {
-      params.append("category", categoryQuery);
-    }
+    if (searchValues.category)
+      params.append("category", String(searchValues.category));
 
     try {
       await fetch(`${base_url_be}/property?${params.toString()}`);
