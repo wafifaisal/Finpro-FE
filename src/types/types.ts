@@ -26,6 +26,14 @@ export interface Review {
     username: string;
     email: string;
   };
+  reply?: IReviewReplies | null;
+}
+
+export interface IReviewReplies {
+  id: number;
+  tenant_id: string;
+  review_id: number;
+  reply: string;
 }
 
 export interface Unavailable {
