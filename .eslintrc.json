@@ -9,7 +9,7 @@
         "varsIgnorePattern": "^_",
         "caughtErrorsIgnorePattern": "^_"
       }
-    ],
+    ]
   },
   "extends": ["next/core-web-vitals", "next/typescript"]
 }
