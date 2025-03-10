@@ -10,8 +10,8 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaHome,
-  FaBell,
   FaFileInvoiceDollar,
+  FaStar,
 } from "react-icons/fa";
 import Image from "next/image";
 import { IoMdAnalytics } from "react-icons/io";
@@ -149,8 +149,8 @@ export default function TenantAvatar() {
               onClick={() => navigateTo("/booking-management")}
             />
             <MenuItem
-              icon={<FaBell className="text-gray-600" />}
-              label="Notifikasi"
+              icon={<FaStar className="text-gray-600" />}
+              label="Ulasan"
               onClick={() => navigateTo("/tenant-review")}
             />
             <MenuItem

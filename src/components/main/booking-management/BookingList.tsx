@@ -3,7 +3,6 @@ import { IBooking, BookingStatus } from "@/types/booking";
 
 interface BookingListProps {
   bookings: IBooking[];
-  selectedTab: "ongoing" | "completed";
   selectedImage: string | null;
   onOpenConfirm: (bookingId: string, status: BookingStatus) => void;
   onCancelBooking: (bookingId: string) => void;
@@ -12,21 +11,12 @@ interface BookingListProps {
 
 export default function BookingList({
   bookings,
-  selectedTab,
   selectedImage,
   onOpenConfirm,
   onCancelBooking,
   handleResendEmail,
 }: BookingListProps) {
-  const filteredBookings =
-    selectedTab === "ongoing"
-      ? bookings.filter(
-          (booking) =>
-            booking.status === "new" || booking.status === "waiting_payment"
-        )
-      : bookings.filter((booking) => booking.status === "completed");
-
-  if (filteredBookings.length === 0) {
+  if (bookings.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="inline-block p-4 rounded-full bg-rose-50 mb-4">
@@ -49,8 +39,7 @@ export default function BookingList({
           Tidak ada reservasi yang ditemukan
         </h3>
         <p className="text-gray-500">
-          Saat ini, Anda tidak memiliki{" "}
-          {selectedTab === "ongoing" ? "pemesanan aktif" : "pemesanan selesai"}.
+          Saat ini, Anda tidak memiliki reservasi.
         </p>
       </div>
     );
@@ -58,7 +47,7 @@ export default function BookingList({
 
   return (
     <div className="grid gap-6">
-      {filteredBookings.map((booking) => (
+      {bookings.map((booking) => (
         <BookingItem
           key={booking.id}
           booking={booking}

@@ -14,7 +14,7 @@ export const useBookings = (tenantId: string | undefined) => {
     const fetchBookings = async () => {
       try {
         const data = await getTenantBooking(tenantId);
-        setBookings(data);
+        setBookings(data.bookings);
       } catch (err) {
         console.error("Error fetching bookings", err);
       } finally {

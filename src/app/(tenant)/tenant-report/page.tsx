@@ -56,10 +56,8 @@ const ReportPage = () => {
       const endDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
       console.log("Fetching data from:", startDate, "to", endDate);
 
-      // Get the raw sales report data.
       const data = await getSalesReport(tenantId, startDate, endDate, sortBy);
 
-      // Aggregate data: group by day (using the created_at date)
       const aggregated = data.reduce((acc, booking) => {
         const key = dayjs(booking.created_at).format("YYYY-MM-DD");
         if (!acc[key]) {
@@ -70,7 +68,6 @@ const ReportPage = () => {
       }, {} as Record<string, AggregatedSalesData>);
 
       const aggregatedData = Object.values(aggregated);
-      // Sort ascending so the earliest date appears on the left.
       aggregatedData.sort((a, b) =>
         dayjs(a.created_at).isAfter(dayjs(b.created_at)) ? 1 : -1
       );
@@ -85,15 +82,16 @@ const ReportPage = () => {
   }, [fetchSalesReport]);
 
   return (
-    <div className="h-min-screen">
+    <div className="h-min-screen bg-gradient-to-b from-white to-rose-50">
       <TripsNavbar />
       <div className="flex">
         <SideBar />
         <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
           <div className="flex flex-col container mx-auto p-8">
-            <h2 className="font-bold text-xl text-gray-800 mb-4">
+            <h2 className="font-bold text-xl text-gray-800">
               Analisis Penjualan
             </h2>
+            <div className="border-b-[1px] my-6"></div>
             <div className="flex flex-wrap gap-4 mb-6 items-center">
               {/* Date pickers for start and end dates */}
               <div className="flex gap-2 border border-rose-700 shadow-md p-2 rounded-xl">
