@@ -65,8 +65,10 @@ export const getPropertyAvailability = async (
     }
     const data = await response.json();
     return data;
-  } catch (error: any) {
-    console.error("Error fetching property availability:", error.message);
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Error fetching property availability:", errorMessage);
     throw error;
   }
 };

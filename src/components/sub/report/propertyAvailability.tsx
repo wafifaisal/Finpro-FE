@@ -17,17 +17,19 @@ const PropertyAvailabilityCalendar = ({
     IAvailabilityRecord[]
   >([]);
 
-  const fetchAvailability = async () => {
-    try {
-      const data = await getPropertyAvailability(tenantId);
-      setAvailabilityData(data);
-    } catch (error) {
-      console.error("Error fetching property availability:", error);
-    }
-  };
-
   useEffect(() => {
-    if (tenantId) fetchAvailability();
+    if (tenantId) {
+      const fetchAvailability = async () => {
+        try {
+          const data = await getPropertyAvailability(tenantId);
+          setAvailabilityData(data);
+        } catch (error) {
+          console.error("Error fetching property availability:", error);
+        }
+      };
+
+      fetchAvailability();
+    }
   }, [tenantId]);
 
   // Customize each calendar tile to display available and booked room numbers.
