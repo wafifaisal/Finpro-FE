@@ -1,6 +1,4 @@
 "use client";
-
-import { useEffect } from "react";
 import Loading from "@/app/loading";
 import RoomDetail from "@/components/main/propertyDetails/RoomDetail";
 import BookingCard from "@/components/main/propertyDetails/BookingCard/BookingCard";
