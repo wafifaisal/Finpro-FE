@@ -36,11 +36,11 @@ export default function Sidebar() {
 
       <Link
         className={`flex justify-center gap-2 font-semibold w-44 p-2 rounded-md ${
-          pathname === "/report"
+          pathname === "/tenant-report"
             ? "text-red-500 hover:text-red-700 border-b-2 border-red-500"
             : "text-gray-800 border-b-2 border-gray-800"
         }`}
-        href="/report"
+        href="/tenant-report"
       >
         <IoMdAnalytics className="text-2xl" />
         <p>Laporan</p>
