@@ -1,6 +1,6 @@
 import { IBooking, ICreateBooking } from "@/types/booking";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE; // Adjust the endpoint if needed
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
 export const getBooking = async (bookingId: string): Promise<IBooking> => {
   try {

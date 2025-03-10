@@ -1,6 +1,6 @@
 import { IBooking } from "@/types/booking";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE; //
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
 export async function getUserReviews(userId: string): Promise<IBooking[]> {
   try {

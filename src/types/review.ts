@@ -1,7 +1,7 @@
 export interface IUser {
   id: string;
   name: string;
-  avatar: string; // URL for the user's avatar image
+  avatar: string;
   email: string;
 }
 

@@ -2,28 +2,30 @@ import { BookingStatus, IBooking } from "@/types/booking";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
-export const getTenantBooking = async (
-  tenantId: string
-): Promise<IBooking[]> => {
-  try {
-    const response = await fetch(`${BASE_URL}/tenant-bookings/${tenantId}`, {
+interface ITenantBookingsResponse {
+  bookings: IBooking[];
+  totalPages: number;
+}
+
+export async function getTenantBooking(
+  tenantId: string,
+  queryString: string = ""
+): Promise<ITenantBookingsResponse> {
+  const response = await fetch(
+    `${BASE_URL}/tenant-bookings/${tenantId}?${queryString}`,
+    {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
-
-    const data = await response.json();
-    return data.bookings as IBooking[];
-  } catch (error) {
-    console.error("Failed to fetch tenant bookings:", error);
-    throw error;
+  );
+  if (!response.ok) {
+    throw new Error(`Error ${response.status}: ${response.statusText}`);
   }
-};
+  const data = await response.json();
+  return data;
+}
 
 export const updateBookingStatus = async (
   bookingId: string,

@@ -1,4 +1,4 @@
-import { RoomType } from "./roomTypes"; // Pastikan file roomTypes.ts sudah ada
+import { RoomType } from "./roomTypes";
 
 export interface SeasonalPrice {
   price: number;

@@ -32,7 +32,6 @@ const PropertyAvailabilityCalendar = ({
     }
   }, [tenantId]);
 
-  // Customize each calendar tile to display available and booked room numbers.
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view === "month") {
       const dateKey = dayjs(date).format("YYYY-MM-DD");

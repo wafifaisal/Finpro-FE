@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import TripsNavbar from "@/components/sub/trips/tripsNavbar";
 import SideBar from "@/components/sub/tenant-booking/sideBar";
 import Loading from "@/app/loading";
@@ -17,11 +18,26 @@ import {
   cancelBooking,
 } from "@/libs/tenantBooking";
 import { BookingStatus, IBooking } from "@/types/booking";
-import { useBookings } from "@/components/main/booking-management/useBookings";
+import { useBookings } from "@/hooks/useBookings";
+import BookingSearchFilter from "@/components/sub/tenant-booking/bookingSearchFilter";
+import BookingPagination from "@/components/sub/tenant-booking/bookingPagination";
 
 export default function BookingManagementPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { tenant } = useSession();
-  const { bookings, setBookings, loading } = useBookings(tenant?.id);
+
+  const initialFilterType = searchParams.get("filterType") || "property";
+  const initialSearchValue = searchParams.get("q") || "";
+  const currentPage = Number(searchParams.get("page")) || 1;
+
+  const { bookings, setBookings, loading, refetch, totalPages } = useBookings(
+    tenant?.id
+  );
+  const visibleBookings = bookings.filter(
+    (booking) => booking.status !== BookingStatus.canceled
+  );
+
   const [selectedImage] = useState<string | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
     bookingId: string;
@@ -30,9 +46,6 @@ export default function BookingManagementPage() {
   const [cancelDialog, setCancelDialog] = useState<string | null>(null);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] =
     useState<boolean>(false);
-  const [selectedTab, setSelectedTab] = useState<"ongoing" | "completed">(
-    "ongoing"
-  );
 
   if (loading) {
     return <Loading />;
@@ -52,11 +65,9 @@ export default function BookingManagementPage() {
     if (!confirmDialog) return;
     try {
       await updateBookingStatus(confirmDialog.bookingId, confirmDialog.status);
-
       if (confirmDialog.status === BookingStatus.completed) {
         await handleResendEmail(confirmDialog.bookingId);
       }
-
       setBookings((prev: IBooking[]) =>
         prev.map((booking) =>
           booking.id === confirmDialog.bookingId
@@ -65,7 +76,7 @@ export default function BookingManagementPage() {
         )
       );
       toast.success(`Status diperbarui menjadi ${confirmDialog.status}`);
-      window.location.reload();
+      refetch();
     } catch (err) {
       toast.error("Gagal memperbarui status");
       console.error("Error updating status:", err);
@@ -100,48 +111,76 @@ export default function BookingManagementPage() {
     setCancelDialog(bookingId);
   };
 
+  const handleSearch = (filterType: string, searchValue: string) => {
+    const params: Record<string, string> = {};
+    params.filterType = filterType;
+    if (
+      filterType === "status-new" ||
+      filterType === "status-waiting_payment" ||
+      filterType === "status-completed"
+    ) {
+      params.status = filterType.split("-")[1];
+    } else {
+      params.q = searchValue;
+      params.search = searchValue;
+    }
+    params.page = "1";
+    const queryString = new URLSearchParams(params).toString();
+    router.push(`?${queryString}`);
+    refetch();
+  };
+
+  const handleClearSearch = () => {
+    const params = new URLSearchParams();
+    params.set("filterType", "property");
+    params.set("q", "");
+    params.set("search", "");
+    params.set("page", "1");
+    router.push(`?${params.toString()}`);
+    refetch();
+  };
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", newPage.toString());
+    router.push(`?${params.toString()}`);
+    refetch();
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-white to-rose-50">
       <TripsNavbar />
       <div className="flex">
         <SideBar />
         <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
-          <div className="main-content flex flex-col p-4 md:p-8 mb-20">
+          <div className="main-content w-[80%] flex flex-col p-4 md:p-8 mb-20">
             <h1 className="text-2xl font-bold text-gray-900">Reservasi</h1>
             <p className="text-gray-500 mt-1 mb-6">
               Kelola semua pemesanan properti Anda
             </p>
-            <div className="flex mb-8 border-b">
-              <button
-                className={`py-3 px-6 font-medium text-sm transition-colors ${
-                  selectedTab === "ongoing"
-                    ? "text-rose-500 border-b-2 border-rose-500"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-                onClick={() => setSelectedTab("ongoing")}
-              >
-                Pemesanan Aktif
-              </button>
-              <button
-                className={`py-3 px-6 font-medium text-sm transition-colors ${
-                  selectedTab === "completed"
-                    ? "text-rose-500 border-b-2 border-rose-500"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-                onClick={() => setSelectedTab("completed")}
-              >
-                Selesai
-              </button>
-            </div>
+
+            <BookingSearchFilter
+              initialFilterType={initialFilterType}
+              initialSearchValue={initialSearchValue}
+              onSearch={handleSearch}
+              onClear={handleClearSearch}
+            />
 
             <BookingList
-              bookings={bookings}
-              selectedTab={selectedTab}
+              bookings={visibleBookings}
               selectedImage={selectedImage}
               onOpenConfirm={openConfirmDialog}
               onCancelBooking={openCancelDialog}
               handleResendEmail={handleResendEmail}
             />
+
+            {totalPages > 1 && (
+              <BookingPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
           </div>
 
           <ConfirmDialog
