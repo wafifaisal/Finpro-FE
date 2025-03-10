@@ -93,7 +93,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({
     <div className="mb-12 pb-12 border-b last:border-b-0">
       <div className="relative w-full mb-6 group">
         {roomUnavailable && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black rounded-xl bg-opacity-50">
             <p className="text-white text-xl font-bold">
               Kamar ini tidak tersedia
             </p>

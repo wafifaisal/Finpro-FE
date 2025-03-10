@@ -88,7 +88,11 @@ const PropertyDetailsComponent = ({
         <span className="text-sm text-gray-500">/ malam</span>
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-center">
-        <Link href={`/property/${property.id}`} onClick={handleButtonClick}>
+        <Link
+          href={`/property/${property.id}`}
+          target="_blank"
+          onClick={handleButtonClick}
+        >
           <button className="border text-white hover:text-black duration-300 relative group cursor-pointer overflow-hidden h-10 w-44 rounded-md bg-red-500 p-2 font-extrabold hover:bg-sky-700">
             <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-16 h-16 rounded-full group-hover:scale-150 duration-700 right-12 top-12 bg-[#EB5A3C]"></div>
             <div className="absolute group-hover:-top-1 group-hover:-right-2 z-10 w-12 h-12 rounded-full group-hover:scale-150 duration-700 right-20 -top-6 bg-[#DF9755]"></div>

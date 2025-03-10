@@ -16,10 +16,6 @@ import { Review as ReviewType } from "@/types/types";
 import Footer from "@/components/main/footer/footer";
 
 const PropertyDetail = ({ params }: { params: { id: string } }) => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const {
     property,
     showAllPhotos,
@@ -115,7 +111,7 @@ const PropertyDetail = ({ params }: { params: { id: string } }) => {
 
         <OwnerInfo tenant={property.tenant} />
 
-        <Reviews reviews={aggregatedReviews} />
+        <Reviews reviews={aggregatedReviews} tenantId={property.tenant.id} />
       </main>
       <Footer />
     </div>

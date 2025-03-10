@@ -1,4 +1,5 @@
 "use client";
+import { useSession } from "@/context/useSessionHook";
 import { useEffect, useState } from "react";
 import { FaStar, FaTicketAlt } from "react-icons/fa";
 import { RiMoneyDollarBoxFill } from "react-icons/ri";
@@ -10,11 +11,12 @@ export default function StatGrid() {
   const [expenditure, setExpenditure] = useState<number>(0);
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
+  const { user } = useSession();
+  const userId = user?.id;
 
-  // Deteksi ukuran layar
   useEffect(() => {
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 640); // breakpoint sesuai Tailwind 'sm'
+      setIsSmallScreen(window.innerWidth < 640);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -76,12 +78,16 @@ export default function StatGrid() {
 
     const fetchReviewCount = async () => {
       try {
+        if (!userId) {
+          console.error("No user id found");
+          return;
+        }
         const token = localStorage.getItem("token");
         if (!token) {
           console.error("No authentication token found");
           return;
         }
-        const response = await fetch(`${base_url}/reviews/count`, {
+        const response = await fetch(`${base_url}/reviews/count/${userId}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -100,7 +106,7 @@ export default function StatGrid() {
     fetchBookingCount();
     fetchExpenditure();
     fetchReviewCount();
-  }, [base_url]);
+  }, [base_url, userId]);
 
   const formatExpenditure = (value: number) => {
     if (isSmallScreen) {
@@ -113,25 +119,27 @@ export default function StatGrid() {
     });
   };
 
+  const stats = [
+    {
+      icon: FaTicketAlt,
+      label: "Jumlah Booking",
+      value: bookingCount.toString(),
+    },
+    {
+      icon: FaStar,
+      label: "Jumlah Review",
+      value: reviewCount.toString(),
+    },
+    {
+      icon: RiMoneyDollarBoxFill,
+      label: "Total Pengeluaran Anda",
+      value: formatExpenditure(expenditure),
+    },
+  ];
+
   return (
     <div className="px-0 md:px-4 mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {[
-        {
-          icon: FaTicketAlt,
-          label: "Jumlah Booking",
-          value: bookingCount.toString(),
-        },
-        {
-          icon: FaStar,
-          label: "Jumlah Review",
-          value: reviewCount.toString(),
-        },
-        {
-          icon: RiMoneyDollarBoxFill,
-          label: "Total Pengeluaran Anda",
-          value: formatExpenditure(expenditure),
-        },
-      ].map((stat, index) => (
+      {stats.map((stat, index) => (
         <div
           key={index}
           className={`bg-white border border-gray-100 rounded-xl p-6 shadow-sm transition-all duration-500 cursor-pointer ${

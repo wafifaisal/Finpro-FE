@@ -22,7 +22,8 @@ export interface Review {
   id: number;
   rating: number;
   review: string;
-  created_at?: string;
+  created_at?: Date | string;
+  updated_at?: Date | string;
   user?: {
     avatar: string;
     username: string;
