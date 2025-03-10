@@ -25,7 +25,6 @@ import { useSession } from "@/context/useSessionHook";
 import Loading from "@/app/loading";
 import withGuard from "@/hoc/pageGuard";
 
-// Define an interface for aggregated sales data
 interface AggregatedSalesData {
   created_at: string;
   total_price: number;
