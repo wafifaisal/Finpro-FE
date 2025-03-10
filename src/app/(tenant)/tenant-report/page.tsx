@@ -24,6 +24,7 @@ import { CustomizedYAxisTick } from "@/components/sub/report/yAxis";
 import { useSession } from "@/context/useSessionHook";
 import Loading from "@/app/loading";
 import withGuard from "@/hoc/pageGuard";
+import PropertyAvailability from "@/components/sub/report/propertyAvailability";
 
 // Define an interface for aggregated sales data
 interface AggregatedSalesData {
@@ -41,7 +42,7 @@ const ReportPage = () => {
 
   const today = dayjs();
   const defaultStartDate = today.subtract(1, "month").toDate();
-  const defaultEndDate = today.toDate();
+  const defaultEndDate = today.add(1, "day").toDate();
 
   const [salesData, setSalesData] = useState<AggregatedSalesData[]>([]);
   const sortBy: "date" | "total_penjualan" = "date";
@@ -91,9 +92,12 @@ const ReportPage = () => {
         <SideBar />
         <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
           <div className="flex flex-col container mx-auto p-8">
+            <h2 className="font-bold text-xl text-gray-800 mb-4">
+              Analisis Penjualan
+            </h2>
             <div className="flex flex-wrap gap-4 mb-6 items-center">
               {/* Date pickers for start and end dates */}
-              <div className="flex gap-2 border-[1px] border-rose-700 shadow-md p-2 rounded-xl">
+              <div className="flex gap-2 border border-rose-700 shadow-md p-2 rounded-xl">
                 <label className="text-sm font-semibold text-rose-700">
                   Start Date :
                 </label>
@@ -109,7 +113,7 @@ const ReportPage = () => {
               <div>
                 <FaArrowRight />
               </div>
-              <div className="flex gap-2 border-[1px] border-gray-700 shadow-md p-2 rounded-xl">
+              <div className="flex gap-2 border border-gray-700 shadow-md p-2 rounded-xl">
                 <label className="text-sm font-semibold text-gray-600">
                   End Date :
                 </label>
@@ -130,7 +134,6 @@ const ReportPage = () => {
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                {/* Use the aggregated date key */}
                 <XAxis
                   dataKey="created_at"
                   tickFormatter={(tick) => formatDate(tick, "MMMM dd, yyyy")}
@@ -154,6 +157,9 @@ const ReportPage = () => {
                 />
               </LineChart>
             </ResponsiveContainer>
+
+            <div className="w-full border-[1px] my-4"></div>
+            <PropertyAvailability tenantId={tenantId} />
           </div>
         </div>
       </div>

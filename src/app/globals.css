@@ -341,3 +341,9 @@ body {
 }
 
 .main-content { padding-top: 120px; }
+
+.react-calendar__tile--active {
+  background-color: #bdc6d3f2!important; 
+  border: none !important;
+  color: inherit;
+}
