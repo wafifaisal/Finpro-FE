@@ -9,30 +9,39 @@ import {
   FaTwitterSquare,
   FaLinkedin,
   FaWhatsapp,
-  FaInstagramSquare,
+  FaEnvelope,
 } from "react-icons/fa";
 import { Property } from "@/types/types";
 
-interface ShareModalProps {
+export interface ShareModalProps {
   shareUrl: string;
-  shareImage: string;
   shareTitle: string;
+  shareImage: string;
   shareDescription: string;
   property: Property;
   handleCopyLink: () => void;
   copyStatus: string;
   onClose: () => void;
+  linkShareTwitter: string;
+  linkShareWhatsapp: string;
+  linkShareFacebook: string;
+  linkShareLinkedin: string;
+  mailtoLink: string;
 }
 
 const ShareModal: React.FC<ShareModalProps> = ({
   shareUrl,
   shareImage,
-  shareTitle,
   shareDescription,
   property,
   handleCopyLink,
   copyStatus,
   onClose,
+  linkShareTwitter,
+  linkShareWhatsapp,
+  linkShareFacebook,
+  linkShareLinkedin,
+  mailtoLink,
 }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
@@ -79,7 +88,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
         <p className="text-sm text-gray-600 mb-4">Bagikan melalui:</p>
         <div className="grid grid-cols-5 gap-2 mb-6">
           <Link
-            href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
+            href={linkShareFacebook}
             target="_blank"
             rel="noopener noreferrer"
             className="flex flex-col items-center hover:scale-110 transition-transform"
@@ -90,9 +99,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <span className="text-xs mt-1">Facebook</span>
           </Link>
           <Link
-            href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-              shareUrl
-            )}&text=${encodeURIComponent(shareTitle)}`}
+            href={linkShareTwitter}
             target="_blank"
             rel="noopener noreferrer"
             className="flex flex-col items-center hover:scale-110 transition-transform"
@@ -103,9 +110,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <span className="text-xs mt-1">Twitter</span>
           </Link>
           <Link
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-              shareUrl
-            )}`}
+            href={linkShareLinkedin}
             target="_blank"
             rel="noopener noreferrer"
             className="flex flex-col items-center hover:scale-110 transition-transform"
@@ -116,9 +121,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <span className="text-xs mt-1">LinkedIn</span>
           </Link>
           <Link
-            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-              shareTitle + " " + shareUrl
-            )}`}
+            href={linkShareWhatsapp}
             target="_blank"
             rel="noopener noreferrer"
             className="flex flex-col items-center hover:scale-110 transition-transform"
@@ -129,15 +132,15 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <span className="text-xs mt-1">WhatsApp</span>
           </Link>
           <Link
-            href={`https://www.instagram.com/`}
+            href={mailtoLink}
             target="_blank"
             rel="noopener noreferrer"
             className="flex flex-col items-center hover:scale-110 transition-transform"
           >
-            <div className="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center">
-              <FaInstagramSquare className="w-6 h-6 text-pink-600" />
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+              <FaEnvelope className="w-6 h-6 text-gray-700" />
             </div>
-            <span className="text-xs mt-1">Instagram</span>
+            <span className="text-xs mt-1">Email</span>
           </Link>
         </div>
 

@@ -35,19 +35,33 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState("");
 
-  const domain = process.env.NEXT_PUBLIC_BASE_URL_FE;
-  const shareUrl = `${domain}/property/${property.id}`;
+  const shareUrl =
+    typeof window !== "undefined" ? window.location.href : "https://";
+  const shareTitle = `Lihat ${property.name}`;
+
+  // Definisikan link share sesuai template yang diberikan
+  const linkShareTwitter = `https://twitter.com/share?url=${encodeURIComponent(
+    shareUrl
+  )}&text=${encodeURIComponent(shareTitle)}`;
+  const linkShareWhatsapp = `whatsapp://send?text=${encodeURIComponent(
+    shareTitle
+  )}%0A${encodeURIComponent(shareUrl)}`;
+  const linkShareFacebook = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+    shareUrl
+  )}&title=${encodeURIComponent(shareTitle)}`;
+  const linkShareLinkedin = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(
+    shareTitle
+  )}%0A${encodeURIComponent(shareUrl)}`;
+  const mailtoLink = `mailto:?subject=${encodeURIComponent(
+    shareTitle
+  )}&body=${encodeURIComponent(shareUrl)}`;
 
   const shareImage =
     property.PropertyImages && property.PropertyImages.length > 0
       ? property.PropertyImages[0].image_url
       : "https://res.cloudinary.com/dkyco4yqp/image/upload/v1738528719/nginepin-logo_bzdcsu.png";
 
-  const shareTitle = `Lihat ${property.name}`;
-  const shareDescription = property.desc
-    ? property.desc.substring(0, 100) + "..."
-    : `Properti Eksklusif Untuk Liburanmu ${property.location.city}, ${property.location.country}`;
-
+  // Fungsi untuk menyalin URL ke clipboard
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -98,13 +112,18 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
       {isShareModalOpen && (
         <ShareModal
           shareUrl={shareUrl}
-          shareImage={shareImage}
           shareTitle={shareTitle}
-          shareDescription={shareDescription}
-          property={property}
+          shareImage={shareImage}
+          linkShareTwitter={linkShareTwitter}
+          linkShareWhatsapp={linkShareWhatsapp}
+          linkShareFacebook={linkShareFacebook}
+          linkShareLinkedin={linkShareLinkedin}
+          mailtoLink={mailtoLink}
           handleCopyLink={handleCopyLink}
           copyStatus={copyStatus}
           onClose={() => setIsShareModalOpen(false)}
+          shareDescription={""}
+          property={property}
         />
       )}
     </div>
