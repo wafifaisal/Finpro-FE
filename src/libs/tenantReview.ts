@@ -1,6 +1,6 @@
 import { IReview, IReviewReplies } from "../types/review";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE; // Backend URL
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE; 
 
 export async function getReviewsByTenant(tenantId: string): Promise<IReview[]> {
   try {
