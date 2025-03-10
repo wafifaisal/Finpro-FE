@@ -1,4 +1,4 @@
-import { ISalesReport } from "@/types/salesReport";
+import { IAvailabilityRecord, ISalesReport } from "@/types/salesReport";
 import Swal from "sweetalert2";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE;
@@ -43,6 +43,32 @@ export const getSalesReport = async (
       title: "Kesalahan!",
       text: errorMessage,
     });
+    throw error;
+  }
+};
+
+export const getPropertyAvailability = async (
+  tenantId: string
+): Promise<IAvailabilityRecord[]> => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/property-report?tenantId=${tenantId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Error fetching property availability:", errorMessage);
     throw error;
   }
 };

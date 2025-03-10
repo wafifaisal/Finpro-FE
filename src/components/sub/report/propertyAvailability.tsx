@@ -3,13 +3,8 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import dayjs from "dayjs";
 import { FaCalendarCheck, FaCalendarXmark } from "react-icons/fa6";
-
-interface AvailabilityRecord {
-  date: string; // expected ISO date string (YYYY-MM-DD)
-  available: number;
-  booked: number;
-  total: number;
-}
+import { getPropertyAvailability } from "@/libs/salesReport";
+import { IAvailabilityRecord } from "@/types/salesReport";
 
 interface PropertyAvailabilityCalendarProps {
   tenantId: string;
@@ -19,27 +14,22 @@ const PropertyAvailabilityCalendar = ({
   tenantId,
 }: PropertyAvailabilityCalendarProps) => {
   const [availabilityData, setAvailabilityData] = useState<
-    AvailabilityRecord[]
+    IAvailabilityRecord[]
   >([]);
-  const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
-
-  const fetchAvailability = async () => {
-    try {
-      const res = await fetch(
-        `${base_url}/property-report?tenantId=${tenantId}`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        // The data should be an array of objects with keys: date, available, booked, total.
-        setAvailabilityData(data);
-      }
-    } catch (error) {
-      console.error("Error fetching property availability:", error);
-    }
-  };
 
   useEffect(() => {
-    if (tenantId) fetchAvailability();
+    if (tenantId) {
+      const fetchAvailability = async () => {
+        try {
+          const data = await getPropertyAvailability(tenantId);
+          setAvailabilityData(data);
+        } catch (error) {
+          console.error("Error fetching property availability:", error);
+        }
+      };
+
+      fetchAvailability();
+    }
   }, [tenantId]);
 
   // Customize each calendar tile to display available and booked room numbers.

@@ -21,3 +21,10 @@ export interface ISalesReport {
     };
   };
 }
+
+export interface IAvailabilityRecord {
+  date: string;
+  available: number;
+  booked: number;
+  total: number;
+}
