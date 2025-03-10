@@ -1,4 +1,5 @@
 "use client";
+import { useSession } from "@/context/useSessionHook";
 import { useState, useEffect } from "react";
 import { FaHome, FaStar } from "react-icons/fa";
 import { FaMoneyBill } from "react-icons/fa6";
@@ -10,6 +11,8 @@ export default function StatGrid() {
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL_BE;
+  const { tenant } = useSession();
+  const tenantId = tenant?.id;
 
   useEffect(() => {
     const handleResize = () => {
@@ -72,7 +75,6 @@ export default function StatGrid() {
 
     const fetchReviewCount = async () => {
       try {
-        const tenantId = localStorage.getItem("tenantId");
         if (!tenantId) {
           console.error("No tenant id found");
           return;
@@ -82,17 +84,21 @@ export default function StatGrid() {
           console.error("No authentication token found");
           return;
         }
-        const response = await fetch(`${base_url}/review-reply/count-reviews`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `${base_url}/review-reply/count-reviews/${tenantId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setReviewCount(data.length);
+        setReviewCount(data.totalReviews);
       } catch (error) {
         console.error("Error fetching review count:", error);
       }
@@ -101,7 +107,7 @@ export default function StatGrid() {
     fetchPropertyCount();
     fetchSalesProfit();
     fetchReviewCount();
-  }, [base_url]);
+  }, [base_url, tenantId]);
 
   const formatSalesProfit = (profit: number): string => {
     if (isSmallScreen) {
