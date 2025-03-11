@@ -152,7 +152,7 @@ export default function BookingManagementPage() {
       <TripsNavbar />
       <div className="flex flex-col md:flex-row">
         <SideBar />
-        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
+        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24 mt-[-80px] md:mt-0">
           <div className="main-content w-full flex flex-col p-4 md:p-8 mb-20">
             <h1 className="text-2xl font-bold text-gray-900">Reservasi</h1>
             <p className="text-gray-500 mt-1 mb-6">
