@@ -136,7 +136,7 @@ function TenantReviewPage() {
       <TripsNavbar />
       <div className="flex flex-col md:flex-row">
         <SideBar />
-        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24 px-4 md:px-8">
+        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24 px-4 md:px-8 mt-[-80px] md:mt-0">
           <div className="main-content w-full flex flex-col p-4 md:p-8 mb-20">
             <h1 className="text-xl font-bold">Balas Ulasan</h1>
             <div className="border-b-[1px] my-6"></div>
