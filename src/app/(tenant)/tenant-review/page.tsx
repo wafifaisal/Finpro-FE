@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import TripsNavbar from "@/components/sub/trips/tripsNavbar";
 import { getReviewsByTenant, createReviewReply } from "@/libs/tenantReview";
 import { IReview } from "@/types/review";
 import SideBar from "@/components/sub/tenant-booking/sideBar";
-import TripsNavbar from "@/components/sub/trips/tripsNavbar";
 import {
   Dialog,
   DialogContent,
@@ -17,23 +17,40 @@ import withGuard from "@/hoc/pageGuard";
 import { useSession } from "@/context/useSessionHook";
 import Swal from "sweetalert2";
 import ReviewList from "@/components/sub/tenant-review/reviewList";
+import Pagination from "@/components/sub/tenant-booking/bookingPagination";
 
 function TenantReviewPage() {
   const { tenant } = useSession();
+
   const [reviews, setReviews] = useState<IReview[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [reply, setReply] = useState<{ [key: number]: string }>({});
   const [submitting, setSubmitting] = useState<{ [key: number]: boolean }>({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 4;
+  const [totalCount, setTotalCount] = useState(0);
+  const [displayType, setDisplayType] = useState<"replied" | "not_replied">(
+    "not_replied"
+  );
+
   useEffect(() => {
     async function fetchReviews() {
       if (!tenant) return;
+      setLoading(true);
       try {
-        const data = await getReviewsByTenant(tenant.id);
-        setReviews(data);
+        const data = await getReviewsByTenant(
+          tenant.id,
+          currentPage,
+          limit,
+          displayType
+        );
+        setReviews(data.reviews);
+        setTotalCount(data.pagination.total);
       } catch (error) {
         setError("Failed to load reviews.");
         console.error("Error fetching reviews:", error);
@@ -42,7 +59,11 @@ function TenantReviewPage() {
       }
     }
     fetchReviews();
-  }, [tenant]);
+  }, [tenant, currentPage, limit, displayType]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [displayType]);
 
   const handleReplyChange = (reviewId: number, value: string) => {
     setReply((prev) => ({ ...prev, [reviewId]: value }));
@@ -119,10 +140,36 @@ function TenantReviewPage() {
           <div className="main-content w-[80%] flex flex-col p-4 md:p-8 mb-20">
             <h1 className="text-xl font-bold">Balas Ulasan</h1>
             <div className="border-b-[1px] my-6"></div>
+
+            <div className="flex gap-4 mb-4">
+              <Button
+                onClick={() => setDisplayType("not_replied")}
+                className={
+                  displayType === "not_replied"
+                    ? "bg-rose-500 hover:bg-rose-700 text-white font-semibold"
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                }
+              >
+                Belum Diulas
+              </Button>
+              <Button
+                onClick={() => setDisplayType("replied")}
+                className={
+                  displayType === "replied"
+                    ? "bg-rose-500 hover:bg-rose-700 text-white font-semibold"
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                }
+              >
+                Sudah Diulas
+              </Button>
+            </div>
+
             {error ? (
               <p className="text-red-500">{error}</p>
             ) : reviews.length === 0 ? (
-              <p className="text-gray-500">No reviews yet.</p>
+              <p className="text-gray-500">
+                Tidak ada ulasan untuk ditampilkan.
+              </p>
             ) : (
               <ReviewList
                 reviews={reviews}
@@ -132,6 +179,11 @@ function TenantReviewPage() {
                 onOpenReply={openReplyDialog}
               />
             )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalCount / limit)}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
           </div>
         </div>
       </div>

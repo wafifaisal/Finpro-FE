@@ -28,20 +28,22 @@ const Reviews: React.FC<ReviewsProps> = ({ tenantId, itemsPerPage = 3 }) => {
       setIsLoading(true);
       try {
         const reviewsData = await getReviewsByTenant(tenantId);
-        const transformedReviews: Review[] = reviewsData.map((review) => ({
-          ...review,
-          created_at:
-            review.created_at instanceof Date
-              ? review.created_at.toISOString()
-              : review.created_at,
-          user: review.user
-            ? {
-                avatar: review.user.avatar,
-                username: review.user.name,
-                email: review.user.email,
-              }
-            : undefined,
-        }));
+        const transformedReviews: Review[] = reviewsData.reviews.map(
+          (review) => ({
+            ...review,
+            created_at:
+              review.created_at instanceof Date
+                ? review.created_at.toISOString()
+                : review.created_at,
+            user: review.user
+              ? {
+                  avatar: review.user.avatar,
+                  username: review.user.name,
+                  email: review.user.email,
+                }
+              : undefined,
+          })
+        );
         setReviewList(transformedReviews);
       } catch (error) {
         console.error("Error fetching reviews:", error);

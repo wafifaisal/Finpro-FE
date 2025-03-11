@@ -11,7 +11,6 @@ export default function Pagination({
   totalPages,
   onPageChange,
 }: PaginationProps) {
-  if (totalPages <= 1) return null;
   return (
     <div className="w-max mx-auto flex items-center justify-center gap-4 mt-8 shadow-md p-2 rounded-3xl bg-white">
       <button

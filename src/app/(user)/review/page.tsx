@@ -14,119 +14,177 @@ import withGuard from "@/hoc/pageGuard";
 import { FaQuoteLeft } from "react-icons/fa";
 import { LuCalendarArrowUp, LuCalendarArrowDown } from "react-icons/lu";
 import { MdOutlineRateReview } from "react-icons/md";
+import Pagination from "@/components/main/trips/Pagination";
 
 function ReviewPage() {
   const { user } = useSession();
   const [bookings, setBookings] = useState<IBooking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 4;
+  const [totalCount, setTotalCount] = useState(0);
+  const [displayType, setDisplayType] = useState<"reviewed" | "unreviewed">(
+    "unreviewed"
+  );
 
   useEffect(() => {
     const fetchReviews = async () => {
       if (!user) return;
+      setLoading(true);
       try {
-        const data = await getUserReviews(user.id);
-        setBookings(data);
+        const data = await getUserReviews(
+          user.id,
+          currentPage,
+          limit,
+          displayType
+        );
+        setBookings(data.bookings);
+        setTotalCount(data.pagination.total);
       } catch (error) {
         console.error("Failed to fetch reviews", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchReviews();
-  }, [user]);
+  }, [user, currentPage, limit, displayType]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [displayType]);
 
   if (loading) {
-    return <Loading />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loading />
+      </div>
+    );
   }
+
+  const totalPages = Math.ceil(totalCount / limit);
+
   return (
     <div className="min-h-screen">
       <TripsNavbar />
       <div className="main-content flex flex-col container mx-auto p-8 px-60">
-        <h1 className="text-xl font-bold mb-8">Ulasan Saya</h1>
-        {bookings.map((booking) => (
-          <div
-            key={booking.id}
-            className="flex w-full mx-auto border rounded-xl shadow-md mb-10"
+        <h1 className="text-xl font-bold">Ulasan Saya</h1>
+        <div className="border-b-[1px] w-full my-4"></div>
+        <div className="flex gap-4 mb-6">
+          <Button
+            onClick={() => setDisplayType("unreviewed")}
+            className={
+              displayType === "unreviewed"
+                ? "bg-rose-500 hover:bg-rose-700 text-white font-semibold"
+                : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+            }
           >
-            <div className="relative h-60 w-60">
-              <Image
-                src={
-                  booking.room_types.RoomImages[0].image_url ||
-                  "/placeholder.jpg"
-                }
-                alt="Room"
-                layout="fill"
-                className="object-cover rounded-l-xl"
-              />
-            </div>
+            Belum Diulas
+          </Button>
+          <Button
+            onClick={() => setDisplayType("reviewed")}
+            className={
+              displayType === "reviewed"
+                ? "bg-rose-500 hover:bg-rose-700 text-white font-semibold"
+                : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+            }
+          >
+            Sudah Diulas
+          </Button>
+        </div>
 
-            <div className="flex w-[70%]">
-              <div className="flex-1 p-4">
-                <p className="text-lg font-semibold">
-                  {booking.room_types.property.name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {booking.room_types.name}
-                </p>
-                <div className="flex justify-between mt-2 text-sm border-t-[1px] border-gray-300 p-1">
-                  <div className="flex flex-col">
-                    <div className="flex gap-1">
-                      <LuCalendarArrowUp className="my-1" />
-                      <p className="text-gray-500">Check-in</p>
+        {bookings.length === 0 ? (
+          <p className="text-gray-500">Tidak ada pesanan untuk ditampilkan.</p>
+        ) : (
+          bookings.map((booking) => (
+            <div
+              key={booking.id}
+              className="flex w-full mx-auto border rounded-xl shadow-md mb-10"
+            >
+              <div className="relative h-60 w-60">
+                <Image
+                  src={
+                    booking.room_types.RoomImages[0].image_url ||
+                    "/placeholder.jpg"
+                  }
+                  alt="Room"
+                  layout="fill"
+                  className="object-cover rounded-l-xl"
+                />
+              </div>
+
+              <div className="flex w-[70%]">
+                <div className="flex-1 p-4">
+                  <p className="text-lg font-semibold">
+                    {booking.room_types.property.name}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {booking.room_types.name}
+                  </p>
+                  <div className="flex justify-between mt-2 text-sm border-t-[1px] border-gray-300 p-1">
+                    <div className="flex flex-col">
+                      <div className="flex gap-1">
+                        <LuCalendarArrowUp className="my-1" />
+                        <p className="text-gray-500">Check-in</p>
+                      </div>
+                      <p className="font-semibold">
+                        {formatDateDay(booking.start_date)}
+                      </p>
                     </div>
-                    <p className="font-semibold">
-                      {formatDateDay(booking.start_date)}
-                    </p>
-                  </div>
-                  <div className="text-xl font-semibold text-gray-500">
-                    {">"}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex gap-1">
-                      <LuCalendarArrowDown className="my-1" />
-                      <p className="text-gray-500">Check-out</p>
+                    <div className="text-xl font-semibold text-gray-500">
+                      {">"}
                     </div>
-                    <p className="font-semibold">
-                      {formatDateDay(booking.end_date)}
-                    </p>
+                    <div className="flex flex-col">
+                      <div className="flex gap-1">
+                        <LuCalendarArrowDown className="my-1" />
+                        <p className="text-gray-500">Check-out</p>
+                      </div>
+                      <p className="font-semibold">
+                        {formatDateDay(booking.end_date)}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex-1 p-4 bg-gray-100 rounded-r-xl">
-                {booking.Review && booking.Review.length > 0 ? (
-                  <>
-                    <div className="flex gap-1 text-gray-600">
-                      <FaQuoteLeft />
-                      <p>Anda menulis</p>
-                    </div>
-                    <div className="flex gap-2 text-sm mt-8">
-                      <p className="text-white bg-yellow-500 rounded-l-3xl rounded-tr-3xl w-8 h-8 p-2 text-center content-center">
-                        {booking.Review[0]?.rating}/5
-                      </p>
-                      <p
-                        className="text-gray-800"
-                        dangerouslySetInnerHTML={{
-                          __html: booking.Review[0]?.review,
-                        }}
-                      ></p>
-                    </div>
-                  </>
-                ) : (
-                  <Link href={`/review/${booking.id}`}>
-                    <Button className="bg-rose-500 hover:bg-rose-600 text-white font-semibold w-full rounded-xl">
-                      <div className="flex gap-1">
-                        <p>Ulas Sekarang</p>
-                        <MdOutlineRateReview className="mt-1" />
+                <div className="flex-1 p-4 bg-gray-100 rounded-r-xl">
+                  {booking.Review && booking.Review.length > 0 ? (
+                    <>
+                      <div className="flex gap-1 text-gray-600">
+                        <FaQuoteLeft />
+                        <p>Anda menulis</p>
                       </div>
-                    </Button>
-                  </Link>
-                )}
+                      <div className="flex gap-2 text-sm mt-8">
+                        <p className="text-white bg-yellow-500 rounded-l-3xl rounded-tr-3xl w-8 h-8 p-2 text-center">
+                          {booking.Review[0]?.rating}/5
+                        </p>
+                        <p
+                          className="text-gray-800"
+                          dangerouslySetInnerHTML={{
+                            __html: booking.Review[0]?.review,
+                          }}
+                        ></p>
+                      </div>
+                    </>
+                  ) : (
+                    <Link href={`/review/${booking.id}`}>
+                      <Button className="bg-rose-500 hover:bg-rose-600 text-white font-semibold w-full rounded-xl">
+                        <div className="flex gap-1">
+                          <p>Ulas Sekarang</p>
+                          <MdOutlineRateReview className="mt-1" />
+                        </div>
+                      </Button>
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
     </div>
   );
