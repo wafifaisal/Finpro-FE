@@ -121,7 +121,7 @@ function TenantReviewPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-rose-50">
         <TripsNavbar />
-        <div className="flex">
+        <div className="flex flex-col md:flex-row">
           <SideBar />
           <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
             <p className="font-semibold p-4">Loading reviews...</p>
@@ -134,14 +134,14 @@ function TenantReviewPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-rose-50">
       <TripsNavbar />
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <SideBar />
-        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
-          <div className="main-content w-[80%] flex flex-col p-4 md:p-8 mb-20">
+        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24 px-4 md:px-8">
+          <div className="main-content w-full flex flex-col p-4 md:p-8 mb-20">
             <h1 className="text-xl font-bold">Balas Ulasan</h1>
             <div className="border-b-[1px] my-6"></div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <Button
                 onClick={() => setDisplayType("not_replied")}
                 className={

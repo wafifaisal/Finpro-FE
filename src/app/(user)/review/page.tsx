@@ -64,9 +64,10 @@ function ReviewPage() {
   const totalPages = Math.ceil(totalCount / limit);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-white to-rose-50">
       <TripsNavbar />
-      <div className="main-content flex flex-col container mx-auto p-8 px-60">
+      {/* Adjusted container: on mobile uses smaller horizontal padding */}
+      <div className="main-content flex flex-col container mx-auto p-8 px-4 md:px-60  mt-[-80px] md:mt-0 mb-16 md:mb-0">
         <h1 className="text-xl font-bold">Ulasan Saya</h1>
         <div className="border-b-[1px] w-full my-4"></div>
         <div className="flex gap-4 mb-6">
@@ -98,9 +99,10 @@ function ReviewPage() {
           bookings.map((booking) => (
             <div
               key={booking.id}
-              className="flex w-full mx-auto border rounded-xl shadow-md mb-10"
+              className="flex flex-col md:flex-row w-full mx-auto border rounded-xl shadow-md mb-10"
             >
-              <div className="relative h-60 w-60">
+              {/* Image container: full width on mobile, fixed on md+ */}
+              <div className="relative h-60 w-full md:w-60">
                 <Image
                   src={
                     booking.room_types.RoomImages[0].image_url ||
@@ -108,19 +110,20 @@ function ReviewPage() {
                   }
                   alt="Room"
                   layout="fill"
-                  className="object-cover rounded-l-xl"
+                  className="object-cover rounded-t-xl md:rounded-l-xl md:rounded-t-none"
                 />
               </div>
 
-              <div className="flex w-[70%]">
-                <div className="flex-1 p-4">
+              {/* Details container: stacks vertically on mobile, side-by-side on desktop */}
+              <div className="flex flex-col md:flex-row w-full md:w-[70%]">
+                <div className="w-full md:w-1/2 p-4">
                   <p className="text-lg font-semibold">
                     {booking.room_types.property.name}
                   </p>
                   <p className="text-sm text-gray-600">
                     {booking.room_types.name}
                   </p>
-                  <div className="flex justify-between mt-2 text-sm border-t-[1px] border-gray-300 p-1">
+                  <div className="flex justify-between mt-2 text-sm border-t border-gray-300 p-1">
                     <div className="flex flex-col">
                       <div className="flex gap-1">
                         <LuCalendarArrowUp className="my-1" />
@@ -145,7 +148,7 @@ function ReviewPage() {
                   </div>
                 </div>
 
-                <div className="flex-1 p-4 bg-gray-100 rounded-r-xl">
+                <div className="w-full md:w-1/2 p-4 bg-gray-100 md:rounded-r-xl">
                   {booking.Review && booking.Review.length > 0 ? (
                     <>
                       <div className="flex gap-1 text-gray-600">

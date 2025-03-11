@@ -9,9 +9,9 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="main-content w-[20%] min-h-screen flex flex-col items-center gap-4 bg-gray-100">
+    <div className="main-content w-full md:w-[20%] h-96 md:min-h-screen flex flex-col items-center gap-4 bg-gray-100 p-4">
       <Link
-        className={`flex gap-2 font-semibold w-44 p-2 rounded-md ${
+        className={`flex justify-center gap-2 font-semibold w-full md:w-44 p-2 rounded-md ${
           pathname === "/booking-management"
             ? "text-red-500 hover:text-red-700 border-b-2 border-red-500"
             : "text-gray-800 border-b-2 border-gray-800"
@@ -23,7 +23,7 @@ export default function Sidebar() {
       </Link>
 
       <Link
-        className={`flex justify-center gap-2 font-semibold w-44 p-2 rounded-md ${
+        className={`flex justify-center gap-2 font-semibold w-full md:w-44 p-2 rounded-md ${
           pathname === "/tenant-review"
             ? "text-red-500 hover:text-red-700 border-b-2 border-red-500"
             : "text-gray-800 border-b-2 border-gray-800"
@@ -35,7 +35,7 @@ export default function Sidebar() {
       </Link>
 
       <Link
-        className={`flex justify-center gap-2 font-semibold w-44 p-2 rounded-md ${
+        className={`flex justify-center gap-2 font-semibold w-full md:w-44 p-2 rounded-md ${
           pathname === "/tenant-report"
             ? "text-red-500 hover:text-red-700 border-b-2 border-red-500"
             : "text-gray-800 border-b-2 border-gray-800"

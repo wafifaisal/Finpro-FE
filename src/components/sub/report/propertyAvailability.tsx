@@ -55,7 +55,7 @@ const PropertyAvailabilityCalendar = ({
       <h2 className="font-bold text-xl text-gray-800 mb-4">
         Ketersediaan Properti
       </h2>
-      <div className="flex gap-6">
+      <div className="flex flex-col md:flex-row gap-6 mb-28">
         <Calendar tileContent={tileContent} className="react-calendar" />
         <div className="flex flex-col mt-4">
           <div className="flex gap-2 mb-2 text-gray-500">

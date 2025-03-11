@@ -103,7 +103,7 @@ function TripsPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-b from-white to-rose-50 pt-0 md:pt-20">
+      <div className="min-h-screen bg-gradient-to-b from-white to-rose-50 pt-0 md:pt-20 mb-16 md:mb-0">
         <div className="relative bg-rose-600 text-white overflow-hidden">
           <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10 animate-pulse"></div>
           <div className="container mx-auto px-4 py-8 relative z-10">
