@@ -22,7 +22,7 @@ const BookingSearchFilter: React.FC<BookingSearchFilterProps> = ({
   const [showFilterOptions, setShowFilterOptions] = useState(false);
 
   const filterOptions = [
-    { value: "property", label: "Filter" },
+    { value: "property", label: "Semua" },
     { value: "status-new", label: "Baru" },
     { value: "status-waiting_payment", label: "Sedang Diproses" },
     { value: "status-completed", label: "Selesai" },

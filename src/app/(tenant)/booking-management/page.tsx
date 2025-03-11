@@ -150,10 +150,10 @@ export default function BookingManagementPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-rose-50">
       <TripsNavbar />
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <SideBar />
         <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
-          <div className="main-content w-[80%] flex flex-col p-4 md:p-8 mb-20">
+          <div className="main-content w-full flex flex-col p-4 md:p-8 mb-20">
             <h1 className="text-2xl font-bold text-gray-900">Reservasi</h1>
             <p className="text-gray-500 mt-1 mb-6">
               Kelola semua pemesanan properti Anda

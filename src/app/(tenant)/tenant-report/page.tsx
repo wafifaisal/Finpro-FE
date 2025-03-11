@@ -82,18 +82,17 @@ const ReportPage = () => {
   }, [fetchSalesReport]);
 
   return (
-    <div className="h-min-screen bg-gradient-to-b from-white to-rose-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-rose-50">
       <TripsNavbar />
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <SideBar />
-        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-0 md:pt-24">
-          <div className="flex flex-col container mx-auto p-8">
+        <div className="w-full md:w-[80%] lg:w-[75%] xl:w-[80%] mx-auto pt-4 md:pt-24 px-4 md:px-8">
+          <div className="w-full max-w-6xl mx-auto">
             <h2 className="font-bold text-xl text-gray-800">
               Analisis Penjualan
             </h2>
             <div className="border-b-[1px] my-6"></div>
-            <div className="flex flex-wrap gap-4 mb-6 items-center">
-              {/* Date pickers for start and end dates */}
+            <div className="flex flex-col md:flex-row gap-4 mb-6 items-center">
               <div className="flex gap-2 border border-rose-700 shadow-md p-2 rounded-xl">
                 <label className="text-sm font-semibold text-rose-700">
                   Start Date :
@@ -154,7 +153,6 @@ const ReportPage = () => {
                 />
               </LineChart>
             </ResponsiveContainer>
-
             <div className="w-full border-[1px] my-4"></div>
             <PropertyAvailability tenantId={tenantId} />
           </div>
