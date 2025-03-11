@@ -2,9 +2,26 @@ import { IBooking } from "@/types/booking";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
-export async function getUserReviews(userId: string): Promise<IBooking[]> {
+export async function getUserReviews(
+  userId: string,
+  page: number,
+  limit: number,
+  displayType?: "reviewed" | "unreviewed"
+): Promise<{
+  bookings: IBooking[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}> {
   try {
-    const response = await fetch(`${BASE_URL}/reviews/${userId}`);
+    let url = `${BASE_URL}/reviews/${userId}?page=${page}&limit=${limit}`;
+    if (displayType) {
+      url += `&displayType=${displayType}`;
+    }
+    const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch reviews");
     return response.json();
   } catch (error) {

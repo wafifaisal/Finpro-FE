@@ -1,15 +1,30 @@
 import { IReview, IReviewReplies } from "../types/review";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE; 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_BE;
 
-export async function getReviewsByTenant(tenantId: string): Promise<IReview[]> {
+export async function getReviewsByTenant(
+  tenantId: string,
+  page: number = 1,
+  limit: number = 10,
+  displayType?: "replied" | "not_replied"
+): Promise<{
+  reviews: IReview[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}> {
   try {
-    const response = await fetch(`${BASE_URL}/review-reply/tenant/${tenantId}`);
-
+    let url = `${BASE_URL}/review-reply/tenant/${tenantId}?page=${page}&limit=${limit}`;
+    if (displayType) {
+      url += `&displayType=${displayType}`;
+    }
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Error fetching reviews: ${response.statusText}`);
     }
-
     return await response.json();
   } catch (error) {
     console.error("Failed to fetch reviews:", error);
