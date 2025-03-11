@@ -19,7 +19,7 @@ export default function ReviewCard({
   onOpenReply,
 }: ReviewCardProps) {
   return (
-    <div className="border p-4 rounded-xl bg-white shadow-md">
+    <div className="border p-4 rounded-xl bg-white shadow-md mt-8">
       {review.propertyName && (
         <p className="text-lg font-bold mb-1">{review.propertyName}</p>
       )}

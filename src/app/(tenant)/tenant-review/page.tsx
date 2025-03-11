@@ -141,7 +141,7 @@ function TenantReviewPage() {
             <h1 className="text-xl font-bold">Balas Ulasan</h1>
             <div className="border-b-[1px] my-6"></div>
 
-            <div className="flex gap-4 mb-4">
+            <div className="flex gap-4">
               <Button
                 onClick={() => setDisplayType("not_replied")}
                 className={
